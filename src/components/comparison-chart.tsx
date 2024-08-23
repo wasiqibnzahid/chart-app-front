@@ -106,7 +106,7 @@ const BarChart: React.FC<BarChartProps> = ({ data: propData }) => {
       return {
         series: [],
         names: [],
-        allNames: [],
+        allNames: allNames,
       };
     }
     if (!showAllData) {
@@ -377,14 +377,15 @@ const BarChart: React.FC<BarChartProps> = ({ data: propData }) => {
             style={{
               cursor: "pointer",
             }}
-            onClick={() => onClickHandler(name)}
           >
             <Checkbox
               size="sm"
               colorScheme="purple"
               isChecked={!removedNames.includes(name)}
+              id={`ASD-${name}`}
+              onChange={() => onClickHandler(name)}
             />
-            {name}
+            <label htmlFor={`ASD-${name}`}>{name}</label>
           </span>
         ))}
       </div>
