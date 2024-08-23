@@ -196,6 +196,7 @@ export const App = () => {
                     : currentQuarter.competition
                   )?.map((company) => (
                     <div
+                      key={company.name}
                       style={{
                         paddingLeft: "20%",
                         fontSize: "16px",
@@ -243,7 +244,7 @@ export const App = () => {
                       src={"/down.png"}
                       style={{
                         width: "20px",
-                        opacity: "0.5",
+                        opacity: "1",
                       }}
                     />
                   </span>
@@ -393,7 +394,7 @@ export const App = () => {
                       src={"/down.png"}
                       style={{
                         width: "20px",
-                        opacity: "0.5",
+                        opacity: "1",
                       }}
                     />
                   </span>
@@ -496,6 +497,7 @@ export const App = () => {
                     : currentQuarter.competition
                   )?.map((company) => (
                     <div
+                      key={company.name}
                       style={{
                         paddingLeft: "20%",
                         fontSize: "16px",
@@ -542,7 +544,7 @@ export const App = () => {
                       src={"/down.png"}
                       style={{
                         width: "20px",
-                        opacity: "0.5",
+                        opacity: "1",
                       }}
                     />
                   </span>

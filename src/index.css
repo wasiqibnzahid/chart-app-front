@@ -149,7 +149,7 @@ strong {
 
 .box {
   background-color: rgba(0, 0, 0, 0.27) !important;
-  padding: 25px 20px 0 20px;
+  padding: 25px 20px;
   border-radius: 17px;
 }
 
@@ -367,4 +367,5 @@ h5 {
 .box.pt-2.px-3 {
   display: flex;
   flex-direction: column;
+  padding-bottom: 0 !important;
 }
