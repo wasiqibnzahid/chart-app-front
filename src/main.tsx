@@ -13,8 +13,4 @@ function Main() {
     </ChakraProvider>
   );
 }
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <Main />
-</StrictMode>
-);
+createRoot(document.getElementById("root")!).render(<Main />);

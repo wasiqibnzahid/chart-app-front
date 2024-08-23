@@ -1,17 +1,15 @@
 import axios from "axios";
 
 interface DataPoint {
-  x: string; // Date or any other categorical value
-  y: number; // Numeric value
+  x: string;
+  y: number;
 }
 
-// Interface for a series
 interface Series {
-  name: string; // Name of the series (e.g., "Azteca UNO (Note)")
-  data: DataPoint[]; // Array of data points
+  name: string;
+  data: DataPoint[];
 }
 
-// Interface for the chart data
 export type ChartData = Series[];
 export interface ResData {
   changes: ChartData;
@@ -38,10 +36,44 @@ export interface Insights {
     competition: string;
   };
 }
+
+interface CompanyInsights {
+  name: string;
+  total: number;
+  video: number;
+  note: number;
+  total_change: number;
+  video_change: number;
+  note_change: number;
+}
+
 export async function getAverageData(): Promise<{
   weekly: ResData;
-  quarterly: ResData;
   comparison: ComparisonData;
 }> {
   return axios.get("http://localhost:8000/").then((res) => res.data);
+}
+export interface QuarterData {
+  Date: string;
+  "TV Azteca Change": number;
+  "Competition Change": number;
+  "TV Azteca Avg": number;
+  "Competition Avg": number;
+  "TV Azteca Video Change": number;
+  "Competition Video Change": number;
+  "TV Azteca Note Change": number;
+  "Competition Note Change": number;
+  "TV Azteca Video Avg": number;
+  "Competition Video Avg": number;
+  "TV Azteca Note Avg": number;
+  "Competition Note Avg": number;
+  competition: CompanyInsights[];
+  azteca: CompanyInsights[];
+}
+export async function getQuarterlyData(): Promise<QuarterData[]> {
+  return axios.get("http://localhost:8000/quarter").then((res) => res.data);
+}
+
+export async function getInsights(): Promise<Insights> {
+  return axios.post("http://localhost:8000/insights").then((res) => res.data);
 }

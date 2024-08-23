@@ -6,5 +6,7 @@
   ],
   "compilerOptions": {
     "allowJs": true, // Allow JavaScript files
+    "strictNullChecks": false
   }
+  
 }
