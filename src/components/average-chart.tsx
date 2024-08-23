@@ -1,7 +1,13 @@
 import { ApexOptions } from "apexcharts";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Chart from "react-apexcharts";
-import { ComparisonData, QuarterData, ResData } from "../data";
+import {
+  ComparisonData,
+  getInsights,
+  Insights,
+  QuarterData,
+  ResData,
+} from "../data";
 import {
   Button,
   Checkbox,
@@ -82,6 +88,20 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     }
     return mainDataUse;
   }, [data, selectedDropdown, quarterVal, selectedYear, showAllData]);
+  const [insightsData, setInsights] = useState<Insights>({
+    notes: {
+      competition: "",
+      self: "",
+    },
+    total: {
+      competition: "",
+      self: "",
+    },
+    videos: {
+      competition: "",
+      self: "",
+    },
+  });
   const optionsLine = useMemo<ApexOptions>(
     () => ({
       chart: {
@@ -256,12 +276,30 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     }),
     [dataToUse, showPercentages, showVals]
   );
+  const prevReqController = useRef(new AbortController());
+  useEffect(() => {
+    if (prevReqController.current) {
+      prevReqController.current.abort();
+    }
+    prevReqController.current = new AbortController();
+    getInsights(
+      {
+        start: `${quarterVal[0] > 8 ? "" : "0"}${
+          quarterVal[0] + 1
+        }-${selectedYear}`,
+        end: `${quarterVal[1] > 8 ? "" : "0"}${
+          quarterVal[1] + 1
+        }-${selectedYear}`,
+      },
+      prevReqController.current.signal
+    ).then((res) => setInsights(res));
+  }, [quarterVal]);
   const insights =
     selectedDropdown === "Both"
-      ? data.comparison.insights.total
+      ? insightsData.total
       : selectedDropdown === "Video"
-      ? data.comparison.insights.videos
-      : data.comparison.insights.notes;
+      ? insightsData.videos
+      : insightsData.notes;
   return (
     <div id="line-adwords">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -387,8 +425,14 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       </div>
       <h5>Insights</h5>
       <UnorderedList>
-        <ListItem>{insights.competition?.split(",")[0]}</ListItem>
-        <ListItem>{insights.self?.split(",")[0]}</ListItem>
+        <ListItem>
+          {insights.competition?.split(",")[0] ||
+            "No significant changes were observed across the Competition companies."}
+        </ListItem>
+        <ListItem>
+          {insights.self?.split(",")[0] ||
+            "No significant changes were observed across the TV Azteca companies."}
+        </ListItem>
       </UnorderedList>
     </div>
   );

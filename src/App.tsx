@@ -5,6 +5,7 @@ import {
   ComparisonData,
   getAverageData,
   getQuarterlyData,
+  Insights,
   QuarterData,
   ResData,
 } from "./data";
@@ -42,6 +43,7 @@ export const App = () => {
       },
     },
   });
+
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     getAverageData().then((res) =>

@@ -1,8 +1,14 @@
 import { ApexOptions } from "apexcharts";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Chart from "react-apexcharts";
-import { ComparisonData, QuarterData, ResData } from "../data";
+import {
+  ComparisonData,
+  getInsights,
+  Insights,
+  QuarterData,
+  ResData,
+} from "../data";
 import {
   Button,
   Checkbox,
@@ -118,6 +124,7 @@ const BarChart: React.FC<BarChartProps> = ({ data: propData }) => {
         }),
       }));
     }
+
     const firstItem = items[0];
 
     let dateList = firstItem.data.map((item) => item.x);
@@ -138,6 +145,38 @@ const BarChart: React.FC<BarChartProps> = ({ data: propData }) => {
     removedNames,
     showAllData,
   ]);
+  const [insightsData, setInsights] = useState<Insights>({
+    notes: {
+      competition: "",
+      self: "",
+    },
+    total: {
+      competition: "",
+      self: "",
+    },
+    videos: {
+      competition: "",
+      self: "",
+    },
+  });
+  const prevReqController = useRef(new AbortController());
+  useEffect(() => {
+    if (prevReqController.current) {
+      prevReqController.current.abort();
+    }
+    prevReqController.current = new AbortController();
+    getInsights(
+      {
+        start: `${quarterVal[0] > 8 ? "" : "0"}${
+          quarterVal[0] + 1
+        }-${selectedYear}`,
+        end: `${quarterVal[1] > 8 ? "" : "0"}${
+          quarterVal[1] + 1
+        }-${selectedYear}`,
+      },
+      prevReqController.current.signal
+    ).then((res) => setInsights(res));
+  }, [quarterVal]);
 
   const options: ApexOptions = {
     chart: {
@@ -197,10 +236,10 @@ const BarChart: React.FC<BarChartProps> = ({ data: propData }) => {
   }, [series]);
   const insights =
     selectedOption === "Both"
-      ? data.comparison.insights.total
+      ? insightsData.total
       : selectedOption === "Video"
-      ? data.comparison.insights.videos
-      : data.comparison.insights.notes;
+      ? insightsData.videos
+      : insightsData.notes;
 
   function onClickHandler(name: string) {
     if (!removedNames.includes(name)) {
@@ -408,8 +447,14 @@ const BarChart: React.FC<BarChartProps> = ({ data: propData }) => {
       <div className="mt-2">
         <h5>Insights</h5>
         <UnorderedList>
-          <ListItem>{insights.competition?.split(",")[0]}</ListItem>
-          <ListItem>{insights.self?.split(",")[0]}</ListItem>
+          <ListItem>
+            {insights.competition?.split(",")[0] ||
+              "No significant changes were observed across the Competition companies."}
+          </ListItem>
+          <ListItem>
+            {insights.self?.split(",")[0] ||
+              "No significant changes were observed across the TV Azteca companies."}
+          </ListItem>
         </UnorderedList>
       </div>
     </div>

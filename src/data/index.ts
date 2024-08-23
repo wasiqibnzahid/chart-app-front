@@ -74,6 +74,17 @@ export async function getQuarterlyData(): Promise<QuarterData[]> {
   return axios.get("http://localhost:8000/quarter").then((res) => res.data);
 }
 
-export async function getInsights(): Promise<Insights> {
-  return axios.post("http://localhost:8000/insights").then((res) => res.data);
+export async function getInsights(
+  data: {
+    start: string;
+    end: string;
+  },
+  signal: AbortSignal
+): Promise<Insights> {
+  return axios
+    .get("http://localhost:8000/insights", {
+      params: data,
+      signal,
+    })
+    .then((res) => res.data);
 }
