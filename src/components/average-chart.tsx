@@ -235,12 +235,14 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
           if (item && prevItem) {
             if (item > prevItem) {
               str += "▲ ";
-            } else {
+            } else if (item < prevItem) {
               str += "▼ ";
+            } else {
+              str += "- ";
             }
             let difference = item - prevItem;
             let percentageDifference = +((difference / prevItem) * 100).toFixed(
-              2
+              1
             );
             str += percentageDifference;
           }
@@ -260,15 +262,15 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         distributed: true,
         style: {
           colors: [
-            function (data: any) {
+            function (data: any): any {
               const item = data.series[data.seriesIndex][data.dataPointIndex];
               const prevItem =
                 data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
               if (item && prevItem) {
                 if (item > prevItem) return "#3dae63";
-                return "#dc2c3e";
+                else if (item < prevItem) return "#dc2c3e";
               }
-              return "#3dae63";
+              // return "#3dae63";
             },
           ],
         },
