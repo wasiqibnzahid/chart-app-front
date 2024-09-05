@@ -93,3 +93,10 @@ export async function getInsights(
     })
     .then((res) => res.data);
 }
+
+export async function runJob() {
+  return axios
+    .post("http://3.93.188.217:8000/insights")
+    .then((res) => res)
+    .catch((e) => console.error(e));
+}

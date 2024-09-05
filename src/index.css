@@ -369,3 +369,7 @@ h5 {
   flex-direction: column;
   padding-bottom: 0 !important;
 }
+
+.items-center {
+  align-items: center;
+}

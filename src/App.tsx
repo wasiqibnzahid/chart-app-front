@@ -8,10 +8,12 @@ import {
   Insights,
   QuarterData,
   ResData,
+  runJob,
 } from "./data";
-import { Radio, RadioGroup } from "@chakra-ui/react";
+import { Button, Radio, RadioGroup } from "@chakra-ui/react";
 import AnimateNumber from "./components/animate-number";
 import dayjs from "dayjs";
+import axios from "axios";
 
 export const App = () => {
   const [data, setData] = useState<{
@@ -96,9 +98,23 @@ export const App = () => {
           style={{ zIndex: "-1" }}
         />
       </div>
-      <div className="d-flex align-items-center title-section-i">
-        <img className="" src="/logo.png" />
-        Azteca Digital&nbsp;<span>Benchmarks</span>
+      <div
+        className="d-flex items-center justify-between"
+        style={{
+          paddingRight: "7rem",
+        }}
+        onClick={() => {
+          runJob().catch();
+          alert("Job running initiated");
+        }}
+      >
+        <div className="d-flex items-center title-section-i">
+          <img className="" src="/logo.png" />
+          Azteca Digital&nbsp;<span>Benchmarks</span>
+        </div>
+        <div>
+          <Button colorScheme="purple">Run Job</Button>
+        </div>
       </div>
       <div className="">
         <div
