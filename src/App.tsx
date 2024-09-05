@@ -110,9 +110,9 @@ export const App = () => {
           <img className="" src="/logo.png" />
           Azteca Digital&nbsp;<span>Benchmarks</span>
         </div>
-        <div>
+        {/* <div>
           <Button colorScheme="purple">Run Job</Button>
-        </div>
+        </div> */}
       </div>
       <div className="">
         <div
