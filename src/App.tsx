@@ -5,7 +5,6 @@ import {
   ComparisonData,
   getAverageData,
   getQuarterlyData,
-  Insights,
   QuarterData,
   ResData,
   runJob,
@@ -13,7 +12,6 @@ import {
 import { Button, Radio, RadioGroup } from "@chakra-ui/react";
 import AnimateNumber from "./components/animate-number";
 import dayjs from "dayjs";
-import axios from "axios";
 
 export const App = () => {
   const [data, setData] = useState<{
