@@ -50,8 +50,13 @@ interface CompanyInsights {
 export async function getAverageData(): Promise<{
   weekly: ResData;
   comparison: ComparisonData;
+  errors: {
+    id: number;
+    message: string;
+    created_at: string;
+  }[];
 }> {
-  return axios.get("http://localhost:8000/").then((res) => res.data);
+  return axios.get("http://3.93.188.217:8000/").then((res) => res.data);
 }
 export interface QuarterData {
   Date: string;
@@ -71,7 +76,7 @@ export interface QuarterData {
   azteca: CompanyInsights[];
 }
 export async function getQuarterlyData(): Promise<QuarterData[]> {
-  return axios.get("http://localhost:8000/quarter").then((res) => res.data);
+  return axios.get("http://3.93.188.217:8000/quarter").then((res) => res.data);
 }
 
 export async function getInsights(
@@ -82,7 +87,7 @@ export async function getInsights(
   signal: AbortSignal
 ): Promise<Insights> {
   return axios
-    .get("http://localhost:8000/insights", {
+    .get("http://3.93.188.217:8000/insights", {
       params: data,
       signal,
     })

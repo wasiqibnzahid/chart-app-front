@@ -11,6 +11,7 @@ import {
 } from "./data";
 import { Radio, RadioGroup } from "@chakra-ui/react";
 import AnimateNumber from "./components/animate-number";
+import dayjs from "dayjs";
 
 export const App = () => {
   const [data, setData] = useState<{
@@ -46,12 +47,22 @@ export const App = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
-    getAverageData().then((res) =>
+    getAverageData().then((res) => {
+      console.log("ZE RES", res);
+      if (res?.errors && res?.errors.length) {
+        let str = "";
+        res.errors.forEach((e) => {
+          str += `error: ${e.message} at ${dayjs(e.created_at).format(
+            "YYYY-MM-DD"
+          )} \r\n`;
+        });
+        alert(str);
+      }
       setData((old) => ({
         ...res,
         quarterData: old.quarterData,
-      }))
-    );
+      }));
+    });
     getQuarterlyData().then((res) =>
       setData((old) => ({ ...old, quarterData: res }))
     );
