@@ -18,6 +18,7 @@ export const App = () => {
     weekly: ResData;
     comparison: ComparisonData;
     quarterData: QuarterData[];
+    weekComparison?: QuarterData;
   }>({
     quarterData: [],
     weekly: {
@@ -64,7 +65,11 @@ export const App = () => {
       }));
     });
     getQuarterlyData().then((res) =>
-      setData((old) => ({ ...old, quarterData: res }))
+      setData((old) => ({
+        ...old,
+        quarterData: res.quarter,
+        weekComparison: res.week,
+      }))
     );
   }, []);
   const [isAzteca, setIsAzteca] = useState<[boolean, boolean, boolean]>([
@@ -72,7 +77,11 @@ export const App = () => {
     true,
     true,
   ]);
+  const [topbarMode, setTopbarMode] = useState<"quarter" | "week">("quarter");
   const currentQuarter = useMemo(() => {
+    if (topbarMode === "week") {
+      return data.weekComparison;
+    }
     let currentlyQuarter = 0;
     const currentMonth = new Date().getMonth();
     for (let i = 0; i < 4; i++) {
@@ -86,7 +95,11 @@ export const App = () => {
     return {
       ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
     };
-  }, [data.quarterData]);
+  }, [data.quarterData, data?.weekComparison, topbarMode]);
+
+  function changeTopbarMode() {
+    setTopbarMode(topbarMode === "quarter" ? "week" : "quarter");
+  }
   return (
     <div id="">
       <div>
@@ -206,7 +219,13 @@ export const App = () => {
                   </span>
                 </div>
                 <div className="d-flex justify-content-center align-items-center vs-quarter text-green">
-                  vs previous quarter
+                  vs previous&nbsp;{" "}
+                  <span
+                    onClick={changeTopbarMode}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    {topbarMode}
+                  </span>
                 </div>
                 <div
                   style={
@@ -219,8 +238,8 @@ export const App = () => {
                   }
                 >
                   {(isAzteca[0]
-                    ? currentQuarter.azteca
-                    : currentQuarter.competition
+                    ? currentQuarter?.azteca
+                    : currentQuarter?.competition
                   )?.map((company) => (
                     <div
                       key={company.name}
@@ -358,7 +377,13 @@ export const App = () => {
                   </span>
                 </div>
                 <div className="d-flex justify-content-center align-items-center vs-quarter text-green">
-                  vs previous quarter
+                  vs previous&nbsp;{" "}
+                  <span
+                    onClick={changeTopbarMode}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    {topbarMode}
+                  </span>
                 </div>
                 <div
                   style={
@@ -371,8 +396,8 @@ export const App = () => {
                   }
                 >
                   {(isAzteca[1]
-                    ? currentQuarter.azteca
-                    : currentQuarter.competition
+                    ? currentQuarter?.azteca
+                    : currentQuarter?.competition
                   )?.map((company) => (
                     <div
                       style={{
@@ -507,7 +532,13 @@ export const App = () => {
                   %
                 </div>
                 <div className="d-flex justify-content-center align-items-center vs-quarter">
-                  vs previous quarter
+                  vs previous&nbsp;{" "}
+                  <span
+                    onClick={changeTopbarMode}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    {topbarMode}
+                  </span>
                 </div>
                 <div
                   style={
@@ -520,8 +551,8 @@ export const App = () => {
                   }
                 >
                   {(isAzteca[2]
-                    ? currentQuarter.azteca
-                    : currentQuarter.competition
+                    ? currentQuarter?.azteca
+                    : currentQuarter?.competition
                   )?.map((company) => (
                     <div
                       key={company.name}

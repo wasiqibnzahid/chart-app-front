@@ -20,6 +20,7 @@ import {
   Select,
   UnorderedList,
 } from "@chakra-ui/react";
+
 const months = [
   "January", // 0
   "February", // 1
@@ -428,10 +429,11 @@ const BarChart: React.FC<BarChartProps> = ({ data: propData }) => {
           </Button>
         </div>
         <div className="d-flex justify-content-between slider-custom-text">
-          <span>Q1.{selectedYear.toString().substring(2)}</span>
-          <span>Q2.{selectedYear.toString().substring(2)}</span>
-          <span>Q3.{selectedYear.toString().substring(2)}</span>
-          <span>Q4.{selectedYear.toString().substring(2)}</span>
+          {months.map((month) => (
+            <span key={month}>
+              {month.substring(0, 3)}.{selectedYear.toString().substring(2)}
+            </span>
+          ))}
         </div>
         <div
           className="d-flex justify-content-center align-items-center"

@@ -333,14 +333,14 @@ h5 {
 }
 
 .slider-custom-text {
-  :nth-child(2) {
+  /* :nth-child(2) {
     position: absolute;
     left: 32.5%;
   }
   :nth-child(3) {
     position: absolute;
     right: 32.5%;
-  }
+  } */
   span {
     font-size: 12px !important;
   }
