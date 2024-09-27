@@ -37,7 +37,8 @@ export interface AverageChartProps {
     weekly: ResData;
     comparison: ComparisonData;
     quarterData: QuarterData[];
-  };
+  },
+  titleHeading: string;
 }
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
@@ -54,7 +55,7 @@ const months = [
   "November", // 10
   "December", // 11
 ];
-const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
+const PipeCombineChart: React.FC<AverageChartProps> = ({ data: propData, titleHeading }) => {
 
   // States
   const [showZoomIn, setShowZoomIn] = useState(false)
@@ -73,7 +74,6 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   const [selectedDropdown, setSelectedDropdown] = useState(dropdownOptions[0]);
   const [showVals, setShowVals] = useState(false);
   const [showPercentages, setShowPercentages] = useState(false);
-
   const dataToUse = useMemo(() => {
     let mainDataUse = [...data.weekly.data];
     mainDataUse = mainDataUse
@@ -123,81 +123,65 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       self: "",
     },
   });
-  const optionsLine = useMemo<ApexOptions>(
+  const optionsBar = useMemo(
     () => ({
       chart: {
-        animations: {},
+        type: "bar",
         height: 328,
-        type: "line",
-        zoom: {},
+        dropShadow: {
+          enabled: true,
+          top: 3,
+          left: 2,
+          blur: 4,
+          opacity: 1,
+        },
         toolbar: {
           show: false,
         },
       },
-      stroke: {
-        curve: "smooth",
-        width: 2,
+      grid: {
+        show: false, // Enable grid lines for a simple grid
       },
-      series: dataToUse.map((item, index) => ({
-        ...item,
-        color: index === 0 ? "#3bae63" : "#7444ba", // Line colors
-      })),
       fill: {
-        type: "gradient",
-        gradient: {
-          shade: "light",
-          type: "vertical",
-          gradientToColors: undefined, // Match gradient to line color
-          opacityFrom: 0.5, // Opacity at the top
-          opacityTo: 0.1, // Opacity at the bottom
-          stops: [0, 90, 100],
-          colorStops: [
-            {
-              offset: 0,
-              color: "#3bae63", // Gradient for the first line
-              opacity: 0.5,
-            },
-            {
-              offset: 100,
-              color: "#3bae63",
-              opacity: 0.1,
-            },
-            {
-              offset: 0,
-              color: "#7444ba", // Gradient for the second line
-              opacity: 0.5,
-            },
-            {
-              offset: 100,
-              color: "#7444ba",
-              opacity: 0.1,
-            },
-          ],
+        opacity: 1, // Solid color fill
+      },
+      plotOptions: {
+        bar: {
+          columnWidth: "45%",
+          borderRadius: 5, // Rounded corners for the bars
+          distributed: false, // Colors are assigned by series
         },
       },
+      colors: dataToUse.map((item) => {
+        if (item.name.includes("Azteca")) {
+          return "#3bae63"; // Green for Azteca
+        } else if (item.name.includes("Comp")) {
+          return "#7444ba"; // Purple for Comp
+        }
+        return "#0574cd"; // Default color (blue) for others
+      }),
+      stroke: {
+        width: 0, // No stroke around the bars
+      },
+      series: dataToUse.map((item) => ({
+        ...item,
+        color: undefined, // Custom color already defined in `colors`
+      })),
       title: {
         align: "left",
         offsetY: 25,
         offsetX: 20,
-      },
-      markers: {
-        size: 6,
-        strokeWidth: 0,
-        hover: {
-          size: 9,
-        },
-      },
-      grid: {
-        show: false, // Disable grid lines
-        padding: {
-          bottom: 0,
-        },
       },
       xaxis: {
         tooltip: {
           enabled: false,
         },
         type: "datetime",
+        labels: {
+          style: {
+            colors: "#ffffff", // Customize to match your design
+          },
+        },
       },
       yaxis: {
         labels: {
@@ -211,19 +195,11 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         horizontalAlign: "center",
       },
       dataLabels: {
-        offsetY:
-          showVals && showPercentages
-            ? -20
-            : showVals
-            ? -10
-            : showPercentages
-            ? -10
-            : 0,
+        offsetY: showVals && showPercentages ? -20 : showVals ? -10 : showPercentages ? -10 : 0,
         enabled: true,
-        formatter(val, data): any {
+        formatter(val, data) {
           const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
-          const prevItem =
-            dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
+          const prevItem = dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
           let str = "";
           if (item && prevItem) {
             if (item > prevItem) {
@@ -253,14 +229,14 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         distributed: true,
         style: {
           colors: [
-            function (data: any): any {
+            function (data) {
               const item = data.series[data.seriesIndex][data.dataPointIndex];
-              const prevItem =
-                data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
+              const prevItem = data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
               if (item && prevItem) {
-                if (item > prevItem) return "#3bae63";
-                else if (item < prevItem) return "#dc2c3e";
+                if (item > prevItem) return "#3dae63"; // Green for increase
+                else if (item < prevItem) return "#dc2c3e"; // Red for decrease
               }
+              return undefined;
             },
           ],
         },
@@ -269,14 +245,11 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     [dataToUse, showPercentages, showVals]
   );
   
-  
-  // const optionsLine = useMemo<ApexOptions>(
+  //  const optionsBar = useMemo(
   //   () => ({
   //     chart: {
-  //       animations: {},
+  //       type: "bar",
   //       height: 328,
-  //       type: "line",
-  //       zoom: {},
   //       dropShadow: {
   //         enabled: true,
   //         top: 3,
@@ -288,28 +261,34 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //         show: false,
   //       },
   //     },
+  //     grid: {
+  //       show: false // Disable grid lines
+  //     },
+  //     fill: {
+  //       opacity: 1, // Solid color fill
+  //     },
+  //     plotOptions: {
+  //       bar: {
+  //         columnWidth: "45%",
+  //         borderRadius: 5, // Rounded corners for the bars
+  //         distributed: false, // Set to true for separate coloring of bars
+  //       },
+  //     },
+  //     colors: ["#3bae63", "#0574cd", "#7444ba", "#f32e42", "#fdc437"], // Custom colors for bars
   //     stroke: {
-  //       curve: "smooth",
-  //       width: 2,
+  //       width: 0, // No stroke around the bars
   //     },
   //     series: dataToUse.map((item, index) => ({
   //       ...item,
-  //       color: index === 1 ? "#fdc437" : undefined,
+  //       color: index === 1 ? "#fdc437" : undefined, // Set custom color for specific series if needed
   //     })),
   //     title: {
   //       align: "left",
   //       offsetY: 25,
   //       offsetX: 20,
   //     },
-  //     markers: {
-  //       size: 6,
-  //       strokeWidth: 0,
-  //       hover: {
-  //         size: 9,
-  //       },
-  //     },
   //     grid: {
-  //       show: false, // Disable grid lines
+  //       show: true,
   //       padding: {
   //         bottom: 0,
   //       },
@@ -317,7 +296,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //     fill: {
   //       type: "gradient",
   //       gradient: {
-  //         type: "horizontal",
+  //         type: "horizontal", // Gradient from left to right
   //         colorStops: [
   //           [
   //             {
@@ -325,34 +304,27 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //               color: "#3bae63",
   //               opacity: 1,
   //             },
-  //             // {
-  //             //   offset: 40,
-  //             //   color: "#0574cd",
-  //             //   opacity: 1,
-  //             // },
-  //             // {
-  //             //   offset: 60,
-  //             //   color: "#7444ba",
-  //             //   opacity: 1,
-  //             // },
-  //             // {
-  //             //   offset: 80,
-  //             //   color: "#f32e42",
-  //             //   opacity: 1,
-  //             // },
-  //             // {
-  //             //   offset: 100,
-  //             //   color: "#fdc437",
-  //             //   opacity: 1,
-  //             // },
+  //             {
+  //               offset: 40,
+  //               color: "#0574cd",
+  //               opacity: 1,
+  //             },
+  //             {
+  //               offset: 60,
+  //               color: "#7444ba",
+  //               opacity: 1,
+  //             },
+  //             {
+  //               offset: 80,
+  //               color: "#f32e42",
+  //               opacity: 1,
+  //             },
+  //             {
+  //               offset: 100,
+  //               color: "#fdc437",
+  //               opacity: 1,
+  //             },
   //           ],
-  //           // [
-  //           //   {
-  //           //     offset: 100,
-  //           //     color: "#fdc437",
-  //           //     opacity: 1,
-  //           //   },
-  //           // ],
   //         ],
   //       },
   //     },
@@ -360,18 +332,12 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //       tooltip: {
   //         enabled: false,
   //       },
-  //       // labels: {
-  //       //   ...(isQuarterly
-  //       //     ? {
-  //       //         formatter(value) {
-  //       //           return "Q" + value;
-  //       //         },
-  //       //       }
-  //       //     : {
-  //       //         formatter: undefined,
-  //       //       }),
-  //       // },
   //       type: "datetime",
+  //       labels: {
+  //         style: {
+  //           colors: "#ffffff", // Customize to match your design
+  //         },
+  //       },
   //     },
   //     yaxis: {
   //       labels: {
@@ -383,22 +349,13 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //     legend: {
   //       position: "bottom",
   //       horizontalAlign: "center",
-  //       // offsetY: -20,
   //     },
   //     dataLabels: {
-  //       offsetY:
-  //         showVals && showPercentages
-  //           ? -20
-  //           : showVals
-  //             ? -10
-  //             : showPercentages
-  //               ? -10
-  //               : 0,
+  //       offsetY: showVals && showPercentages ? -20 : showVals ? -10 : showPercentages ? -10 : 0,
   //       enabled: true,
-  //       formatter(val, data): any {
+  //       formatter(val, data) {
   //         const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
-  //         const prevItem =
-  //           dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
+  //         const prevItem = dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
   //         let str = "";
   //         if (item && prevItem) {
   //           if (item > prevItem) {
@@ -409,9 +366,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //             str += "- ";
   //           }
   //           let difference = item - prevItem;
-  //           let percentageDifference = +((difference / prevItem) * 100).toFixed(
-  //             1
-  //           );
+  //           let percentageDifference = +((difference / prevItem) * 100).toFixed(1);
   //           str += percentageDifference;
   //         }
   //         const res = [];
@@ -430,15 +385,14 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //       distributed: true,
   //       style: {
   //         colors: [
-  //           function (data: any): any {
+  //           function (data) {
   //             const item = data.series[data.seriesIndex][data.dataPointIndex];
-  //             const prevItem =
-  //               data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
+  //             const prevItem = data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
   //             if (item && prevItem) {
   //               if (item > prevItem) return "#3dae63";
   //               else if (item < prevItem) return "#dc2c3e";
   //             }
-  //             // return "#3dae63";
+  //             return undefined;
   //           },
   //         ],
   //       },
@@ -446,6 +400,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //   }),
   //   [dataToUse, showPercentages, showVals]
   // );
+
   const prevReqController = useRef(new AbortController());
   useEffect(() => {
     if (prevReqController.current) {
@@ -474,7 +429,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       {/* Header Text */}
       <div className="justify-content-between align-items-center mb-4">
         <div>
-          <h5>General Azteca vs Competition Overview</h5>
+          <h5>{titleHeading}</h5>
         </div>
 
         <section className="VerticalBarChart__legend">
@@ -614,13 +569,13 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
 
 
       {/* Chart */}
-      <Chart
+      {/* <Chart
         options={optionsLine}
         series={optionsLine.series}
         type="line"
-        height={250}
-      />
-
+        height={500}
+      /> */}
+      <Chart options={optionsBar} series={dataToUse} type="bar" height={228} />
       {/* Range Line */}
       <div
         className="px-4 mb-3 slider-container"
@@ -657,6 +612,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
 
 
       {/* Open When user click on Zoom in then show this */}
+
       <section style={{
         marginTop: "3%",
         overflow: "hidden",
@@ -665,137 +621,136 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         <Box p={0} borderRadius="md" color="white">
 
           {
-            showControls && (
-              <>
+            showControls && (<>
 
-                {/* Check Box Row's */}
-                <section style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "start",
-                  alignItems: "start",
-                  textAlign: "center",
-                  gap: 5,
-                  marginBottom: "2%"
-                }}>
-                  {/* control SVG Start */}
-                  <div>
-                    <button
-                      onClick={() => setShowControls(!showControls)}
-                      style={{
-                        outline: "none",
-                        border: "none",
-                        cursor: "pointer"
-                      }}
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-                        <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
-                        <g id="SVGRepo_iconCarrier">
-                          <path d="M6 5V20"
-                            stroke={showControls ? "white" : "gray"}
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                          <path d="M12 5V20"
-                            stroke={showControls ? "white" : "gray"}
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                          <path d="M18 5V20"
-                            stroke={showControls ? "white" : "gray"}
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                          <path d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                            fill={showControls ? "white" : "gray"}
-                          />
-                          <path d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                            fill={showControls ? "white" : "gray"}
-                          />
-                          <path d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                            fill={showControls ? "white" : "gray"}
-                          />
-                        </g>
-                      </svg>
-                    </button>
-                  </div>
-                  {/* Control SVG End */}
-                  <div>
-                    <Stack direction="row" spacing={5} align="center" mb={0}>
-                      <Checkbox
-                        id="x-scheme"
-                        isChecked={showPercentages}
-                        onChange={(e) => setShowPercentages(e.target.checked)}
-                        colorScheme="transparent"
-                        outline="none"
-                        iconColor="white"
-                        borderColor="white"
-                        size="lg"
-                      >Show percentages</Checkbox>
-
-                      <Checkbox
-                        id="show-all-data"
-                        isChecked={showAllData}
-                        onChange={(e) => setShowAllData(e.target.checked)}
-                        colorScheme="transparent"
-                        outline="none"
-                        iconColor="white"
-                        borderColor="white"
-                        size="lg"
-                      >Show All Data</Checkbox>
-
-                      <Checkbox
-                        id="raw-value"
-                        checked={showVals}
-                        onChange={(e) => setShowVals(e.target.checked)}
-                        colorScheme="transparent"
-                        outline="none"
-                        iconColor="white"
-                        borderColor="white"
-                        size="lg"
-                      >Show Raw Values</Checkbox>
-                    </Stack>
-                  </div>
-                </section>
-
-                <HStack spacing={4} mb={8}>
-                  <Checkbox
-                    colorScheme="transparent"
-                    outline="none"
-                    iconColor="white"
-                    borderColor="white"
-                    size="lg"
-                  />
-                  <Select
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
+              {/* Check Box Row's */}
+              <section style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "start",
+                alignItems: "start",
+                textAlign: "center",
+                gap: 5,
+                marginBottom: "2%"
+              }}>
+                {/* control SVG Start */}
+                <div>
+                  <button
+                    onClick={() => setShowControls(!showControls)}
                     style={{
-                      height: "30px",
-                      fontSize: "14px",
-                      padding: "4px",
-                      borderRadius: "5px"
+                      outline: "none",
+                      border: "none",
+                      cursor: "pointer"
                     }}
                   >
-                    <option value="17-Jul-4">17-Jul-4</option>
-                  </Select>
-                </HStack>
-              </>
-            )
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                      <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
+                      <g id="SVGRepo_iconCarrier">
+                        <path d="M6 5V20"
+                          stroke={showControls ? "white" : "gray"}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <path d="M12 5V20"
+                          stroke={showControls ? "white" : "gray"}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <path d="M18 5V20"
+                          stroke={showControls ? "white" : "gray"}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <path d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
+                          fill={showControls ? "white" : "gray"}
+                        />
+                        <path d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
+                          fill={showControls ? "white" : "gray"}
+                        />
+                        <path d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
+                          fill={showControls ? "white" : "gray"}
+                        />
+                      </g>
+                    </svg>
+                  </button>
+                </div>
+                {/* Control SVG End */}
+                <div>
+                  <Stack direction="row" spacing={5} align="center" mb={0}>
+                    <Checkbox
+                      id="x-scheme"
+                      isChecked={showPercentages}
+                      onChange={(e) => setShowPercentages(e.target.checked)}
+                      colorScheme="transparent"
+                      outline="none"
+                      iconColor="white"
+                      borderColor="white"
+                      size="lg"
+                    >Show percentages</Checkbox>
+
+                    <Checkbox
+                      id="show-all-data"
+                      isChecked={showAllData}
+                      onChange={(e) => setShowAllData(e.target.checked)}
+                      colorScheme="transparent"
+                      outline="none"
+                      iconColor="white"
+                      borderColor="white"
+                      size="lg"
+                    >Show All Data</Checkbox>
+
+                    <Checkbox
+                      id="raw-value"
+                      checked={showVals}
+                      onChange={(e) => setShowVals(e.target.checked)}
+                      colorScheme="transparent"
+                      outline="none"
+                      iconColor="white"
+                      borderColor="white"
+                      size="lg"
+                    >Show Raw Values</Checkbox>
+                  </Stack>
+                </div>
+              </section>
+
+              <HStack spacing={4} mb={8}>
+                <Checkbox
+                  colorScheme="transparent"
+                  outline="none"
+                  iconColor="white"
+                  borderColor="white"
+                  size="lg"
+                />
+                <Select
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  style={{
+                    height: "30px",
+                    fontSize: "14px",
+                    padding: "4px",
+                    borderRadius: "5px"
+                  }}
+                >
+                  <option value="17-Jul-4">17-Jul-4</option>
+                </Select>
+              </HStack>
+
+            </>)
           }
 
           {
             showZoomIn && (
               <section style={{
                 transition: "max-height 0.7s ease",
-                maxHeight: showZoomIn ? "200px" : "0px"
+                maxHeight: showZoomIn ? "500px" : "0px"
               }}>
-                <Stack spacing={2} mb={0}>
+                <Stack spacing={2} mb={4}>
                   <HStack style={{
                     display: "flex",
                     flexDirection: "row",
@@ -858,9 +813,8 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
           }
         </Box>
       </section>
-
     </div>
   );
 };
 
-export default AverageChart;
+export default PipeCombineChart;
