@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import PipeChart from "../components/PipeChart";
 import PipeCombineChart from "../components/PipeCombineChart";
 import PipCombineGrouped from "../components/PipCombineChartGrouped";
+import { ExpandWrapper } from "../components/expand-wrapper";
 
 export const GeneralOverview = () => {
   const [data, setData] = useState<{
@@ -587,7 +588,9 @@ export const GeneralOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="line-adwords" className="">
-              <AverageChart data={data} />
+              <ExpandWrapper>
+                <AverageChart data={data} />
+              </ExpandWrapper>
             </div>
           </div>
         </div>
@@ -597,11 +600,13 @@ export const GeneralOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <PipCombineGrouped
-                data={data}
-                hideChecked
-                titleHeading="General Overview - TVA vs. Comp. Individual Bar charts"
-              />
+              <ExpandWrapper>
+                <PipCombineGrouped
+                  data={data}
+                  hideChecked
+                  titleHeading="General Overview - TVA vs. Comp. Individual Bar charts"
+                />
+              </ExpandWrapper>
             </div>
           </div>
         </div>

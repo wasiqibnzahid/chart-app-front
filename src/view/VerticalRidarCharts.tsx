@@ -1,10 +1,27 @@
-import {SimpleGrid } from '@chakra-ui/react';
-import RadarChart from '../components/VerticalRadarChart';
+import { SimpleGrid } from "@chakra-ui/react";
+import RadarChart from "../components/VerticalRadarChart";
+import { ExpandWrapper } from "../components/expand-wrapper";
 
 const VerticalRidarCharts = () => {
   // Data for the two charts
-  const tvAztecaLabels = ['UNO', 'Deportes', 'Noticias', 'ADN40', 'a+', 'Azteca 7'];
-  const competitorLabels = ['El Heraldo', 'NY Times', 'Televisa', 'Milenio', 'Infobae', 'El Universal', 'AS', 'Terra'];
+  const tvAztecaLabels = [
+    "UNO",
+    "Deportes",
+    "Noticias",
+    "ADN40",
+    "a+",
+    "Azteca 7",
+  ];
+  const competitorLabels = [
+    "El Heraldo",
+    "NY Times",
+    "Televisa",
+    "Milenio",
+    "Infobae",
+    "El Universal",
+    "AS",
+    "Terra",
+  ];
 
   // Sample Data (Week/Month data for Video, Nota, General)
   const tvAztecaDataSets = {
@@ -31,30 +48,32 @@ const VerticalRidarCharts = () => {
 
   return (
     <SimpleGrid columns={[1, 2]} spacing={5}>
-      <section className='box'>
-        <RadarChart
-          title="TVA"
-          labels={tvAztecaLabels}
-          dataSets={{
-            Video: tvAztecaDataSets.Video,
-            Nota: tvAztecaDataSets.Nota,
-          }}
-        />
+      <section className="box">
+        <ExpandWrapper>
+          <RadarChart
+            title="TVA"
+            labels={tvAztecaLabels}
+            dataSets={{
+              Video: tvAztecaDataSets.Video,
+              Nota: tvAztecaDataSets.Nota,
+            }}
+          />
+        </ExpandWrapper>
       </section>
-      <section className='box'>
-        <RadarChart
-          title="Comp."
-          labels={competitorLabels}
-          dataSets={{
-            Video: competitorDataSets.Video,
-            Nota: competitorDataSets.Nota,
-          }}
-        />
+      <section className="box">
+        <ExpandWrapper>
+          <RadarChart
+            title="Comp."
+            labels={competitorLabels}
+            dataSets={{
+              Video: competitorDataSets.Video,
+              Nota: competitorDataSets.Nota,
+            }}
+          />
+        </ExpandWrapper>
       </section>
     </SimpleGrid>
   );
-}
+};
 
 export default VerticalRidarCharts;
-
-

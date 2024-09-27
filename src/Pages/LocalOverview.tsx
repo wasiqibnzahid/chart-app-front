@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import BarChart from "../components/comparison-chart";
+import { ComparisonData, ResData, runJob } from "../data";
 import {
-  ComparisonData,
-  ResData,
-  runJob,
-} from "../data";
-import {getLocalQuarterlyData,LocalQuarterData,getLocalAverageData} from "../data/local_data_api_calls.ts"
+  getLocalQuarterlyData,
+  LocalQuarterData,
+  getLocalAverageData,
+} from "../data/local_data_api_calls.ts";
 import { Radio, RadioGroup, SimpleGrid } from "@chakra-ui/react";
-
 
 import AnimateNumber from "../components/animate-number";
 import dayjs from "dayjs";
@@ -15,7 +14,7 @@ import PerformanceMap from "../components/PerformanceMap";
 import Heatmap from "../view/Heatmap";
 import WeekChart from "../components/WeekChart";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup.tsx";
-
+import { ExpandWrapper } from "../components/expand-wrapper.tsx";
 
 export const LocalOverview = () => {
   const [data, setData] = useState<{
@@ -52,9 +51,7 @@ export const LocalOverview = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-
   useEffect(() => {
-
     getLocalAverageData().then((res) => {
       console.log("ZE RES", res);
       if (res?.errors && res?.errors.length) {
@@ -66,12 +63,15 @@ export const LocalOverview = () => {
         });
         alert(str);
       }
-      setData((old) => (
-        console.log(old.quarterData),
-        {
-        ...res,
-        quarterData: old.quarterData,
-      }));
+      setData(
+        (old) => (
+          console.log(old.quarterData),
+          {
+            ...res,
+            quarterData: old.quarterData,
+          }
+        )
+      );
     });
 
     getLocalQuarterlyData().then((res) =>
@@ -83,18 +83,13 @@ export const LocalOverview = () => {
     );
   }, []);
 
-  
-
-
   const [isAzteca, setIsAzteca] = useState<[boolean, boolean, boolean]>([
     true,
     true,
     true,
   ]);
 
-
   const [topbarMode, setTopbarMode] = useState<"month" | "week">("month");
-
 
   const currentQuarter = useMemo(() => {
     if (topbarMode === "week") {
@@ -118,14 +113,11 @@ export const LocalOverview = () => {
   function changeTopbarMode() {
     setTopbarMode(topbarMode === "month" ? "week" : "month");
   }
-  
+
   return (
-
     <div className="main">
-
       {/* Row 1 */}
       <div className="d-flex top-row text-white custom-row">
-
         {/* General */}
         <div className="box pt-2 px-3 ">
           <div className="d-flex align-items-center justify-content-between">
@@ -177,12 +169,13 @@ export const LocalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[0]
-              ? currentQuarter?.["Azteca Avg Change"]
-              : currentQuarter?.["Competition Avg Change"]) || 1) > 0
-              ? "text-green"
-              : "text-red"
-              }`}
+            className={`d-flex justify-content-center align-items-center percentage-change ${
+              ((isAzteca[0]
+                ? currentQuarter?.["Azteca Avg Change"]
+                : currentQuarter?.["Competition Avg Change"]) || 1) > 0
+                ? "text-green"
+                : "text-red"
+            }`}
           >
             <span className="arrow">
               {((isAzteca[0]
@@ -219,9 +212,9 @@ export const LocalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                  height: "0",
-                  overflow: "hidden",
-                }
+                    height: "0",
+                    overflow: "hidden",
+                  }
             }
           >
             {(isAzteca[0]
@@ -241,8 +234,9 @@ export const LocalOverview = () => {
                 </span>{" "}
                 {company.total.toFixed?.(0)}%{" "}
                 <span
-                  className={`${company.total_change < 0 ? "text-red" : "text-green"
-                    }`}
+                  className={`${
+                    company.total_change < 0 ? "text-red" : "text-green"
+                  }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -334,18 +328,18 @@ export const LocalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[1]
-              ? currentQuarter?.["Azteca Note Change"]
-              : currentQuarter?.["Competition Note Change"]) || 1) > 0
-              ? "text-green"
-              : "text-red"
-              }`}
+            className={`d-flex justify-content-center align-items-center percentage-change ${
+              ((isAzteca[1]
+                ? currentQuarter?.["Azteca Note Change"]
+                : currentQuarter?.["Competition Note Change"]) || 1) > 0
+                ? "text-green"
+                : "text-red"
+            }`}
           >
             <span className="arrow">
               {((isAzteca[1]
                 ? currentQuarter?.["Azteca Note Change"]
-                : currentQuarter?.["Competition Note Change"]) || 1) >
-                0 ? (
+                : currentQuarter?.["Competition Note Change"]) || 1) > 0 ? (
                 <>&uarr;</>
               ) : (
                 <>&darr;</>
@@ -377,9 +371,9 @@ export const LocalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                  height: "0",
-                  overflow: "hidden",
-                }
+                    height: "0",
+                    overflow: "hidden",
+                  }
             }
           >
             {(isAzteca[1]
@@ -398,8 +392,9 @@ export const LocalOverview = () => {
                 </span>{" "}
                 {company.note.toFixed?.(0)}%{" "}
                 <span
-                  className={`${company.note_change < 0 ? "text-red" : "text-green"
-                    }`}
+                  className={`${
+                    company.note_change < 0 ? "text-red" : "text-green"
+                  }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -480,7 +475,6 @@ export const LocalOverview = () => {
                 </div>
               </RadioGroup>
             </div>
-
           </div>
 
           <div className="d-flex justify-content-center align-items-center percentage">
@@ -495,18 +489,18 @@ export const LocalOverview = () => {
           </div>
 
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[2]
-              ? currentQuarter?.["Azteca Video Change"]
-              : currentQuarter?.["Competition Video Change"]) || 1) > 0
-              ? "text-green"
-              : "text-red"
-              }`}
+            className={`d-flex justify-content-center align-items-center percentage-change ${
+              ((isAzteca[2]
+                ? currentQuarter?.["Azteca Video Change"]
+                : currentQuarter?.["Competition Video Change"]) || 1) > 0
+                ? "text-green"
+                : "text-red"
+            }`}
           >
             <span className="arrow">
               {((isAzteca[2]
                 ? currentQuarter?.["Azteca Video Change"]
-                : currentQuarter?.["Competition Video Change"]) || 1) >
-                0 ? (
+                : currentQuarter?.["Competition Video Change"]) || 1) > 0 ? (
                 <>&uarr;</>
               ) : (
                 <>&darr;</>
@@ -539,9 +533,9 @@ export const LocalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                  height: "0",
-                  overflow: "hidden",
-                }
+                    height: "0",
+                    overflow: "hidden",
+                  }
             }
           >
             {(isAzteca[2]
@@ -561,8 +555,9 @@ export const LocalOverview = () => {
                 </span>{" "}
                 {company.video.toFixed?.(0)}%{" "}
                 <span
-                  className={`${company.video_change < 0 ? "text-red" : "text-green"
-                    }`}
+                  className={`${
+                    company.video_change < 0 ? "text-red" : "text-green"
+                  }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -608,10 +603,10 @@ export const LocalOverview = () => {
       <div className="row custom-row">
         <div className="col-12">
           <SimpleGrid columns={[1, 2]} spacing={5}>
-            <section className='boxHeatmap'>
+            <section className="boxHeatmap">
               <PerformanceMap />
             </section>
-            <section className='box'>
+            <section className="box">
               <Heatmap />
             </section>
           </SimpleGrid>
@@ -623,7 +618,12 @@ export const LocalOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <BarChart data={data} titleHeading="Local Overview - TVA - Individual Bar Chart" />
+              <ExpandWrapper>
+                <BarChart
+                  data={data}
+                  titleHeading="Local Overview - TVA - Individual Bar Chart"
+                />
+              </ExpandWrapper>
             </div>
           </div>
         </div>
@@ -634,14 +634,18 @@ export const LocalOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <ComparisonNoGroup data={data} titleHeading="Local Overview - TVA - Week by Week Bar Chart" />
+              <ExpandWrapper>
+                <ComparisonNoGroup
+                  data={data}
+                  titleHeading="Local Overview - TVA - Week by Week Bar Chart"
+                />
+              </ExpandWrapper>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 };
 
-export default LocalOverview
+export default LocalOverview;

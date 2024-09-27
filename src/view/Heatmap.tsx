@@ -1,3 +1,4 @@
+import { ExpandWrapper } from "../components/expand-wrapper";
 import RadarChart from "../components/RadarChart";
 
 function Heatmap() {
@@ -36,15 +37,17 @@ function Heatmap() {
   };
 
   return (
-    <RadarChart
-      title="Local Companies Performance"
-      labels={companyLabels}
-      dataSets={{
-        Video: companyDataSets.Video,
-        Nota: companyDataSets.Nota,
-        General: companyDataSets.General,
-      }}
-    />
+    <ExpandWrapper>
+      <RadarChart
+        title="Local Companies Performance"
+        labels={companyLabels}
+        dataSets={{
+          Video: companyDataSets.Video,
+          Nota: companyDataSets.Nota,
+          General: companyDataSets.General,
+        }}
+      />
+    </ExpandWrapper>
   );
 }
 

@@ -13,6 +13,7 @@ import AnimateNumber from "../components/animate-number";
 import dayjs from "dayjs";
 import VerticalRidarCharts from "../view/VerticalRidarCharts";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup";
+import { ExpandWrapper } from "../components/expand-wrapper";
 
 export const VerticalOverview = () => {
   const [data, setData] = useState<{
@@ -583,10 +584,12 @@ export const VerticalOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <BarChart
-                data={data}
-                titleHeading="Vertrical Overview - TVA vs. Comp. - Individual Bar Chart"
-              />
+              <ExpandWrapper>
+                <BarChart
+                  data={data}
+                  titleHeading="Vertrical Overview - TVA vs. Comp. - Individual Bar Chart"
+                />
+              </ExpandWrapper>
             </div>
           </div>
         </div>
@@ -596,10 +599,12 @@ export const VerticalOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <ComparisonNoGroup
-                data={data}
-                titleHeading="Vertical Overview - TVA vs. Comp. - Week by Week Bar Chart"
-              />
+              <ExpandWrapper>
+                <ComparisonNoGroup
+                  data={data}
+                  titleHeading="Vertical Overview - TVA vs. Comp. - Week by Week Bar Chart"
+                />
+              </ExpandWrapper>
             </div>
           </div>
         </div>
