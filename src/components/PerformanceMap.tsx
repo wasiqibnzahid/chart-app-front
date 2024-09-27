@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Box, Text, Button, HStack } from "@chakra-ui/react";
+import { Box, Text, Button, HStack } from '@chakra-ui/react'
 const citiesData = [
   {
     name: "Chihuahua",
@@ -155,8 +155,8 @@ const PerformanceMap = () => {
         attributionControl={false}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
+          url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg"
+          attribution="&copy; CNES, Distribution Airbus DS, &copy; Airbus DS, &copy; PlanetObserver (Contains Copernicus Data) | &copy; Stadia Maps, &copy; OpenMapTiles, &copy; OpenStreetMap contributors"
         />
 
         {citiesData.map((city, idx) => (
@@ -165,7 +165,10 @@ const PerformanceMap = () => {
             center={[city.lat, city.lng]}
             color="black" // Border color
             radius={10}
-            fillColor={getColor(city.performances[view][0], currentPerformance)} // Use correct view performance
+            fillColor={getColor(
+              city.performances[view][0],
+              currentPerformance
+            )} // Use correct view performance
             fillOpacity={0.8}
           >
             <Tooltip direction="top" offset={[0, -10]} opacity={1}>

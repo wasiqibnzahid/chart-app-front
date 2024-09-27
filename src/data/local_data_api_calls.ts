@@ -44,8 +44,8 @@ export async function getLocalAverageData(): Promise<{
       created_at: string;
     }[];
   }> {
-    // return axios.get("http://52.90.192.106:8000/").then((res) => res.data);
-    return axios.get("http://52.90.192.106:8000/local").then((res) => res.data);
+    // return axios.get("http://54.159.137.198:8000/").then((res) => res.data);
+    return axios.get("http://54.159.137.198:8000/local").then((res) => res.data);
   }
 
 
@@ -64,24 +64,24 @@ interface LocalCompanyInsights {
   }
 export interface LocalQuarterData {
     Date: string;
-    "TV Azteca Avg": number;
+    "Azteca Avg": number;
     "Competition Avg": number;
-    "TV Azteca Note Avg": number;
+    "Azteca Note Avg": number;
     "Competition Note Avg": number;
-    "TV Azteca Video Avg": number;
+    "Azteca Video Avg": number;
     "Competition Video Avg": number;
-    "TV Azteca Avg Change": number;
+    "Azteca Avg Change": number;
     "Competition Avg Change": number;
-    "TV Azteca Note Change": number;
+    "Azteca Note Change": number;
     "Competition Note Change": number;
-    "TV Azteca Video Change": number;
+    "Azteca Video Change": number;
     "Competition Video Change": number;
     competition: LocalCompanyInsights[];
     azteca: LocalCompanyInsights[];
   }
 export async function getLocalQuarterlyData(): Promise<{
     quarter: LocalQuarterData[];
-    week: LocalQuarterData
+    week: LocalQuarterData;
   }> {
-    return axios.get("http://52.90.192.106:8000/local/quarter").then((res) => res.data);
+    return axios.get("http://54.159.137.198:8000/local/quarter").then((res) => res.data);
 }
