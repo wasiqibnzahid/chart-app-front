@@ -248,7 +248,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
               str += "- ";
             }
             let difference = item - prevItem;
-            let percentageDifference = +((difference / prevItem) * 100).toFixed(
+            let percentageDifference = +((difference / prevItem) * 100).toFixed?.(
               1
             );
             str += percentageDifference;
@@ -407,7 +407,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
   //             str += "- ";
   //           }
   //           let difference = item - prevItem;
-  //           let percentageDifference = +((difference / prevItem) * 100).toFixed(1);
+  //           let percentageDifference = +((difference / prevItem) * 100).toFixed?.(1);
   //           str += percentageDifference;
   //         }
   //         const res = [];

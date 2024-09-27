@@ -224,7 +224,7 @@ export const GeneralOverview = () => {
                 <span style={{ fontWeight: "bold", fontSize: "16px" }}>
                   {company.name.replace("Azteca ", "")}:
                 </span>{" "}
-                {company.total.toFixed(0)}%{" "}
+                {company.total.toFixed?.(0)}%{" "}
                 <span
                   className={`${
                     company.total_change < 0 ? "text-red" : "text-green"
@@ -233,7 +233,7 @@ export const GeneralOverview = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ({company.total_change.toFixed(1)}%)
+                  ({company.total_change.toFixed?.(1)}%)
                 </span>
               </div>
             ))}
@@ -382,7 +382,7 @@ export const GeneralOverview = () => {
                 <span style={{ fontWeight: "bold", fontSize: "16px" }}>
                   {company.name.replace("Azteca ", "")}:
                 </span>{" "}
-                {company.note.toFixed(0)}%{" "}
+                {company.note.toFixed?.(0)}%{" "}
                 <span
                   className={`${
                     company.note_change < 0 ? "text-red" : "text-green"
@@ -391,7 +391,7 @@ export const GeneralOverview = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ({company.note_change.toFixed(1)}%)
+                  ({company.note_change.toFixed?.(1)}%)
                 </span>
               </div>
             ))}
@@ -538,7 +538,7 @@ export const GeneralOverview = () => {
                 <span style={{ fontWeight: "bold", fontSize: "16px" }}>
                   {company.name.replace("Azteca ", "")}:
                 </span>{" "}
-                {company.video.toFixed(0)}%{" "}
+                {company.video.toFixed?.(0)}%{" "}
                 <span
                   className={`${
                     company.video_change < 0 ? "text-red" : "text-green"
@@ -547,7 +547,7 @@ export const GeneralOverview = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ({company.video_change.toFixed(1)}%)
+                  ({company.video_change.toFixed?.(1)}%)
                 </span>
               </div>
             ))}

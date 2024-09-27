@@ -234,7 +234,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
               str += "- ";
             }
             let difference = item - prevItem;
-            let percentageDifference = +((difference / prevItem) * 100).toFixed(1);
+            let percentageDifference = +((difference / prevItem) * 100).toFixed?.(1);
             str += percentageDifference;
           }
           const res = [];
@@ -409,7 +409,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   //             str += "- ";
   //           }
   //           let difference = item - prevItem;
-  //           let percentageDifference = +((difference / prevItem) * 100).toFixed(
+  //           let percentageDifference = +((difference / prevItem) * 100).toFixed?.(
   //             1
   //           );
   //           str += percentageDifference;

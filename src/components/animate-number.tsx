@@ -19,5 +19,5 @@ export default function AnimateNumber({
     }, 500 / item);
     return () => clearInterval(interval);
   }, [number]);
-  return <>{state.toFixed(0)}</>;
+  return <>{state.toFixed?.(0)}</>;
 }

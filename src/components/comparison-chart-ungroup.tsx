@@ -246,7 +246,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
         colors: ["#fff"], // White color for visibility
       },
       formatter: function (val) {
-        return val % 1 === 0 ? val.toFixed(0) : val.toFixed(2);
+        return val % 1 === 0 ? val.toFixed?.(0) : val.toFixed?.(2);
       },
       offsetY: -20, // Position the label above the bar
     },
@@ -273,7 +273,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
     return names.map((_name, index) => {
       const first = series?.[0]?.data?.[index];
       const last = series?.[series.length - 1]?.data?.[index];
-      return Number(calculatePercentageChange(first, last).toFixed(0));
+      return Number(calculatePercentageChange(first, last).toFixed?.(0));
     });
   }, [series]);
   const insights =
