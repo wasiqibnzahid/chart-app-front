@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import PerformanceMap from "../components/PerformanceMap";
 import Heatmap from "../view/Heatmap";
 import WeekChart from "../components/WeekChart";
+import ComparisonNoGroup from "../components/comparison-chart-ungroup.tsx";
 
 
 export const LocalOverview = () => {
@@ -633,7 +634,7 @@ export const LocalOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <BarChart data={data} titleHeading="Local Overview - TVA - Week by Week Bar Chart" />
+              <ComparisonNoGroup data={data} titleHeading="Local Overview - TVA - Week by Week Bar Chart" />
             </div>
           </div>
         </div>

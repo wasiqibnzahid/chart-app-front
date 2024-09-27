@@ -1,12 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-// Charts
+// Chart
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
-
-// Images
-import InsightsLogo from "../assets/Insights.svg";
-import ControlsLogo from "../assets/Controls.svg";
 
 // Api
 import {
@@ -19,28 +15,18 @@ import {
 
 // UI Elements
 import {
-  Box,
-  Button,
   Checkbox,
   RangeSlider,
   RangeSliderFilledTrack,
   RangeSliderThumb,
   RangeSliderTrack,
   Select,
+  Box,
   Stack,
   Text,
   HStack,
 } from "@chakra-ui/react";
 
-export interface AverageChartProps {
-  data: {
-    weekly: ResData;
-    comparison: ComparisonData;
-    quarterData: QuarterData[];
-  };
-  titleHeading: string;
-}
-const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
   "January", // 0
   "February", // 1
@@ -55,47 +41,104 @@ const months = [
   "November", // 10
   "December", // 11
 ];
-const PipeCombineChart: React.FC<AverageChartProps> = ({
+const colors = [
+  "#FF5733",
+  "#33FF57",
+  "#3357FF",
+  "#F1C40F",
+  "#9B59B6",
+  "#E67E22",
+  "#2ECC71",
+  "#3498DB",
+  "#E74C3C",
+  "#1ABC9C",
+  "#F39C12",
+  "#D35400",
+  "#8E44AD",
+  "#16A085",
+  "#C0392B",
+  "#27AE60",
+  "#2980B9",
+  "#F5B041",
+  "#E67E22",
+  "#9B59B6",
+  "#34495E",
+  "#BDC3C7",
+  "#C0392B",
+  "#2E86C1",
+  "#F4D03F",
+  "#D68910",
+  "#A569BD",
+  "#1F618D",
+  "#7D3F8C",
+  "#2C3E50",
+  "#45B39D",
+];
+
+export interface BarChartProps {
+  data: {
+    weekly: ResData;
+    comparison: ComparisonData;
+    quarterData: QuarterData[];
+  };
+  titleHeading: string;
+  disableGrouping?: boolean;
+}
+function calculatePercentageChange(num1: number, num2: number) {
+  const difference = num2 - num1;
+  const percentageChange = (difference / num1) * 100;
+  return percentageChange;
+}
+const dropdownOptions = ["Video", "Note", "Both"];
+
+const ComparisonNoGroup: React.FC<BarChartProps> = ({
   data: propData,
   titleHeading,
+  disableGrouping = false,
 }) => {
+  console.log(`ddd`, propData);
   // States
-  const [showZoomIn, setShowZoomIn] = useState(false);
-  const [showControls, setShowControls] = useState(false);
   const [dateFilter, setDateFilter] = useState("17-Jul-4");
-
-  //
+  const [quarterVal, setQuarterVal] = useState([0, 11]);
   const [showAllData, setShowAllData] = useState(false);
   const [data, setData] = useState(propData);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [isChecked, setIsChecked] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(dropdownOptions[0]);
+  const [removedNames, setRemovedNames] = useState<string[]>([]);
+  const [showRawValues, setShowRawValues] = useState(false);
+  const [showZoomIn, setShowZoomIn] = useState(false);
+  const [showControls, setShowControls] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  // Show and hide Menu
+  const handleCheckboxChange = () => {
+    setShowRawValues(!showRawValues); // Toggle the state
+  };
+
   useEffect(() => {
     setData(propData);
   }, [propData]);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [quarterVal, setQuarterVal] = useState([0, 11]);
 
-  const [selectedDropdown, setSelectedDropdown] = useState(dropdownOptions[0]);
-  const [showVals, setShowVals] = useState(false);
-  const [showPercentages, setShowPercentages] = useState(false);
-  const dataToUse = useMemo(() => {
-    let mainDataUse = [...data.weekly.data];
-    mainDataUse = mainDataUse
-      .filter((item) => {
-        if (selectedDropdown === "Video") {
-          return item.name.includes("Video");
-        } else if (selectedDropdown === "Note") {
-          return item.name.includes("Note");
-        } else
-          return !item.name.includes("Note") && !item.name.includes("Video");
-      })
-      .map((data) => ({
-        ...data,
-        name: data.name
-          .replace(" Avg", "")
-          .replace(" Video", "")
-          .replace(" Note", ""),
-      }));
+  const { series, names, allNames, dateOptions } = useMemo(() => {
+    let items =
+      selectedOption === "Both"
+        ? data.comparison.total
+        : selectedOption === "Video"
+        ? data.comparison.videos
+        : data.comparison.notes;
+    const allNames = items.map((item) => item.name);
+    items = items.filter((item) => !removedNames.includes(item.name));
+    const names = items.map((item) => item.name);
+    if (items.length === 0) {
+      return {
+        series: [],
+        names: [],
+        allNames: allNames,
+      };
+    }
     if (!showAllData) {
-      mainDataUse = mainDataUse.map((item) => ({
+      items = items.map((item) => ({
         ...item,
         data: item.data.filter((date) => {
           const f = new Date(date.x);
@@ -109,8 +152,30 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
         }),
       }));
     }
-    return mainDataUse;
-  }, [data, selectedDropdown, quarterVal, selectedYear, showAllData]);
+
+    const firstItem = items[0];
+
+    let dateList = firstItem.data.map((item) => item.x);
+    const dateOptions = firstItem.data.map((item) => item.x);
+    const stuff = dateList;
+    // .map((date, index) => ({
+    //   name: date,
+    //   data: items.map((item) => item.data[index].y),
+    // }));
+    return {
+      series: items,
+      names,
+      allNames,
+      dateOptions,
+    };
+  }, [
+    data,
+    selectedOption,
+    selectedYear,
+    quarterVal,
+    removedNames,
+    showAllData,
+  ]);
   const [insightsData, setInsights] = useState<Insights>({
     notes: {
       competition: "",
@@ -125,323 +190,6 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
       self: "",
     },
   });
-  const optionsBar = useMemo(
-    () => ({
-      chart: {
-        type: "bar",
-        height: 328,
-        dropShadow: {
-          enabled: true,
-          top: 3,
-          left: 2,
-          blur: 4,
-          opacity: 1,
-        },
-        toolbar: {
-          show: false,
-        },
-      },
-      grid: {
-        show: false, // Disable grid lines
-      },
-
-      plotOptions: {
-        bar: {
-          columnWidth: "45%",
-          borderRadius: 5, // Rounded corners for the bars
-          distributed: false, // Set to true for separate coloring of bars
-        },
-      },
-      colors: ["#0574cd", "#f32e42", "#7444ba", "#f32e42", "#fdc437"], // Custom colors for bars
-      stroke: {
-        width: 0, // No stroke around the bars
-      },
-      series: dataToUse.map((item, index) => ({
-        ...item,
-        color: index === 1 ? "#fdc437" : undefined, // Set custom color for specific series if needed
-      })),
-      title: {
-        align: "left",
-        offsetY: 25,
-        offsetX: 20,
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          type: "horizontal", // Gradient from left to right
-          colorStops: [
-            [
-              // {
-              //   offset: 20,
-              //   color: "#3bae63",
-              //   opacity: 1,
-              // },
-              {
-                offset: 40,
-                color: "#0574cd",
-                opacity: 1,
-              },
-            ],
-            [
-              // {
-              //   offset: 60,
-              //   color: "#7444ba",
-              //   opacity: 1,
-              // },
-              {
-                offset: 80,
-                color: "#f32e42",
-                opacity: 1,
-              },
-              // {
-              //   offset: 100,
-              //   color: "#fdc437",
-              //   opacity: 1,
-              // },
-            ],
-          ],
-        },
-      },
-      xaxis: {
-        tooltip: {
-          enabled: false,
-        },
-        type: "datetime",
-        labels: {
-          style: {
-            colors: "#ffffff", // Customize to match your design
-          },
-        },
-      },
-      yaxis: {
-        labels: {
-          formatter(val) {
-            return val?.toFixed?.(2) || val.toString();
-          },
-        },
-      },
-      legend: {
-        position: "bottom",
-        horizontalAlign: "center",
-      },
-      dataLabels: {
-        offsetY:
-          showVals && showPercentages
-            ? -20
-            : showVals
-            ? -10
-            : showPercentages
-            ? -10
-            : 0,
-        enabled: true,
-        formatter(val, data) {
-          const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
-          const prevItem =
-            dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
-          let str = "";
-          if (item && prevItem) {
-            if (item > prevItem) {
-              str += "▲ ";
-            } else if (item < prevItem) {
-              str += "▼ ";
-            } else {
-              str += "- ";
-            }
-            let difference = item - prevItem;
-            let percentageDifference = +((difference / prevItem) * 100).toFixed(
-              1
-            );
-            str += percentageDifference;
-          }
-          const res = [];
-          if (showVals) {
-            res.push(val.toString());
-          }
-          if (str && showPercentages) {
-            res.unshift(str + "%");
-          }
-          return res;
-        },
-        background: {
-          enabled: true,
-          borderColor: "transparent",
-        },
-        distributed: true,
-        style: {
-          colors: [
-            function (data) {
-              const item = data.series[data.seriesIndex][data.dataPointIndex];
-              const prevItem =
-                data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
-              if (item && prevItem) {
-                if (item > prevItem) return "#3dae63";
-                else if (item < prevItem) return "#dc2c3e";
-              }
-              return undefined;
-            },
-          ],
-        },
-      },
-    }),
-    [dataToUse, showPercentages, showVals]
-  );
-
-  //  const optionsBar = useMemo(
-  //   () => ({
-  //     chart: {
-  //       type: "bar",
-  //       height: 328,
-  //       dropShadow: {
-  //         enabled: true,
-  //         top: 3,
-  //         left: 2,
-  //         blur: 4,
-  //         opacity: 1,
-  //       },
-  //       toolbar: {
-  //         show: false,
-  //       },
-  //     },
-  //     grid: {
-  //       show: false // Disable grid lines
-  //     },
-  //     fill: {
-  //       opacity: 1, // Solid color fill
-  //     },
-  //     plotOptions: {
-  //       bar: {
-  //         columnWidth: "45%",
-  //         borderRadius: 5, // Rounded corners for the bars
-  //         distributed: false, // Set to true for separate coloring of bars
-  //       },
-  //     },
-  //     colors: ["#3bae63", "#0574cd", "#7444ba", "#f32e42", "#fdc437"], // Custom colors for bars
-  //     stroke: {
-  //       width: 0, // No stroke around the bars
-  //     },
-  //     series: dataToUse.map((item, index) => ({
-  //       ...item,
-  //       color: index === 1 ? "#fdc437" : undefined, // Set custom color for specific series if needed
-  //     })),
-  //     title: {
-  //       align: "left",
-  //       offsetY: 25,
-  //       offsetX: 20,
-  //     },
-  //     grid: {
-  //       show: true,
-  //       padding: {
-  //         bottom: 0,
-  //       },
-  //     },
-  //     fill: {
-  //       type: "gradient",
-  //       gradient: {
-  //         type: "horizontal", // Gradient from left to right
-  //         colorStops: [
-  //           [
-  //             {
-  //               offset: 20,
-  //               color: "#3bae63",
-  //               opacity: 1,
-  //             },
-  //             {
-  //               offset: 40,
-  //               color: "#0574cd",
-  //               opacity: 1,
-  //             },
-  //             {
-  //               offset: 60,
-  //               color: "#7444ba",
-  //               opacity: 1,
-  //             },
-  //             {
-  //               offset: 80,
-  //               color: "#f32e42",
-  //               opacity: 1,
-  //             },
-  //             {
-  //               offset: 100,
-  //               color: "#fdc437",
-  //               opacity: 1,
-  //             },
-  //           ],
-  //         ],
-  //       },
-  //     },
-  //     xaxis: {
-  //       tooltip: {
-  //         enabled: false,
-  //       },
-  //       type: "datetime",
-  //       labels: {
-  //         style: {
-  //           colors: "#ffffff", // Customize to match your design
-  //         },
-  //       },
-  //     },
-  //     yaxis: {
-  //       labels: {
-  //         formatter(val) {
-  //           return val?.toFixed?.(2) || val.toString();
-  //         },
-  //       },
-  //     },
-  //     legend: {
-  //       position: "bottom",
-  //       horizontalAlign: "center",
-  //     },
-  //     dataLabels: {
-  //       offsetY: showVals && showPercentages ? -20 : showVals ? -10 : showPercentages ? -10 : 0,
-  //       enabled: true,
-  //       formatter(val, data) {
-  //         const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
-  //         const prevItem = dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
-  //         let str = "";
-  //         if (item && prevItem) {
-  //           if (item > prevItem) {
-  //             str += "▲ ";
-  //           } else if (item < prevItem) {
-  //             str += "▼ ";
-  //           } else {
-  //             str += "- ";
-  //           }
-  //           let difference = item - prevItem;
-  //           let percentageDifference = +((difference / prevItem) * 100).toFixed(1);
-  //           str += percentageDifference;
-  //         }
-  //         const res = [];
-  //         if (showVals) {
-  //           res.push(val.toString());
-  //         }
-  //         if (str && showPercentages) {
-  //           res.unshift(str + "%");
-  //         }
-  //         return res;
-  //       },
-  //       background: {
-  //         enabled: true,
-  //         borderColor: "transparent",
-  //       },
-  //       distributed: true,
-  //       style: {
-  //         colors: [
-  //           function (data) {
-  //             const item = data.series[data.seriesIndex][data.dataPointIndex];
-  //             const prevItem = data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
-  //             if (item && prevItem) {
-  //               if (item > prevItem) return "#3dae63";
-  //               else if (item < prevItem) return "#dc2c3e";
-  //             }
-  //             return undefined;
-  //           },
-  //         ],
-  //       },
-  //     },
-  //   }),
-  //   [dataToUse, showPercentages, showVals]
-  // );
-
   const prevReqController = useRef(new AbortController());
   useEffect(() => {
     if (prevReqController.current) {
@@ -460,20 +208,107 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
       prevReqController.current.signal
     ).then((res) => setInsights(res));
   }, [quarterVal]);
+
+  const options: ApexOptions = {
+    chart: {
+      type: "bar",
+      stacked: false,
+    },
+    grid: {
+      show: false, // Disable the grid lines
+    },
+    yaxis: {
+      title: {
+        text: "Values",
+      },
+    },
+    xaxis: {
+      // categories: names,
+      axisBorder: {
+        show: true,
+      },
+      labels: {
+        style: {
+          colors: ["#000"],
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+    fill: {
+      opacity: 1,
+    },
+    dataLabels: {
+      enabled: showRawValues, // Enable data labels
+      style: {
+        fontSize: "12px",
+        colors: ["#fff"], // White color for visibility
+      },
+      formatter: function (val) {
+        return val % 1 === 0 ? val.toFixed(0) : val.toFixed(2);
+      },
+      offsetY: -20, // Position the label above the bar
+    },
+    tooltip: {
+      enabled: true,
+      y: {
+        formatter: function (val) {
+          return `${val}  units`; // Customize this to show your units
+        },
+      },
+    },
+    plotOptions: {
+      bar: {
+        // horizontal: false,
+        // distributed: true,
+        dataLabels: {
+          position: "top", // Show data labels on top of each bar
+        },
+      },
+    },
+  };
+
+  const items = useMemo(() => {
+    return names.map((_name, index) => {
+      const first = series?.[0]?.data?.[index];
+      const last = series?.[series.length - 1]?.data?.[index];
+      return Number(calculatePercentageChange(first, last).toFixed(0));
+    });
+  }, [series]);
   const insights =
-    selectedDropdown === "Both"
+    selectedOption === "Both"
       ? insightsData.total
-      : selectedDropdown === "Video"
+      : selectedOption === "Video"
       ? insightsData.videos
       : insightsData.notes;
+
+  function onClickHandler(name: string) {
+    if (!removedNames.includes(name)) {
+      setRemovedNames((old) => [...old, name]);
+    } else {
+      const newArr = [...removedNames];
+      const index = newArr.indexOf(name);
+      newArr.splice(index, 1);
+      setRemovedNames(newArr);
+    }
+  }
+  useEffect(() => {
+    if (names.length < 9 && isChecked) {
+      setIsChecked(false);
+    }
+  }, [isChecked, names]);
   return (
-    <div id="line-adwords">
+    <section
+      style={{
+        position: "relative",
+      }}
+    >
       {/* Header Text */}
-      <div className="justify-content-between align-items-center mb-4">
+      <div className="justify-content-between align-items-center">
         <div>
           <h5>{titleHeading}</h5>
         </div>
-
         <section className="VerticalBarChart__legend">
           {/* control SVG Start */}
           <div>
@@ -589,8 +424,8 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
           <div>
             <Box>
               <Select
-                value={selectedDropdown}
-                onChange={(e) => setSelectedDropdown(e.target.value)}
+                value={selectedOption}
+                onChange={(e) => setSelectedOption(e.target.value)}
                 border="2px"
                 borderColor="#cbd5e0" // Apply the border color
                 borderRadius="8px"
@@ -611,54 +446,85 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
             </Box>
           </div>
         </section>
-        {/*         
-        <div style={{ width: "300px" }}>
-          <Select
-            value={selectedDropdown}
-            onChange={(e) => setSelectedDropdown(e.target.value)}
-          >
-            {dropdownOptions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </Select>
-        </div> */}
       </div>
 
       {/* Chart */}
-      {/* <Chart
-        options={optionsLine}
-        series={optionsLine.series}
-        type="line"
-        height={500}
-      /> */}
-      <div onClick={() => console.log("FAFA", propData, dataToUse)}>ASD</div>
-      <Chart options={optionsBar} series={dataToUse} type="bar" height={228} />
+      <div
+        style={{
+          position: "relative",
+        }}
+        onClick={() => console.log(series)}
+      >
+        <Chart options={options} series={series} type="bar" height={200} />
+      </div>
+
+      {/* Perncentages Color Values before Chart */}
+      {isChecked && (
+        <div
+          style={{
+            position: "relative",
+            top: "0px",
+            zIndex: 1000,
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "10px",
+            textAlign: "center",
+          }}
+          className="my-item"
+        >
+          {items.map((item) => (
+            <span
+              style={{
+                background: isNaN(item)
+                  ? "transparent"
+                  : item > 0
+                  ? "#3dae63"
+                  : "#dc2c3e",
+                borderRadius: "8px",
+                padding: "0.25rem 0.25rem",
+                color: "#fff",
+                width: "50px",
+              }}
+              // className={`${item > 0 ? "text-green" : "text-red"}`}
+            >
+              {!isNaN(item) ? (
+                <>
+                  {item > 0 ? "▲" : "▼"}
+                  {item}%
+                </>
+              ) : (
+                <></>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Range Line */}
       <div
         className="px-4 mb-3 slider-container"
         style={{
+          marginTop: "3%",
           position: "relative",
         }}
       >
         <RangeSlider
-          defaultValue={[0, 100]}
+          isDisabled={showAllData}
           min={0}
           max={11}
           step={1}
           value={quarterVal}
           onChange={(e) => setQuarterVal(e)}
-          isDisabled={showAllData}
         >
-          <RangeSliderTrack bg="red.100">
-            <RangeSliderFilledTrack bg="#a8def8" />
+          <RangeSliderTrack>
+            <RangeSliderFilledTrack />
           </RangeSliderTrack>
           <RangeSliderThumb boxSize={3} index={0} />
           <RangeSliderThumb boxSize={3} index={1} />
         </RangeSlider>
 
-        <div className="d-flex justify-content-between slider-custom-text">
+        <div className="d-flex justify-content-between">
           {months.map((month) => (
             <span
               key={month}
@@ -673,6 +539,42 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
       </div>
 
       {/* Open When user click on Zoom in then show this */}
+
+      {/* Companies Checkbox */}
+      {showControls && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "12px",
+            color: "#fff",
+            gap: "0.75rem",
+            marginBottom: "1rem",
+            flexWrap: "wrap",
+          }}
+        >
+          {allNames.map((name, i) => (
+            <span
+              key={name + i}
+              className="checkbox-container-sm d-flex justify-content-center align-items-center"
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              <Checkbox
+                size="sm"
+                colorScheme="purple"
+                isChecked={!removedNames.includes(name)}
+                id={`ASD-${name}`}
+                onChange={() => onClickHandler(name)}
+              />
+              <label htmlFor={`ASD-${name}`}>{name}</label>
+            </span>
+          ))}
+        </div>
+      )}
+      {/* Checkbox for row, perncetage and show all data */}
 
       <section
         style={{
@@ -757,9 +659,10 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
                 <div>
                   <Stack direction="row" spacing={5} align="center" mb={0}>
                     <Checkbox
+                      isDisabled={names.length < 9}
                       id="x-scheme"
-                      isChecked={showPercentages}
-                      onChange={(e) => setShowPercentages(e.target.checked)}
+                      isChecked={isChecked}
+                      onChange={(e) => setIsChecked(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
                       iconColor="white"
@@ -770,7 +673,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
                     </Checkbox>
 
                     <Checkbox
-                      id="show-all-data"
+                      id="show-all-data-2"
                       isChecked={showAllData}
                       onChange={(e) => setShowAllData(e.target.checked)}
                       colorScheme="transparent"
@@ -783,9 +686,8 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
                     </Checkbox>
 
                     <Checkbox
-                      id="raw-value"
-                      checked={showVals}
-                      onChange={(e) => setShowVals(e.target.checked)}
+                      checked={showRawValues}
+                      onChange={handleCheckboxChange}
                       colorScheme="transparent"
                       outline="none"
                       iconColor="white"
@@ -798,27 +700,28 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
                 </div>
               </section>
 
-              <HStack spacing={4} mb={8}>
-                <Checkbox
-                  colorScheme="transparent"
-                  outline="none"
-                  iconColor="white"
-                  borderColor="white"
-                  size="lg"
-                />
-                <Select
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  style={{
-                    height: "30px",
-                    fontSize: "14px",
-                    padding: "4px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <option value="17-Jul-4">17-Jul-4</option>
-                </Select>
-              </HStack>
+              {/* <HStack spacing={4} mb={8}>
+                  <Checkbox
+                    colorScheme="transparent"
+                    outline="none"
+                    iconColor="white"
+                    borderColor="white"
+                    size="lg"
+                  />
+                  <Select
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="custom-select"
+                  >
+                    <option value="" disabled>Select Date</option>
+                    {dateOptions.map((date) => (
+                      <option key={date} value={date}>
+                        {date}
+                      </option>
+                    ))}
+                  </Select>
+
+                </HStack> */}
             </>
           )}
 
@@ -826,10 +729,10 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
             <section
               style={{
                 transition: "max-height 0.7s ease",
-                maxHeight: showZoomIn ? "500px" : "0px",
+                maxHeight: showZoomIn ? "200px" : "0px",
               }}
             >
-              <Stack spacing={2} mb={4}>
+              <Stack spacing={2} mb={0}>
                 <HStack
                   style={{
                     display: "flex",
@@ -902,8 +805,8 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
           )}
         </Box>
       </section>
-    </div>
+    </section>
   );
 };
 
-export default PipeCombineChart;
+export default ComparisonNoGroup;

@@ -12,6 +12,7 @@ import { Button, Radio, RadioGroup } from "@chakra-ui/react";
 import AnimateNumber from "../components/animate-number";
 import dayjs from "dayjs";
 import VerticalRidarCharts from "../view/VerticalRidarCharts";
+import ComparisonNoGroup from "../components/comparison-chart-ungroup";
 
 export const VerticalOverview = () => {
   const [data, setData] = useState<{
@@ -101,9 +102,7 @@ export const VerticalOverview = () => {
     setTopbarMode(topbarMode === "quarter" ? "week" : "quarter");
   }
   return (
-
     <div className="main">
-
       <div className="d-flex top-row text-white custom-row">
         <div className="box pt-2 px-3 ">
           <div className="d-flex align-items-center justify-content-between">
@@ -155,12 +154,13 @@ export const VerticalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[0]
-              ? currentQuarter?.["TV Azteca Change"]
-              : currentQuarter?.["Competition Change"]) || 1) > 0
-              ? "text-green"
-              : "text-red"
-              }`}
+            className={`d-flex justify-content-center align-items-center percentage-change ${
+              ((isAzteca[0]
+                ? currentQuarter?.["TV Azteca Change"]
+                : currentQuarter?.["Competition Change"]) || 1) > 0
+                ? "text-green"
+                : "text-red"
+            }`}
           >
             <span className="arrow">
               {((isAzteca[0]
@@ -197,9 +197,9 @@ export const VerticalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                  height: "0",
-                  overflow: "hidden",
-                }
+                    height: "0",
+                    overflow: "hidden",
+                  }
             }
           >
             {(isAzteca[0]
@@ -219,8 +219,9 @@ export const VerticalOverview = () => {
                 </span>{" "}
                 {company.total.toFixed(0)}%{" "}
                 <span
-                  className={`${company.total_change < 0 ? "text-red" : "text-green"
-                    }`}
+                  className={`${
+                    company.total_change < 0 ? "text-red" : "text-green"
+                  }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -310,18 +311,18 @@ export const VerticalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[1]
-              ? currentQuarter?.["TV Azteca Note Change"]
-              : currentQuarter?.["Competition Note Change"]) || 1) > 0
-              ? "text-green"
-              : "text-red"
-              }`}
+            className={`d-flex justify-content-center align-items-center percentage-change ${
+              ((isAzteca[1]
+                ? currentQuarter?.["TV Azteca Note Change"]
+                : currentQuarter?.["Competition Note Change"]) || 1) > 0
+                ? "text-green"
+                : "text-red"
+            }`}
           >
             <span className="arrow">
               {((isAzteca[1]
                 ? currentQuarter?.["TV Azteca Note Change"]
-                : currentQuarter?.["Competition Note Change"]) || 1) >
-                0 ? (
+                : currentQuarter?.["Competition Note Change"]) || 1) > 0 ? (
                 <>&uarr;</>
               ) : (
                 <>&darr;</>
@@ -353,9 +354,9 @@ export const VerticalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                  height: "0",
-                  overflow: "hidden",
-                }
+                    height: "0",
+                    overflow: "hidden",
+                  }
             }
           >
             {(isAzteca[1]
@@ -374,8 +375,9 @@ export const VerticalOverview = () => {
                 </span>{" "}
                 {company.note.toFixed(0)}%{" "}
                 <span
-                  className={`${company.note_change < 0 ? "text-red" : "text-green"
-                    }`}
+                  className={`${
+                    company.note_change < 0 ? "text-red" : "text-green"
+                  }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -464,18 +466,18 @@ export const VerticalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[2]
-              ? currentQuarter?.["TV Azteca Video Change"]
-              : currentQuarter?.["Competition Video Change"]) || 1) > 0
-              ? "text-green"
-              : "text-red"
-              }`}
+            className={`d-flex justify-content-center align-items-center percentage-change ${
+              ((isAzteca[2]
+                ? currentQuarter?.["TV Azteca Video Change"]
+                : currentQuarter?.["Competition Video Change"]) || 1) > 0
+                ? "text-green"
+                : "text-red"
+            }`}
           >
             <span className="arrow">
               {((isAzteca[2]
                 ? currentQuarter?.["TV Azteca Video Change"]
-                : currentQuarter?.["Competition Video Change"]) || 1) >
-                0 ? (
+                : currentQuarter?.["Competition Video Change"]) || 1) > 0 ? (
                 <>&uarr;</>
               ) : (
                 <>&darr;</>
@@ -506,9 +508,9 @@ export const VerticalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                  height: "0",
-                  overflow: "hidden",
-                }
+                    height: "0",
+                    overflow: "hidden",
+                  }
             }
           >
             {(isAzteca[2]
@@ -528,8 +530,9 @@ export const VerticalOverview = () => {
                 </span>{" "}
                 {company.video.toFixed(0)}%{" "}
                 <span
-                  className={`${company.video_change < 0 ? "text-red" : "text-green"
-                    }`}
+                  className={`${
+                    company.video_change < 0 ? "text-red" : "text-green"
+                  }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -576,12 +579,14 @@ export const VerticalOverview = () => {
         </div>
       </div>
 
-
       <div className="row custom-row mt-2 ">
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <BarChart data={data} titleHeading="Vertrical Overview - TVA vs. Comp. - Individual Bar Chart" />
+              <BarChart
+                data={data}
+                titleHeading="Vertrical Overview - TVA vs. Comp. - Individual Bar Chart"
+              />
             </div>
           </div>
         </div>
@@ -591,14 +596,16 @@ export const VerticalOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
-              <BarChart data={data} titleHeading="Vertical Overview - TVA vs. Comp. - Week by Week Bar Chart" />
+              <ComparisonNoGroup
+                data={data}
+                titleHeading="Vertical Overview - TVA vs. Comp. - Week by Week Bar Chart"
+              />
             </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 };
 
-export default VerticalOverview
+export default VerticalOverview;
