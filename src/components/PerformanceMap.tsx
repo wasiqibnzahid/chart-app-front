@@ -155,13 +155,9 @@ const PerformanceMap = () => {
         attributionControl={false}
       >
         <TileLayer
-          url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg"
-          attribution="&copy; CNES, Distribution Airbus DS, &copy; Airbus DS, &copy; PlanetObserver (Contains Copernicus Data) | &copy; Stadia Maps, &copy; OpenMapTiles, &copy; OpenStreetMap contributors"
-        />
-        {/* <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
-        /> */}
+        />
 
         {citiesData.map((city, idx) => (
           <CircleMarker

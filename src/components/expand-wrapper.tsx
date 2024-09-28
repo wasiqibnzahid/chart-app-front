@@ -56,7 +56,7 @@ export const ExpandWrapper: React.FC<PropsWithChildren> = ({ children }) => {
           }}
           onClick={() => setIsOpen(true)}
         >
-          {/* <img style={{ width: "20px" }} src="/Expand.png" /> */}
+          <img style={{ width: "20px" }} src="/Expand.png" />
         </div>
         {children}
       </div>
