@@ -16,8 +16,6 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { AiOutlineArrowRight, AiOutlineArrowLeft } from "react-icons/ai";
-import { runJob } from "./data";
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);

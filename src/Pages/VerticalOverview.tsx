@@ -52,15 +52,15 @@ export const VerticalOverview = () => {
   useEffect(() => {
     getAverageData().then((res) => {
       console.log("ZE RES", res);
-      if (res?.errors && res?.errors.length) {
-        let str = "";
-        res.errors.forEach((e) => {
-          str += `error: ${e.message} at ${dayjs(e.created_at).format(
-            "YYYY-MM-DD"
-          )} \r\n`;
-        });
-        alert(str);
-      }
+      // if (res?.errors && res?.errors.length) {
+      //   let str = "";
+      //   res.errors.forEach((e) => {
+      //     str += `error: ${e.message} at ${dayjs(e.created_at).format(
+      //       "YYYY-MM-DD"
+      //     )} \r\n`;
+      //   });
+      //   alert(str);
+      // }
       setData((old) => ({
         ...res,
         quarterData: old.quarterData,
