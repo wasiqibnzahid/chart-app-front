@@ -104,6 +104,7 @@ export const GeneralOverview = () => {
   function changeTopbarMode() {
     setTopbarMode(topbarMode === "quarter" ? "week" : "quarter");
   }
+  
   return (
     <div className="main">
       <div className="d-flex top-row text-white custom-row">

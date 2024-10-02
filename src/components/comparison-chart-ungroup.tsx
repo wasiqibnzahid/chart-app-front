@@ -658,7 +658,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 {/* Control SVG End */}
                 <div>
                   <Stack direction="row" spacing={5} align="center" mb={0}>
-                    <Checkbox
+                    {/* <Checkbox
                       isDisabled={names.length < 9}
                       id="x-scheme"
                       isChecked={isChecked}
@@ -670,7 +670,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       size="lg"
                     >
                       Show percentages
-                    </Checkbox>
+                    </Checkbox> */}
 
                     <Checkbox
                       id="show-all-data-2"
@@ -794,10 +794,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                   </div>
                   {/* Insights SVG End */}
                   <Text style={{ lineHeight: "2rem" }}>
-                    TV Azteca increased moderately by 5% most notably in 25 July
-                    to 31 June. <br />
-                    Competition decreased moderately by 5% most notably in 25
-                    July to 31 June.
+                  {insights ? insights.self : "There is no insights"} <br />
+                  {insights ? insights.competition : "There is no insights"}
                   </Text>
                 </HStack>
               </Stack>

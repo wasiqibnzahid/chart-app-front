@@ -114,6 +114,8 @@ export const LocalOverview = () => {
     setTopbarMode(topbarMode === "month" ? "week" : "month");
   }
 
+  console.log("===============> currentQuarter: ", currentQuarter)
+
   return (
     <div className="main">
       {/* Row 1 */}
@@ -162,8 +164,8 @@ export const LocalOverview = () => {
             <AnimateNumber
               number={
                 isAzteca[0]
-                  ? currentQuarter?.["Azteca Avg"]
-                  : currentQuarter?.["Competition Avg"]
+                  ? currentQuarter?.["TV Azteca Avg"]
+                  : currentQuarter?.["Competition Change"]
               }
             />
             %
@@ -171,16 +173,16 @@ export const LocalOverview = () => {
           <div
             className={`d-flex justify-content-center align-items-center percentage-change ${
               ((isAzteca[0]
-                ? currentQuarter?.["Azteca Avg Change"]
-                : currentQuarter?.["Competition Avg Change"]) || 1) > 0
+                ? currentQuarter?.["TV Azteca Change"]
+                : currentQuarter?.["Competition Change"]) || 1) > 0
                 ? "text-green"
                 : "text-red"
             }`}
           >
             <span className="arrow">
               {((isAzteca[0]
-                ? currentQuarter?.["Azteca Avg Change"]
-                : currentQuarter?.["Competition Avg Change"]) || 1) > 0 ? (
+                ? currentQuarter?.["TV Azteca Change"]
+                : currentQuarter?.["Competition Change"]) || 1) > 0 ? (
                 <>&uarr;</>
               ) : (
                 <>&darr;</>
@@ -191,8 +193,8 @@ export const LocalOverview = () => {
               <AnimateNumber
                 number={
                   isAzteca[0]
-                    ? currentQuarter?.["Azteca Avg Change"]
-                    : currentQuarter?.["Competition Avg Change"]
+                    ? currentQuarter?.["TV Azteca Change"]
+                    : currentQuarter?.["Competition Changee"]
                 }
               />
               %
@@ -232,7 +234,7 @@ export const LocalOverview = () => {
                 <span style={{ fontWeight: "bold", fontSize: "16px" }}>
                   {company.name.replace("Azteca ", "")}:
                 </span>{" "}
-                {company.total.toFixed?.(0)}%{" "}
+                {company.total.toFixed?.(0) || 0}%{" "}
                 <span
                   className={`${
                     company.total_change < 0 ? "text-red" : "text-green"
@@ -241,7 +243,7 @@ export const LocalOverview = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ({company.total_change.toFixed?.(1)}%)
+                  ({company.total_change.toFixed?.(1) || 0}%)
                 </span>
               </div>
             ))}
@@ -321,7 +323,7 @@ export const LocalOverview = () => {
             <AnimateNumber
               number={
                 isAzteca[1]
-                  ? currentQuarter?.["Azteca Note Avg"]
+                  ? currentQuarter?.["TV Azteca Note Avg"]
                   : currentQuarter?.["Competition Note Avg"]
               }
             />
@@ -330,16 +332,16 @@ export const LocalOverview = () => {
           <div
             className={`d-flex justify-content-center align-items-center percentage-change ${
               ((isAzteca[1]
-                ? currentQuarter?.["Azteca Note Change"]
-                : currentQuarter?.["Competition Note Change"]) || 1) > 0
+                ? currentQuarter?.["TV Azteca Note Avg"]
+                : currentQuarter?.["Competition Note Avg"]) || 1) > 0
                 ? "text-green"
                 : "text-red"
             }`}
           >
             <span className="arrow">
               {((isAzteca[1]
-                ? currentQuarter?.["Azteca Note Change"]
-                : currentQuarter?.["Competition Note Change"]) || 1) > 0 ? (
+                ? currentQuarter?.["TV Azteca Note Avg"]
+                : currentQuarter?.["Competition Note Avg"]) || 1) > 0 ? (
                 <>&uarr;</>
               ) : (
                 <>&darr;</>
@@ -350,7 +352,7 @@ export const LocalOverview = () => {
               <AnimateNumber
                 number={
                   isAzteca[1]
-                    ? currentQuarter?.["Azteca Note Change"]
+                    ? currentQuarter?.["TV Azteca Note Change"]
                     : currentQuarter?.["Competition Note Change"]
                 }
               />
@@ -390,7 +392,7 @@ export const LocalOverview = () => {
                 <span style={{ fontWeight: "bold", fontSize: "16px" }}>
                   {company.name.replace("Azteca ", "")}:
                 </span>{" "}
-                {company.note.toFixed?.(0)}%{" "}
+                {company.note.toFixed?.(0) || 0}%{" "}
                 <span
                   className={`${
                     company.note_change < 0 ? "text-red" : "text-green"
@@ -399,7 +401,7 @@ export const LocalOverview = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ({company.note_change.toFixed?.(1)}%)
+                  ({company.note_change.toFixed?.(1) || 0}%)
                 </span>
               </div>
             ))}
@@ -481,7 +483,7 @@ export const LocalOverview = () => {
             <AnimateNumber
               number={
                 isAzteca[2]
-                  ? currentQuarter?.["Azteca Video Avg"]
+                  ? currentQuarter?.["TV Azteca Video Avg"]
                   : currentQuarter?.["Competition Video Avg"]
               }
             />
@@ -491,7 +493,7 @@ export const LocalOverview = () => {
           <div
             className={`d-flex justify-content-center align-items-center percentage-change ${
               ((isAzteca[2]
-                ? currentQuarter?.["Azteca Video Change"]
+                ? currentQuarter?.["TV Azteca Video Change"]
                 : currentQuarter?.["Competition Video Change"]) || 1) > 0
                 ? "text-green"
                 : "text-red"
@@ -499,7 +501,7 @@ export const LocalOverview = () => {
           >
             <span className="arrow">
               {((isAzteca[2]
-                ? currentQuarter?.["Azteca Video Change"]
+                ? currentQuarter?.["TV Azteca Video Change"]
                 : currentQuarter?.["Competition Video Change"]) || 1) > 0 ? (
                 <>&uarr;</>
               ) : (
@@ -510,7 +512,7 @@ export const LocalOverview = () => {
               <AnimateNumber
                 number={
                   isAzteca[2]
-                    ? currentQuarter?.["Azteca Video Change"]
+                    ? currentQuarter?.["TV Azteca Video Change"]
                     : currentQuarter?.["Competition Video Change"]
                 }
               />{" "}
@@ -553,7 +555,7 @@ export const LocalOverview = () => {
                 <span style={{ fontWeight: "bold", fontSize: "16px" }}>
                   {company.name.replace("Azteca ", "")}:
                 </span>{" "}
-                {company.video.toFixed?.(0)}%{" "}
+                {company.video.toFixed?.(0) || 0}%{" "}
                 <span
                   className={`${
                     company.video_change < 0 ? "text-red" : "text-green"
@@ -562,7 +564,7 @@ export const LocalOverview = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ({company.video_change.toFixed?.(1)}%)
+                  ({company.video_change.toFixed?.(1) || 0}%)
                 </span>
               </div>
             ))}

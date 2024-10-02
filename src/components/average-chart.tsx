@@ -718,10 +718,8 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                   </div>
                   {/* Insights SVG End */}
                   <Text style={{ lineHeight: "2rem" }}>
-                    TV Azteca increased moderately by 5% most notably in 25 July
-                    to 31 June. <br />
-                    Competition decreased moderately by 5% most notably in 25
-                    July to 31 June.
+                   {insights ? insights.self : "There is no insights"} <br />
+                   {insights ? insights.competition : "There is no insights"}
                   </Text>
                 </HStack>
               </Stack>

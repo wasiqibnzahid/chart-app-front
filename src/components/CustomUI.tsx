@@ -28,7 +28,7 @@ function CustomUI() {
         <HStack>
           <Icon as={FaInfoCircle} />
           <Text>
-            TV Azteca increased moderately by 5% most notably in 25 July to 31 June. <br />
+            TV Azteca increased moderately by 5% most notably in 25 July to 31 June. fkldjsewiojdfkljcvdksjfieo <br />
             Competition decreased moderately by 5% most notably in 25 July to 31 June.
           </Text>
         </HStack>
