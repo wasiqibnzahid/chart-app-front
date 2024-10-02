@@ -80,7 +80,7 @@ export async function getQuarterlyData(): Promise<{
   quarter: QuarterData[];
   week: QuarterData;
 }> {
-  return axios.get("http://52.90.192.106/quarter").then((res) => res.data);
+  return axios.get("http://52.90.192.106:8000/quarter").then((res) => res.data);
 }
 
 export async function getInsights(
@@ -91,7 +91,7 @@ export async function getInsights(
   signal: AbortSignal
 ): Promise<Insights> {
   return axios
-    .get("http://52.90.192.106/insights", {
+    .get("http://52.90.192.106:8000/insights", {
       params: data,
       signal,
     })
@@ -100,7 +100,7 @@ export async function getInsights(
 
 export async function runJob() {
   return axios
-    .post("http://52.90.192.106/insights")
+    .post("http://52.90.192.106:8000/insights")
     .then((res) => res)
     .catch((e) => console.error(e));
 }
