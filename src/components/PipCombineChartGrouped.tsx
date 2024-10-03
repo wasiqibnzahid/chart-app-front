@@ -194,6 +194,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     removedNames,
     showAllData,
   ]);
+
   const [insightsData, setInsights] = useState<Insights>({
     notes: {
       competition: "",
@@ -330,6 +331,9 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       return Number(calculatePercentageChange(first, last).toFixed?.(0));
     });
   }, [series]);
+
+  console.log("========> items: ", items, "series: ", series)
+
   const insights =
     selectedOption === "Both"
       ? insightsData.total
@@ -348,7 +352,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     }
   }
   useEffect(() => {
-    if (names.length < 9 && isChecked) {
+    if (names.length < 9 && isChecked && names.length !== 2) {
       setIsChecked(false);
     }
   }, [isChecked, names]);
@@ -521,7 +525,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
             zIndex: 1000,
             width: "100%",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: names.length === 2 ? "space-around" :  "space-between",
             fontSize: "10px",
             textAlign: "center",
           }}
@@ -714,8 +718,8 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   <Stack direction="row" spacing={5} align="center" mb={0}>
                     {!hideChecked && (
                       <Checkbox
-                        isDisabled={names.length < 9}
                         id="x-scheme"
+                        disabled={names.length < 9 && names.length !== 2}
                         isChecked={isChecked}
                         onChange={(e) => setIsChecked(e.target.checked)}
                         colorScheme="transparent"

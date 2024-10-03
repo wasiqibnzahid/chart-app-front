@@ -94,7 +94,7 @@ const BarChart: React.FC<BarChartProps> = ({
 	data: propData,
 	titleHeading,
 }) => {
-	console.log(`ddd`, propData);
+	console.log(`=========================> propData ${titleHeading}`, propData);
 	// States
 	const [dateFilter, setDateFilter] = useState("17-Jul-4");
 	const [quarterVal, setQuarterVal] = useState([0, 11]);
@@ -273,6 +273,9 @@ const BarChart: React.FC<BarChartProps> = ({
 			return Number(calculatePercentageChange(first, last).toFixed?.(0));
 		});
 	}, [series]);
+
+	console.log("===============> items and series: ", items, series)
+
 	const insights =
 		selectedOption === "Both"
 			? insightsData.total
