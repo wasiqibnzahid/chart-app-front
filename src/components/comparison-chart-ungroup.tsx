@@ -96,7 +96,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
   titleHeading,
   disableGrouping = false,
 }) => {
-  console.log(`ddd`, propData);
+  console.log(`-----------> ddd ${titleHeading}`, propData);
   // States
   const [dateFilter, setDateFilter] = useState("17-Jul-4");
   const [quarterVal, setQuarterVal] = useState([0, 11]);

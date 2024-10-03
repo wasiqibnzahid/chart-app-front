@@ -604,7 +604,6 @@ export const GeneralOverview = () => {
               <ExpandWrapper>
                 <PipCombineGrouped
                   data={data}
-                  hideChecked
                   titleHeading="General Overview - TVA vs. Comp. Individual Bar charts"
                 />
               </ExpandWrapper>
