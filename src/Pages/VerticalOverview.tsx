@@ -62,8 +62,8 @@ export const VerticalOverview = () => {
       //   alert(str);
       // }
       setData((old) => ({
+        ...old,
         ...res,
-        quarterData: old.quarterData,
       }));
     });
     getQuarterlyData().then((res) =>
@@ -97,7 +97,7 @@ export const VerticalOverview = () => {
     return {
       ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
     };
-  }, [data.quarterData, data?.weekComparison, topbarMode]);
+  }, [data, topbarMode]);
 
   function changeTopbarMode() {
     setTopbarMode(topbarMode === "quarter" ? "week" : "quarter");

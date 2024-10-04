@@ -53,7 +53,6 @@ export const LocalOverview = () => {
 
   useEffect(() => {
     getLocalAverageData().then((res) => {
-      console.log("ZE RES", res);
       // if (res?.errors && res?.errors.length) {
       //   let str = "";
       //   res.errors.forEach((e) => {
@@ -63,15 +62,18 @@ export const LocalOverview = () => {
       //   });
       //   alert(str);
       // }
-      setData(
-        (old) => (
-          console.log(old.quarterData),
-          {
-            ...res,
-            quarterData: old.quarterData,
-          }
-        )
-      );
+      // setData(
+      //   (old) => (
+      //     {
+      //       ...res,
+      //       quarterData: old.quarterData,
+      //     }
+      //   )
+      // );
+      setData((old) => ({
+        ...old,
+        ...res,
+      }))
     });
 
     getLocalQuarterlyData().then((res) =>
@@ -108,13 +110,23 @@ export const LocalOverview = () => {
     return {
       ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
     };
-  }, [data.quarterData, data?.weekComparison, topbarMode]);
+  }, [data, topbarMode]);
 
   function changeTopbarMode() {
     setTopbarMode(topbarMode === "month" ? "week" : "month");
   }
 
-  console.log("===============> currentQuarter: ", currentQuarter)
+  console.log("================> currentQuarter?.azteca: ", currentQuarter?.azteca)
+  console.log("================> currentQuarter?.comptition: ", currentQuarter?.competition)
+
+  const combinedData = useMemo(() => {
+    if(currentQuarter?.azteca?.length > 0 && currentQuarter?.competition?.length > 0) {
+      return [...currentQuarter.azteca, ...currentQuarter.competition]
+    }
+    return []
+  }, [currentQuarter])
+
+  console.log("===========> combinedData: ", combinedData)
 
   return (
     <div className="main">
@@ -125,7 +137,7 @@ export const LocalOverview = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="title">General</div>
             <div className="toggles d-flex align-items-center">
-              <RadioGroup
+              {/* <RadioGroup
                 className="d-flex align-items-center"
                 style={{ gap: "5px" }}
                 value={isAzteca[0].toString()}
@@ -157,7 +169,7 @@ export const LocalOverview = () => {
                     Competition
                   </Radio>
                 </div>
-              </RadioGroup>
+              </RadioGroup> */}
             </div>
           </div>
           <div className="d-flex justify-content-center align-items-center percentage">
@@ -194,7 +206,7 @@ export const LocalOverview = () => {
                 number={
                   isAzteca[0]
                     ? currentQuarter?.["TV Azteca Change"]
-                    : currentQuarter?.["Competition Changee"]
+                    : currentQuarter?.["Competition Change"]
                 }
               />
               %
@@ -219,10 +231,7 @@ export const LocalOverview = () => {
                   }
             }
           >
-            {(isAzteca[0]
-              ? currentQuarter?.azteca
-              : currentQuarter?.competition
-            )?.map((company) => (
+            {combinedData?.map((company) => (
               <div
                 key={company.name}
                 style={{
@@ -284,7 +293,7 @@ export const LocalOverview = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="title">Nota</div>
             <div className="toggles d-flex align-items-center">
-              <RadioGroup
+              {/* <RadioGroup
                 className="d-flex align-items-center"
                 style={{ gap: "5px" }}
                 value={isAzteca[1].toString()}
@@ -316,7 +325,7 @@ export const LocalOverview = () => {
                     Competition
                   </Radio>
                 </div>
-              </RadioGroup>
+              </RadioGroup> */}
             </div>
           </div>
           <div className="d-flex justify-content-center align-items-center percentage">
@@ -378,10 +387,7 @@ export const LocalOverview = () => {
                   }
             }
           >
-            {(isAzteca[1]
-              ? currentQuarter?.azteca
-              : currentQuarter?.competition
-            )?.map((company) => (
+            {combinedData?.map((company) => (
               <div
                 style={{
                   paddingLeft: "20%",
@@ -442,7 +448,7 @@ export const LocalOverview = () => {
             <div className="title">Video</div>
 
             <div className="toggles d-flex align-items-center">
-              <RadioGroup
+              {/* <RadioGroup
                 className="d-flex align-items-center"
                 style={{ gap: "5px" }}
                 value={isAzteca[2].toString()}
@@ -475,7 +481,7 @@ export const LocalOverview = () => {
                     Competition
                   </Radio>
                 </div>
-              </RadioGroup>
+              </RadioGroup> */}
             </div>
           </div>
 
@@ -540,10 +546,7 @@ export const LocalOverview = () => {
                   }
             }
           >
-            {(isAzteca[2]
-              ? currentQuarter?.azteca
-              : currentQuarter?.competition
-            )?.map((company) => (
+            {combinedData?.map((company) => (
               <div
                 key={company.name}
                 style={{

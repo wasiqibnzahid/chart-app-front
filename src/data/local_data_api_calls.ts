@@ -44,7 +44,7 @@ export async function getLocalAverageData(): Promise<{
       created_at: string;
     }[];
   }> {
-    return axios.get("http://52.90.192.106:8000/").then((res) => res.data);
+    return axios.get("http://52.90.192.106:8000/local").then((res) => res.data);
     // return axios.get("http://127.0.0.1:8000/local").then((res) => res.data);
   }
 

@@ -176,6 +176,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
     removedNames,
     showAllData,
   ]);
+  console.log("========> series; ", series)
   const [insightsData, setInsights] = useState<Insights>({
     notes: {
       competition: "",

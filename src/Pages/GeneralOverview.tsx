@@ -64,8 +64,8 @@ export const GeneralOverview = () => {
       //   alert(str);
       // }
       setData((old) => ({
+        ...old,
         ...res,
-        quarterData: old.quarterData,
       }));
     });
     getQuarterlyData().then((res) =>
@@ -99,7 +99,10 @@ export const GeneralOverview = () => {
     return {
       ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
     };
-  }, [data.quarterData, data?.weekComparison, topbarMode]);
+  }, [data, topbarMode]);
+
+
+  console.log("-==========> data.weekComparison: ", data.weekComparison)
 
   function changeTopbarMode() {
     setTopbarMode(topbarMode === "quarter" ? "week" : "quarter");

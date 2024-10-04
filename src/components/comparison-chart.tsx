@@ -128,6 +128,7 @@ const BarChart: React.FC<BarChartProps> = ({
 		const allNames = items.map((item) => item.name);
 		items = items.filter((item) => !removedNames.includes(item.name));
 		const names = items.map((item) => item.name);
+		
 		if (items.length === 0) {
 			return {
 				series: [],
@@ -173,6 +174,9 @@ const BarChart: React.FC<BarChartProps> = ({
 		removedNames,
 		showAllData,
 	]);
+
+	console.log("==========> names: ", names, " ==========> allNames: ", allNames)
+
 	const [insightsData, setInsights] = useState<Insights>({
 		notes: {
 			competition: "",
@@ -225,6 +229,7 @@ const BarChart: React.FC<BarChartProps> = ({
 				show: true,
 			},
 			labels: {
+				rotate: -45,
 				style: {
 					colors: ["#000"],
 				},

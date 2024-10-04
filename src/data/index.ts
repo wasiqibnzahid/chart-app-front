@@ -80,6 +80,7 @@ export async function getQuarterlyData(): Promise<{
   quarter: QuarterData[];
   week: QuarterData;
 }> {
+  // return axios.get("http://127.0.0.1:8000/quarter").then((res) => res.data);
   return axios.get("http://52.90.192.106:8000/quarter").then((res) => res.data);
 }
 
