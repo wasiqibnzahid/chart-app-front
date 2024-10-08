@@ -25,6 +25,8 @@ import {
   Stack,
   Text,
   HStack,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 
 const months = [
@@ -97,9 +99,10 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   titleHeading,
   hideChecked = false,
 }) => {
-  console.log(`ddd`, propData);
+
   // States
-  const [dateFilter, setDateFilter] = useState("17-Jul-4");
+  const [showdateFilter, setShowDateFilter] = useState(false);
+  const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
   const [quarterVal, setQuarterVal] = useState([0, 11]);
   const [showAllData, setShowAllData] = useState(false);
   const [data, setData] = useState(propData);
@@ -110,7 +113,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   const [showRawValues, setShowRawValues] = useState(false);
   const [showZoomIn, setShowZoomIn] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
 
   // Show and hide Menu
   const handleCheckboxChange = () => {
@@ -120,6 +123,39 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   useEffect(() => {
     setData(propData);
   }, [propData]);
+
+
+  useEffect(() => {
+    if (showdateFilter === false) {
+      setDateFilter(["2024-06-17"]);
+      setData(propData);
+    }
+    else{
+
+      const matchedweeklyData = propData.weekly.data.map(outerData => {
+        return {
+            ...outerData,
+            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+        };
+    });
+      
+
+      const matchedchangesData = propData.weekly.changes.map(outerData => {
+        return {
+            ...outerData,
+            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+        };
+    });
+
+    setData({
+      ...propData,
+      weekly: {
+        data: matchedweeklyData,
+        changes: matchedchangesData,
+      },
+    });
+    }
+  }, [showdateFilter,dateFilter.length]);
 
   const { series, names, allNames, dateOptions } = useMemo(() => {
     // let items =
@@ -332,7 +368,6 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     });
   }, [series]);
 
-  console.log("========> items: ", items, "series: ", series)
 
   const insights =
     selectedOption === "Both"
@@ -356,6 +391,20 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       setIsChecked(false);
     }
   }, [isChecked, names]);
+
+
+
+  const handleSelectDateChange = (e) => {
+    const value = e.target.value;
+
+    // Check if the value is already in the dateFilter array
+    if (!dateFilter.includes(value) && value) {
+      setDateFilter([...dateFilter, value]);
+      setSelectedDate(value);
+    }
+  };
+
+
   return (
     <section
       style={{
@@ -511,7 +560,6 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
         style={{
           position: "relative",
         }}
-        onClick={() => console.log(propData)}
       >
         <Chart options={options} series={series} type="bar" height={200} />
       </div>
@@ -532,7 +580,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
           className="my-item"
         >
           {items.map((item) => (
-            <span
+            <span key={item}
               style={{
                 background: isNaN(item)
                   ? "transparent"
@@ -756,6 +804,18 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                     >
                       Show Raw Values
                     </Checkbox>
+                    <Checkbox
+                      id="datefilter"
+                      checked={showdateFilter}
+                      onChange={(e) => setShowDateFilter(e.target.checked)}
+                      colorScheme="transparent"
+                      outline="none"
+                      iconColor="white"
+                      borderColor="white"
+                      size="lg"
+                    >
+                      Show Date Filter
+                    </Checkbox>
                   </Stack>
                 </div>
               </section>
@@ -782,6 +842,40 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   </Select>
 
                 </HStack> */}
+                
+                {showdateFilter && 
+            <>
+                <Box ml={5}>
+                  {dateFilter.length > 0 && 
+                    dateFilter.map((date) => 
+                      <Tag key={date} size="sm" variant="solid" colorScheme="teal" mb={4} mx={.5}>
+                    <TagLabel  >{date}</TagLabel> 
+                    
+                  </Tag>)
+                  }
+                </Box>
+                  <HStack mb={8} mx={5}>
+                    <Select
+                      value={selectedDate}
+                      onChange={handleSelectDateChange}
+                      style={{
+                        height: "30px",
+                        fontSize: "14px",
+                        padding: "4px",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      {
+                        propData.weekly.data?.[1].data.map((date) => (
+                          <option key={date.x} style={{color: "black" }} value={date.x}>{date.x}</option>
+                        ))
+                      }
+
+                    </Select>
+
+                  </HStack>
+            </>
+            }
             </>
           )}
 
