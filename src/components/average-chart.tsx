@@ -30,6 +30,8 @@ import {
   Stack,
   Text,
   HStack,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 
 export interface AverageChartProps {
@@ -58,14 +60,55 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   // States
   const [showZoomIn, setShowZoomIn] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const [dateFilter, setDateFilter] = useState("17-Jul-4");
+  const [showdateFilter, setShowDateFilter] = useState(false);
+  const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
+  const [selectedDate, setSelectedDate] = useState("");
 
-  //
   const [showAllData, setShowAllData] = useState(false);
   const [data, setData] = useState(propData);
   useEffect(() => {
     setData(propData);
   }, [propData]);
+  useEffect(() => {
+    if (showdateFilter === false) {
+      setDateFilter(["2024-06-17"]);
+      setData(propData);
+    }
+    else{
+
+      const matchedweeklyData = propData.weekly.data.map(outerData => {
+        return {
+            ...outerData,
+            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+        };
+    });
+      
+
+      const matchedchangesData = propData.weekly.changes.map(outerData => {
+        return {
+            ...outerData,
+            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+        };
+    });
+
+    
+    
+    
+    setData({
+      ...propData,
+      weekly: {
+        data: matchedweeklyData,
+        changes: matchedchangesData,
+      },
+    });
+    }
+  }, [showdateFilter,dateFilter.length]);
+  
+                              
+
+  //
+
+
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [quarterVal, setQuarterVal] = useState([0, 11]);
 
@@ -74,7 +117,10 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   const [showPercentages, setShowPercentages] = useState(false);
 
   const dataToUse = useMemo(() => {
+    
     let mainDataUse = [...data.weekly.data];
+
+
     mainDataUse = mainDataUse
       .filter((item) => {
         if (selectedDropdown === "Video") {
@@ -108,6 +154,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     }
     return mainDataUse;
   }, [data, selectedDropdown, quarterVal, selectedYear, showAllData]);
+
   const [insightsData, setInsights] = useState<Insights>({
     notes: {
       competition: "",
@@ -269,8 +316,8 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       },
     }),
     [dataToUse, showPercentages, showVals]
+    
   );
-
   const prevReqController = useRef(new AbortController());
   useEffect(() => {
     if (prevReqController.current) {
@@ -295,6 +342,17 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       : selectedDropdown === "Video"
       ? insightsData.videos
       : insightsData.notes;
+
+      const handleSelectDateChange = (e) => {
+        const value = e.target.value;
+    
+        // Check if the value is already in the dateFilter array
+        if (!dateFilter.includes(value) && value) {
+          setDateFilter([...dateFilter, value]);
+          setSelectedDate(value);
+        }
+      };
+  
   return (
     <div id="line-adwords">
       {/* Header Text */}
@@ -621,31 +679,54 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                     >
                       Show Raw Values
                     </Checkbox>
+                    <Checkbox
+                      id="datefilter"
+                      checked={showdateFilter}
+                      onChange={(e) => setShowDateFilter(e.target.checked)}
+                      colorScheme="transparent"
+                      outline="none"
+                      iconColor="white"
+                      borderColor="white"
+                      size="lg"
+                    >
+                      Show Date Filter
+                    </Checkbox>
                   </Stack>
                 </div>
               </section>
+            {showdateFilter && 
+            <>
+                <Box ml={5}>
+                  {dateFilter.length > 0 && 
+                    dateFilter.map((date) => 
+                      <Tag key={date} size="sm" variant="solid" colorScheme="teal" mb={4} mx={.5}>
+                    <TagLabel  >{date}</TagLabel> 
+                    
+                  </Tag>)
+                  }
+                </Box>
+                  <HStack mb={8} mx={5}>
+                    <Select
+                      value={selectedDate}
+                      onChange={handleSelectDateChange}
+                      style={{
+                        height: "30px",
+                        fontSize: "14px",
+                        padding: "4px",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      {
+                        propData.weekly.data?.[1].data.map((date) => (
+                          <option key={date.x} style={{color: "black" }} value={date.x}>{date.x}</option>
+                        ))
+                      }
 
-              <HStack spacing={4} mb={8}>
-                <Checkbox
-                  colorScheme="transparent"
-                  outline="none"
-                  iconColor="white"
-                  borderColor="white"
-                  size="lg"
-                />
-                <Select
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  style={{
-                    height: "30px",
-                    fontSize: "14px",
-                    padding: "4px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <option value="17-Jul-4">17-Jul-4</option>
-                </Select>
-              </HStack>
+                    </Select>
+
+                  </HStack>
+            </>
+            }
             </>
           )}
 
