@@ -44,7 +44,7 @@ export async function getLocalAverageData(): Promise<{
       created_at: string;
     }[];
   }> {
-    return axios.get("http://3.83.126.238:8000/local").then((res) => res.data);
+    return axios.get("http://34.201.129.52:8000/local").then((res) => res.data);
     // return axios.get("http://127.0.0.1:8000/local").then((res) => res.data);
   }
 
@@ -83,5 +83,5 @@ export async function getLocalQuarterlyData(): Promise<{
     quarter: LocalQuarterData[];
     week: LocalQuarterData;
   }> {
-    return axios.get("http://3.83.126.238:8000/local/quarter").then((res) => res.data);
+    return axios.get("http://34.201.129.52:8000/local/quarter").then((res) => res.data);
 }
