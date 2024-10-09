@@ -56,7 +56,28 @@ export async function getAverageData(): Promise<{
     created_at: string;
   }[];
 }> {
-  return axios.get("http://52.90.192.106:8000/").then((res) => res.data);
+  return axios
+    .get<{
+      weekly: ResData;
+      comparison: ComparisonData;
+      errors: {
+        id: number;
+        message: string;
+        created_at: string;
+      }[];
+    }>("http://3.83.126.238:8000/")
+    .then((res) => {
+      res.data.comparison.notes = res.data.comparison.notes.filter(
+        (item) => !item.name.includes("Avg") && !item.name.includes("Change")
+      );
+      res.data.comparison.videos = res.data.comparison.videos.filter(
+        (item) => !item.name.includes("Avg") && !item.name.includes("Change")
+      );
+      res.data.comparison.total = res.data.comparison.total.filter(
+        (item) => !item.name.includes("Avg") && !item.name.includes("Change")
+      );
+      return res.data;
+    });
   // return axios.get("http://127.0.0.1:8000/").then((res) => res.data);
 }
 export interface QuarterData {
@@ -81,7 +102,7 @@ export async function getQuarterlyData(): Promise<{
   week: QuarterData;
 }> {
   // return axios.get("http://127.0.0.1:8000/quarter").then((res) => res.data);
-  return axios.get("http://52.90.192.106:8000/quarter").then((res) => res.data);
+  return axios.get("http://3.83.126.238:8000/quarter").then((res) => res.data);
 }
 
 export async function getInsights(
@@ -92,7 +113,7 @@ export async function getInsights(
   signal: AbortSignal
 ): Promise<Insights> {
   return axios
-    .get("http://52.90.192.106:8000/insights", {
+    .get("http://3.83.126.238:8000/insights", {
       params: data,
       signal,
     })
@@ -101,8 +122,7 @@ export async function getInsights(
 
 export async function runJob() {
   return axios
-    .post("http://52.90.192.106:8000/insights")
+    .post("http://3.83.126.238:8000/insights")
     .then((res) => res)
     .catch((e) => console.error(e));
 }
-
