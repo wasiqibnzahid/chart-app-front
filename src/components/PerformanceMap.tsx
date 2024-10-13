@@ -7,93 +7,94 @@ const citiesData = [
     name: "Chihuahua",
     lat: 28.632996,
     lng: -106.0691,
-    performances: { week: [78], month: [80] },
+    performances: {},
   },
   {
     name: "CJ",
     lat: 31.690363,
     lng: -106.424547,
-    performances: { week: [85], month: [88] },
+    performances: {},
   },
   {
     name: "Morelos",
     lat: 18.681304,
     lng: -99.101349,
-    performances: { week: [60], month: [62] },
+    performances: {},
   },
   {
     name: "Jalisco",
     lat: 20.659698,
     lng: -103.349609,
-    performances: { week: [90], month: [92] },
+    performances: {},
   },
   {
-    name: "Bajío",
+    name: "Bajio",
     lat: 21.019,
     lng: -101.257358,
-    performances: { week: [72], month: [74] },
+    performances: {},
   },
   {
-    name: "Quintana Roo",
+    name: "Quintanaoo",
     lat: 18.5036,
     lng: -88.3055,
-    performances: { week: [50], month: [55] },
+    performances: {},
   },
   {
     name: "Guerrero",
     lat: 17.55219,
     lng: -99.514492,
-    performances: { week: [65], month: [67] },
+    performances: {},
   },
   {
     name: "Veracruz",
     lat: 19.173773,
     lng: -96.134224,
-    performances: { week: [80], month: [82] },
+    performances: {},
   },
   {
     name: "Puebla",
     lat: 19.041297,
     lng: -98.2062,
-    performances: { week: [55], month: [58] },
+    performances: {},
   },
   {
     name: "Chiapas",
     lat: 16.750384,
     lng: -93.116667,
-    performances: { week: [68], month: [70] },
+    performances: {},
   },
   {
     name: "Aguascalientes",
     lat: 21.8818,
     lng: -102.291656,
-    performances: { week: [75], month: [78] },
+    performances: {},
   },
   {
     name: "Sinaloa",
     lat: 24.809065,
     lng: -107.394383,
-    performances: { week: [62], month: [65] },
+    performances: {},
   },
   {
-    name: "Yucatán",
+    name: "Yucatan",
     lat: 20.96737,
     lng: -89.592586,
-    performances: { week: [88], month: [90] },
+    performances: {},
   },
   {
     name: "Baja California",
     lat: 30.8406,
     lng: -115.2838,
-    performances: { week: [70], month: [72] },
+    performances: {},
   },
   {
-    name: "Querétaro",
+    name: "Queretaro",
     lat: 20.5888,
     lng: -100.3899,
-    performances: { week: [75], month: [78] },
+    performances: {},
   },
 ];
+
 
 // Weekly and monthly general TV Azteca performance data
 const generalAztecaPerformance = {
@@ -101,8 +102,33 @@ const generalAztecaPerformance = {
   month: [75],
 };
 
-const PerformanceMap = () => {
+const PerformanceMap = (data) => {
+  
   const [view, setView] = useState("week"); // State to toggle between week and month
+
+  // Function to update citiesData based on performance data
+  const updateCityPerformance = (cityName, average, weekValue) => {
+    
+    const city = citiesData.find(city => city.name === cityName);
+    if (city) {
+      city.performances = {
+        week: weekValue,
+        month: average,
+      };
+    }
+  };
+
+  // Process video data
+  data.data.comparison.total.forEach(({ name, data }) => {
+    const lastFourData = data?.slice(-4);
+    const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
+    const average = sum / lastFourData?.length;
+    
+    // Use the update function
+    
+    updateCityPerformance(name,  average, data[data?.length - 1].y);
+    
+  });
 
   // Get the current performance data based on the selected view
   const currentPerformance =
@@ -165,7 +191,7 @@ const PerformanceMap = () => {
             center={[city.lat, city.lng]}
             color="black" // Border color
             radius={10}
-            fillColor={getColor(city.performances[view][0], currentPerformance)} // Use correct view performance
+            fillColor={getColor(city.performances[view], currentPerformance)} // Use correct view performance
             fillOpacity={0.8}
           >
             <Tooltip direction="top" offset={[0, -10]} opacity={1}>
@@ -173,7 +199,7 @@ const PerformanceMap = () => {
                 <strong>{city.name}</strong>
                 <br />
                 {view === "week" ? "Weekly" : "Monthly"} Performance:{" "}
-                {city.performances[view][0]}
+                {city.performances[view]}
                 <br />
                 General TV Azteca {view === "week" ? "Weekly" : "Monthly"}:{" "}
                 {currentPerformance}
