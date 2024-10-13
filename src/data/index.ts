@@ -66,6 +66,7 @@ export async function getAverageData(): Promise<{
         created_at: string;
       }[];
     }>("http://34.201.129.52:8000/")
+    // }>("http://localhost:8000/")
     .then((res) => {
       res.data.comparison.notes = res.data.comparison.notes.filter(
         (item) => !item.name.includes("Avg") && !item.name.includes("Change")
@@ -114,6 +115,7 @@ export async function getInsights(
 ): Promise<Insights> {
   return axios
     .get("http://34.201.129.52:8000/insights", {
+    // .get("http://localhost:8000/insights", {
       params: data,
       signal,
     })
@@ -123,6 +125,7 @@ export async function getInsights(
 export async function runJob() {
   return axios
     .post("http://34.201.129.52:8000/insights")
+    // .post("http://localhost:8000/insights")
     .then((res) => res)
     .catch((e) => console.error(e));
 }

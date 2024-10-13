@@ -609,10 +609,10 @@ export const LocalOverview = () => {
         <div className="col-12">
           <SimpleGrid columns={[1, 2]} spacing={5}>
             <section className="boxHeatmap">
-              <PerformanceMap />
+              <PerformanceMap data={data} />
             </section>
             <section className="box">
-              <Heatmap />
+              <Heatmap data={data} />
             </section>
           </SimpleGrid>
         </div>
