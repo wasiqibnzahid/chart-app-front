@@ -86,3 +86,19 @@ export async function getLocalQuarterlyData(): Promise<{
     return axios.get("http://34.201.129.52:8000/local/quarter").then((res) => res.data);
     // return axios.get("http://localhost:8000/local/quarter").then((res) => res.data);
 }
+
+export async function getLocalInsights(
+  data: {
+    start: string;
+    end: string;
+  },
+  signal: AbortSignal
+): Promise<Insights> {
+  return axios
+    .get("http://34.201.129.52:8000/local/insights", {
+    // .get("http://localhost:8000/local/insights", {
+      params: data,
+      signal,
+    })
+    .then((res) => res.data);
+}

@@ -129,6 +129,7 @@ useEffect(()=>{
     });
 
     setCities(updatedCities);
+    toggleView()
   }, [data]);
 
   // Get the current performance data based on the selected view

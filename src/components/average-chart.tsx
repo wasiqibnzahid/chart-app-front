@@ -61,17 +61,17 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   const [showZoomIn, setShowZoomIn] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const [showdateFilter, setShowDateFilter] = useState(false);
-  const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
+  const [dateFilter, setDateFilter] = useState([""]);
   const [selectedDate, setSelectedDate] = useState("");
 
   const [showAllData, setShowAllData] = useState(false);
   const [data, setData] = useState(propData);
   useEffect(() => {
+    setDateFilter([propData?.weekly?.data[0]?.data[0]?.x]);
     setData(propData);
   }, [propData]);
   useEffect(() => {
     if (showdateFilter === false) {
-      setDateFilter(["2024-06-17"]);
       setData(propData);
     }
     else{

@@ -47,77 +47,97 @@ const VerticalRidarCharts = (data) => {
     },
   };
 
-  // Push data to videos 
-  data.data.comparison.videos.map((name) => {
-    // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
-    if (tvAztecaLabels.includes(name.name)) {
-      // Get the last four data points
-      const lastFourData = name.data.slice(-4); // Slice to get the last four entries
-  
-      const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
-      const average = sum / lastFourData.length; // Calculate the average
-  
-      // Push the average to companyDataSets.Video.Month
-      tvAztecaDataSets.Video.Month.push(average);
-      // Push the last value of y to companyDataSets.Video.Week
-      tvAztecaDataSets.Video.Week.push(name.data[name.data.length - 1].y);
-    }
-  });
 
 
-  // Push data to Nota 
-  data.data.comparison.notes.map((name) => {
-    // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
-    if (tvAztecaLabels.includes(name.name)) {
-      // Get the last four data points
-      const lastFourData = name.data.slice(-4); // Slice to get the last four entries
+  // Assuming tvAztecaLabels is an array of labels you want to match against
+  tvAztecaLabels.forEach((label) => {
+  // Find the corresponding data entry based on the label
+  const tvAztecaVideoData = data.data.comparison.videos.find(video => video.name === label);
+  const tvAztecaNoteData = data.data.comparison.notes.find(note => note.name === label);
   
-      const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
-      const average = sum / lastFourData.length; // Calculate the average
-  
-      // Push the average to companyDataSets.Video.Month
-      tvAztecaDataSets.Nota.Month.push(average);
-      // Push the last value of y to companyDataSets.Video.Week
-      tvAztecaDataSets.Nota.Week.push(name.data[name.data.length - 1].y);
-    }
-  });
+  if (tvAztecaVideoData) {
+    // Get the last four data points
+    const lastFourData = tvAztecaVideoData.data.slice(-4); // Slice to get the last four entries
+
+    const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+    const average = sum / lastFourData.length; // Calculate the average
+
+    // Push the average to companyDataSets.Video.Month
+    tvAztecaDataSets.Video.Month.push(average);
+    
+    // Push the last value of y to companyDataSets.Video.Week
+    tvAztecaDataSets.Video.Week.push(tvAztecaVideoData.data[tvAztecaVideoData.data.length - 1].y);
+  } else {
+    // If there's no matching data, you might want to handle it (e.g., push a default value)
+    tvAztecaDataSets.Video.Month.push(0); // or another default value
+    tvAztecaDataSets.Video.Week.push(0); // or another default value
+  }
+  if (tvAztecaNoteData) {
+    // Get the last four data points
+    const lastFourData = tvAztecaNoteData.data.slice(-4); // Slice to get the last four entries
+
+    const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+    const average = sum / lastFourData.length; // Calculate the average
+
+    // Push the average to companyDataSets.Video.Month
+    tvAztecaDataSets.Nota.Month.push(average);
+    
+    // Push the last value of y to companyDataSets.Video.Week
+    tvAztecaDataSets.Nota.Week.push(tvAztecaNoteData.data[tvAztecaNoteData.data.length - 1].y);
+  } else {
+    // If there's no matching data, you might want to handle it (e.g., push a default value)
+    tvAztecaDataSets.Nota.Month.push(0); // or another default value
+    tvAztecaDataSets.Nota.Week.push(0); // or another default value
+  }
+});
+
+
+
   
   // competitor
 
-    // Push data to videos 
-    data.data.comparison.videos.map((name) => {
-      // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
-      if (competitorLabels.includes(name.name)) {
-        // Get the last four data points
-        const lastFourData = name.data.slice(-4); // Slice to get the last four entries
-    
-        const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
-        const average = sum / lastFourData.length; // Calculate the average
-    
-        // Push the average to companyDataSets.Video.Month
-        competitorDataSets.Video.Month.push(average);
-        // Push the last value of y to companyDataSets.Video.Week
-        competitorDataSets.Video.Week.push(name.data[name.data.length - 1].y);
-      }
-    });
+// Assuming competitorLabels is an array of labels you want to match against
+competitorLabels.forEach((label) => {
+  // Find the corresponding data entry based on the label
+  const competitorVideoData = data.data.comparison.videos.find(video => video.name === label);
+  const competitorNoteData = data.data.comparison.notes.find(note => note.name === label);
   
-  
-    // Push data to Nota 
-    data.data.comparison.notes.map((name) => {
-      // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
-      if (competitorLabels.includes(name.name)) {
-        // Get the last four data points
-        const lastFourData = name.data.slice(-4); // Slice to get the last four entries
+  if (competitorVideoData) {
+    // Get the last four data points
+    const lastFourData = competitorVideoData.data.slice(-4); // Slice to get the last four entries
+
+    const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+    const average = sum / lastFourData.length; // Calculate the average
+
+    // Push the average to companyDataSets.Video.Month
+    competitorDataSets.Video.Month.push(average);
     
-        const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
-        const average = sum / lastFourData.length; // Calculate the average
+    // Push the last value of y to companyDataSets.Video.Week
+    competitorDataSets.Video.Week.push(competitorVideoData.data[competitorVideoData.data.length - 1].y);
+  } else {
+    // If there's no matching data, you might want to handle it (e.g., push a default value)
+    competitorDataSets.Video.Month.push(0); // or another default value
+    competitorDataSets.Video.Week.push(0); // or another default value
+  }
+  if (competitorNoteData) {
+    // Get the last four data points
+    const lastFourData = competitorNoteData.data.slice(-4); // Slice to get the last four entries
+
+    const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+    const average = sum / lastFourData.length; // Calculate the average
+
+    // Push the average to companyDataSets.Video.Month
+    competitorDataSets.Nota.Month.push(average);
     
-        // Push the average to companyDataSets.Video.Month
-        competitorDataSets.Nota.Month.push(average);
-        // Push the last value of y to companyDataSets.Video.Week
-        competitorDataSets.Nota.Week.push(name.data[name.data.length - 1].y);
-      }
-    });
+    // Push the last value of y to companyDataSets.Video.Week
+    competitorDataSets.Nota.Week.push(competitorNoteData.data[competitorNoteData.data.length - 1].y);
+  } else {
+    // If there's no matching data, you might want to handle it (e.g., push a default value)
+    competitorDataSets.Nota.Month.push(0); // or another default value
+    competitorDataSets.Nota.Week.push(0); // or another default value
+  }
+});
+
 
   return (
     <SimpleGrid columns={[1, 2]} spacing={5}>

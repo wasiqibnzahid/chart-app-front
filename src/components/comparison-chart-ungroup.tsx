@@ -7,11 +7,11 @@ import Chart from "react-apexcharts";
 // Api
 import {
   ComparisonData,
-  getInsights,
   Insights,
   QuarterData,
   ResData,
 } from "../data";
+import {getLocalInsights} from "../data/local_data_api_calls"
 
 // UI Elements
 import {
@@ -100,7 +100,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
 }) => {
   // States
   const [showdateFilter, setShowDateFilter] = useState(false);
-	const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
+	const [dateFilter, setDateFilter] = useState([""]);
   const [quarterVal, setQuarterVal] = useState([0, 11]);
   const [showAllData, setShowAllData] = useState(false);
   const [data, setData] = useState(propData);
@@ -119,12 +119,12 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
   };
 
   useEffect(() => {
+    setDateFilter([propData?.comparison?.videos[0]?.data[0]?.x]);
     setData(propData);
   }, [propData]);
 
   useEffect(() => {
 		if (showdateFilter === false) {
-		  setDateFilter(["2024-06-17"]);
 		  setData(propData);
 		}
 		else{
@@ -235,7 +235,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       prevReqController.current.abort();
     }
     prevReqController.current = new AbortController();
-    getInsights(
+    getLocalInsights(
       {
         start: `${quarterVal[0] > 8 ? "" : "0"}${
           quarterVal[0] + 1
