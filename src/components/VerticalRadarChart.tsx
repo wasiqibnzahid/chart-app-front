@@ -154,7 +154,6 @@ const VerticalRadarChart = ({ title, labels, dataSets }) => {
   };
 
 
-  console.log(`==============> VerticalRadarChartLeft: ${labels}`, dataSets)
 
   const options = {
     maintainAspectRatio: false,

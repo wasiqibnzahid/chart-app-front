@@ -276,6 +276,11 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       title: {
         text: "Values",
       },
+      labels: {
+        formatter(val) {
+          return val.toString();
+        },
+      },
     },
     xaxis: {
       categories: names,

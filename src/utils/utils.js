@@ -190,5 +190,4 @@ function calculateQuarterlyAverages(data) {
   return quarterlyAverages;
 }
 export const finalData = calculateQuarterlyAverages(data);
-// console.log
 export const averageLabels = Object.keys(finalData);

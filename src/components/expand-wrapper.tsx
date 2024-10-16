@@ -32,14 +32,28 @@ export const ExpandWrapper: React.FC<PropsWithChildren> = ({ children }) => {
           >
             <div
               style={{
-                width: "70vw",
+                width: "100vw",
+                height: "100vh",
                 position: "fixed",
-                left: "50%",
-                top: "50%",
-                transform: "translate(-50%,-50%)",
+                left: "0",
+                top: "0",
+                zIndex:"1",
+                // transform: "translate(-50%,-50%)",
               }}
               className="h-screen w-screen"
             >
+            <div
+              style={{
+                position: "absolute",
+                right: "1.5rem",
+                top: "23px",
+               cursor: "pointer",
+               zIndex: "1",
+              }}
+              onClick={() => setIsOpen(false)}
+            >
+          <img style={{ width: "20px" }} src="/Cross.svg" />
+        </div>
               <div className="box" style={{ paddingBottom: "5rem" }}>
                 {children}
               </div>

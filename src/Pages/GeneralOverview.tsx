@@ -53,7 +53,6 @@ export const GeneralOverview = () => {
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     getAverageData().then((res) => {
-      console.log("ZE RES", res);
       // if (res?.errors && res?.errors.length) {
       //   let str = "";
       //   res.errors.forEach((e) => {
@@ -102,10 +101,9 @@ export const GeneralOverview = () => {
   }, [data, topbarMode]);
 
 
-  console.log("-==========> data.weekComparison: ", data.weekComparison)
 
   function changeTopbarMode() {
-    setTopbarMode(topbarMode === "quarter" ? "week" : "quarter");
+    setTopbarMode(topbarMode === "week" ? "month" : "week");
   }
   
   return (
@@ -135,7 +133,7 @@ export const GeneralOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    TV Azteca
+                    TVA
                   </Radio>
                 </div>
                 <div className="toggle-container d-flex align-items-center">
@@ -145,7 +143,7 @@ export const GeneralOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    Competition
+                    Comp
                   </Radio>
                 </div>
               </RadioGroup>
@@ -298,7 +296,7 @@ export const GeneralOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    TV Azteca
+                    TVA
                   </Radio>
                 </div>
                 <div className="toggle-container d-flex align-items-center">
@@ -308,7 +306,7 @@ export const GeneralOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    Competition
+                    Comp
                   </Radio>
                 </div>
               </RadioGroup>
@@ -454,7 +452,7 @@ export const GeneralOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    TV Azteca
+                    TVA
                   </Radio>
                 </div>
                 <div className="toggle-container d-flex align-items-center">
@@ -464,7 +462,7 @@ export const GeneralOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    Competition
+                    Comp
                   </Radio>
                 </div>
               </RadioGroup>
@@ -619,10 +617,12 @@ export const GeneralOverview = () => {
         <div className="col-12">
           <div className="box shadow mt-2">
             <div id="barchart">
+            <ExpandWrapper>
               <PipeCombineChart
                 data={data}
                 titleHeading="General Overview - TVA vs. Comp. Weeb by Week Bar"
               />
+              </ExpandWrapper>
             </div>
           </div>
         </div>

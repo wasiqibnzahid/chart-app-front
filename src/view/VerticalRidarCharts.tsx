@@ -2,49 +2,122 @@ import { SimpleGrid } from "@chakra-ui/react";
 import RadarChart from "../components/VerticalRadarChart";
 import { ExpandWrapper } from "../components/expand-wrapper";
 
-const VerticalRidarCharts = () => {
+const VerticalRidarCharts = (data) => {
   // Data for the two charts
   const tvAztecaLabels = [
     "UNO",
     "Deportes",
     "Noticias",
     "ADN40",
-    "a+",
-    "Azteca 7",
+    "A+",
+    "7",
   ];
   const competitorLabels = [
-    "El Heraldo",
+    "Heraldo",
     "NY Times",
     "Televisa",
     "Milenio",
     "Infobae",
-    "El Universal",
+    "Universal",
     "AS",
     "Terra",
   ];
 
+  
   // Sample Data (Week/Month data for Video, Nota, General)
   const tvAztecaDataSets = {
     Video: {
-      Week: [70, 60, 90, 80, 50, 75],
-      Month: [80, 70, 85, 90, 65, 80],
+      Week: [],
+      Month: [],
     },
     Nota: {
-      Week: [60, 50, 75, 65, 40, 70],
-      Month: [70, 60, 80, 85, 55, 75],
+      Week: [],
+      Month: [],
     },
   };
 
   const competitorDataSets = {
     Video: {
-      Week: [65, 70, 80, 75, 85, 60, 70, 60],
-      Month: [75, 80, 85, 70, 90, 75, 60, 80],
+      Week: [],
+      Month: [],
     },
     Nota: {
-      Week: [55, 60, 70, 65, 75, 55, 50, 77],
-      Month: [65, 70, 80, 65, 85, 65, 70, 66],
+      Week: [],
+      Month: [],
     },
   };
+
+  // Push data to videos 
+  data.data.comparison.videos.map((name) => {
+    // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
+    if (tvAztecaLabels.includes(name.name)) {
+      // Get the last four data points
+      const lastFourData = name.data.slice(-4); // Slice to get the last four entries
+  
+      const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+      const average = sum / lastFourData.length; // Calculate the average
+  
+      // Push the average to companyDataSets.Video.Month
+      tvAztecaDataSets.Video.Month.push(average);
+      // Push the last value of y to companyDataSets.Video.Week
+      tvAztecaDataSets.Video.Week.push(name.data[name.data.length - 1].y);
+    }
+  });
+
+
+  // Push data to Nota 
+  data.data.comparison.notes.map((name) => {
+    // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
+    if (tvAztecaLabels.includes(name.name)) {
+      // Get the last four data points
+      const lastFourData = name.data.slice(-4); // Slice to get the last four entries
+  
+      const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+      const average = sum / lastFourData.length; // Calculate the average
+  
+      // Push the average to companyDataSets.Video.Month
+      tvAztecaDataSets.Nota.Month.push(average);
+      // Push the last value of y to companyDataSets.Video.Week
+      tvAztecaDataSets.Nota.Week.push(name.data[name.data.length - 1].y);
+    }
+  });
+  
+  // competitor
+
+    // Push data to videos 
+    data.data.comparison.videos.map((name) => {
+      // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
+      if (competitorLabels.includes(name.name)) {
+        // Get the last four data points
+        const lastFourData = name.data.slice(-4); // Slice to get the last four entries
+    
+        const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+        const average = sum / lastFourData.length; // Calculate the average
+    
+        // Push the average to companyDataSets.Video.Month
+        competitorDataSets.Video.Month.push(average);
+        // Push the last value of y to companyDataSets.Video.Week
+        competitorDataSets.Video.Week.push(name.data[name.data.length - 1].y);
+      }
+    });
+  
+  
+    // Push data to Nota 
+    data.data.comparison.notes.map((name) => {
+      // Filter the data based on a condition (example: only include names that are in the tvAztecaLabels)
+      if (competitorLabels.includes(name.name)) {
+        // Get the last four data points
+        const lastFourData = name.data.slice(-4); // Slice to get the last four entries
+    
+        const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+        const average = sum / lastFourData.length; // Calculate the average
+    
+        // Push the average to companyDataSets.Video.Month
+        competitorDataSets.Nota.Month.push(average);
+        // Push the last value of y to companyDataSets.Video.Week
+        competitorDataSets.Nota.Week.push(name.data[name.data.length - 1].y);
+      }
+    });
 
   return (
     <SimpleGrid columns={[1, 2]} spacing={5}>

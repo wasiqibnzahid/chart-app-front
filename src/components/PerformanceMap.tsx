@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Box, Text, Button, HStack } from "@chakra-ui/react";
@@ -105,30 +105,31 @@ const generalAztecaPerformance = {
 const PerformanceMap = (data) => {
   
   const [view, setView] = useState("week"); // State to toggle between week and month
+  const [cities, setCities] = useState(citiesData.map(city => ({ ...city, performances: { week: 0, month: 0 } }))); // Initialize performances
+useEffect(()=>{
 
-  // Function to update citiesData based on performance data
-  const updateCityPerformance = (cityName, average, weekValue) => {
+},[cities])
+  useEffect(() => {
+    const updatedCities = [...cities];
     
-    const city = citiesData.find(city => city.name === cityName);
-    if (city) {
-      city.performances = {
-        week: weekValue,
-        month: average,
-      };
-    }
-  };
+    // Process video data
+    data.data.comparison.total.forEach(({ name, data }) => {
+      const lastFourData = data?.slice(-4);
+      const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
+      const average = sum / lastFourData?.length;
 
-  // Process video data
-  data.data.comparison.total.forEach(({ name, data }) => {
-    const lastFourData = data?.slice(-4);
-    const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
-    const average = sum / lastFourData?.length;
-    
-    // Use the update function
-    
-    updateCityPerformance(name,  average, data[data?.length - 1].y);
-    
-  });
+      // Update city performance
+      const city = updatedCities.find(city => city.name === name);
+      if (city) {
+        city.performances = {
+          week: data[data.length - 1].y || 0, // Use last week's value or 0 if undefined
+          month: average || 0, // Use average or 0 if undefined
+        };
+      }
+    });
+
+    setCities(updatedCities);
+  }, [data]);
 
   // Get the current performance data based on the selected view
   const currentPerformance =
@@ -136,6 +137,8 @@ const PerformanceMap = (data) => {
 
   // Function to get the color based on updated logic
   const getColor = (performance: number, general: number) => {
+    
+    
     const lowerThreshold = general * 0.85; // 15% below the general value
     if (performance < lowerThreshold) return "red"; // More than 15% below general
     if (performance >= lowerThreshold && performance < general) return "yellow"; // Less than general but within the 15% range
@@ -146,9 +149,10 @@ const PerformanceMap = (data) => {
   const toggleView = () => {
     setView(view === "week" ? "month" : "week");
   };
+    
 
   return (
-    <Box p={0} mb={0} borderRadius="lg" position="relative" height="70vh">
+    <Box p={0} mb={0} borderRadius="lg" position="relative" height="530px">
       <button
         onClick={toggleView}
         style={{
@@ -185,13 +189,14 @@ const PerformanceMap = (data) => {
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        {citiesData.map((city, idx) => (
+        {cities.map((city, idx) => {
+          return (
           <CircleMarker
             key={`${idx}-${view}`} // Force re-render on view change
             center={[city.lat, city.lng]}
             color="black" // Border color
             radius={10}
-            fillColor={getColor(city.performances[view], currentPerformance)} // Use correct view performance
+            fillColor={getColor(city?.performances[view], currentPerformance)} // Use correct view performance
             fillOpacity={0.8}
           >
             <Tooltip direction="top" offset={[0, -10]} opacity={1}>
@@ -206,7 +211,7 @@ const PerformanceMap = (data) => {
               </span>
             </Tooltip>
           </CircleMarker>
-        ))}
+        )})}
       </MapContainer>
     </Box>
   );

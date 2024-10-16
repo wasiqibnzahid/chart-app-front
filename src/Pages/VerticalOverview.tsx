@@ -51,7 +51,6 @@ export const VerticalOverview = () => {
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     getAverageData().then((res) => {
-      console.log("ZE RES", res);
       // if (res?.errors && res?.errors.length) {
       //   let str = "";
       //   res.errors.forEach((e) => {
@@ -100,7 +99,7 @@ export const VerticalOverview = () => {
   }, [data, topbarMode]);
 
   function changeTopbarMode() {
-    setTopbarMode(topbarMode === "quarter" ? "week" : "quarter");
+    setTopbarMode(topbarMode === "week" ? "month" : "week");
   }
   return (
     <div className="main">
@@ -128,7 +127,7 @@ export const VerticalOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    TV Azteca
+                    TVA
                   </Radio>
                 </div>
                 <div className="toggle-container d-flex align-items-center">
@@ -138,7 +137,7 @@ export const VerticalOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    Competition
+                    Comp
                   </Radio>
                 </div>
               </RadioGroup>
@@ -285,7 +284,7 @@ export const VerticalOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    TV Azteca
+                    TVA
                   </Radio>
                 </div>
                 <div className="toggle-container d-flex align-items-center">
@@ -295,7 +294,7 @@ export const VerticalOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    Competition
+                    Comp
                   </Radio>
                 </div>
               </RadioGroup>
@@ -440,7 +439,7 @@ export const VerticalOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    TV Azteca
+                    TVA
                   </Radio>
                 </div>
                 <div className="toggle-container d-flex align-items-center">
@@ -450,7 +449,7 @@ export const VerticalOverview = () => {
                     style={{ marginBottom: "0" }}
                     size="sm"
                   >
-                    Competition
+                    Comp
                   </Radio>
                 </div>
               </RadioGroup>
@@ -576,7 +575,7 @@ export const VerticalOverview = () => {
 
       <div className="row custom-row">
         <div className="col-12">
-          <VerticalRidarCharts />
+          <VerticalRidarCharts data={data} />
         </div>
       </div>
 
