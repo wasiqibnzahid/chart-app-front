@@ -102,7 +102,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
 
   // States
   const [showdateFilter, setShowDateFilter] = useState(false);
-  const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
+  const [dateFilter, setDateFilter] = useState([""]);
   const [quarterVal, setQuarterVal] = useState([0, 11]);
   const [showAllData, setShowAllData] = useState(false);
   const [data, setData] = useState(propData);
@@ -121,13 +121,13 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   };
 
   useEffect(() => {
+    setDateFilter([propData?.weekly?.data[0]?.data[0]?.x]);
     setData(propData);
   }, [propData]);
 
 
   useEffect(() => {
     if (showdateFilter === false) {
-      setDateFilter(["2024-06-17"]);
       setData(propData);
     }
     else{

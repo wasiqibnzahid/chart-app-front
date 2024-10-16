@@ -67,13 +67,14 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
 	const [showDataFromDate, setShowDataFromDate] = useState(false);
 	
 	const [showdateFilter, setShowDateFilter] = useState(false);
-	const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
+	const [dateFilter, setDateFilter] = useState([""]);
 	const [selectedDate, setSelectedDate] = useState("");
 
 	//
 	const [showAllData, setShowAllData] = useState(false);
 	const [data, setData] = useState(propData);
 	useEffect(() => {
+		setDateFilter([propData?.weekly?.data[0]?.data[0]?.x]);
 		setData(propData);
 	}, [propData]);
 	const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -87,7 +88,6 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
 
 	useEffect(() => {
 		if (showdateFilter === false) {
-		  setDateFilter(["2024-06-17"]);
 		  setData(propData);
 		}
 		else{
