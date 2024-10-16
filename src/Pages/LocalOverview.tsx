@@ -113,11 +113,9 @@ export const LocalOverview = () => {
   }, [data, topbarMode]);
 
   function changeTopbarMode() {
-    setTopbarMode(topbarMode === "month" ? "week" : "month");
+    setTopbarMode(topbarMode === "week" ? "month" : "week");
   }
 
-  console.log("================> currentQuarter?.azteca: ", currentQuarter?.azteca)
-  console.log("================> currentQuarter?.comptition: ", currentQuarter?.competition)
 
   const combinedData = useMemo(() => {
     if(currentQuarter?.azteca?.length > 0 && currentQuarter?.competition?.length > 0) {
@@ -126,7 +124,6 @@ export const LocalOverview = () => {
     return []
   }, [currentQuarter])
 
-  console.log("===========> combinedData: ", combinedData)
 
   return (
     <div className="main">

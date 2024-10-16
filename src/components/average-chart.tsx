@@ -248,7 +248,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       yaxis: {
         labels: {
           formatter(val) {
-            return val?.toFixed?.(2) || val.toString();
+            return val.toString();
           },
         },
       },

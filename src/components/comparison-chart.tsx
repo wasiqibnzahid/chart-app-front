@@ -96,7 +96,6 @@ const BarChart: React.FC<BarChartProps> = ({
 	data: propData,
 	titleHeading,
 }) => {
-	console.log(`=========================> propData ${titleHeading}`, propData);
 	// States
 	const [showdateFilter, setShowDateFilter] = useState(false);
 	const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
@@ -214,7 +213,6 @@ const BarChart: React.FC<BarChartProps> = ({
 		showAllData,
 	]);
 
-	console.log("==========> names: ", names, " ==========> allNames: ", allNames)
 
 	const [insightsData, setInsights] = useState<Insights>({
 		notes: {
@@ -261,6 +259,11 @@ const BarChart: React.FC<BarChartProps> = ({
 			title: {
 				text: "Values",
 			},
+			labels: {
+				formatter(val) {
+				  return val.toString();
+				},
+			  },
 		},
 		xaxis: {
 			categories: names,
@@ -318,7 +321,6 @@ const BarChart: React.FC<BarChartProps> = ({
 		});
 	}, [series]);
 
-	console.log("===============> items and series: ", items, series)
 
 	const insights =
 		selectedOption === "Both"

@@ -98,7 +98,6 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
   titleHeading,
   disableGrouping = false,
 }) => {
-  console.log(`-----------> ddd ${titleHeading}`, propData);
   // States
   const [showdateFilter, setShowDateFilter] = useState(false);
 	const [dateFilter, setDateFilter] = useState(["2024-06-17"]);
@@ -166,6 +165,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
         : selectedOption === "Video"
         ? data.comparison.videos
         : data.comparison.notes;
+      
     const allNames = items.map((item) => item.name);
     items = items.filter((item) => !removedNames.includes(item.name));
     const names = items.map((item) => item.name);
@@ -215,7 +215,6 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
     removedNames,
     showAllData,
   ]);
-  console.log("========> series; ", series)
   const [insightsData, setInsights] = useState<Insights>({
     notes: {
       competition: "",
@@ -261,6 +260,11 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       title: {
         text: "Values",
       },
+      labels: {
+        formatter(val) {
+          return val.toString();
+        },
+        },
     },
     xaxis: {
       // categories: names,
@@ -504,7 +508,6 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
         style={{
           position: "relative",
         }}
-        onClick={() => console.log(series)}
       >
         <Chart options={options} series={series} type="bar" height={200} />
       </div>

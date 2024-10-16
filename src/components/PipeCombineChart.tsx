@@ -288,9 +288,9 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
 			yaxis: {
 				labels: {
 					formatter(val) {
-						return val?.toFixed?.(2) || val.toString();
+					  return val.toString();
 					},
-				},
+				  },
 			},
 			legend: {
 				position: "bottom",
@@ -716,7 +716,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
         type="line"
         height={500}
       /> */}
-			<div onClick={() => console.log("FAFA", propData, dataToUse)}>ASD</div>
+			<div>ASD</div>
 			<Chart options={optionsBar} series={dataToUse} type="bar" height={228} />
 			{/* Range Line */}
 			<div
