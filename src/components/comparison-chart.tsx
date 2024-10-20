@@ -31,18 +31,18 @@ import {
 } from "@chakra-ui/react";
 
 const months = [
-	"January", // 0
-	"February", // 1
-	"March", // 2
-	"April", // 3
+	"Jan", // 0
+	"Feb", // 1
+	"Mar", // 2
+	"Apr", // 3
 	"May", // 4
-	"June", // 5
-	"July", // 6
-	"August", // 7
-	"September", // 8
-	"October", // 9
-	"November", // 10
-	"December", // 11
+	"Jun", // 5
+	"Jul", // 6
+	"Aug", // 7
+	"Sep", // 8
+	"Oct", // 9
+	"Nov", // 10
+	"Dec", // 11
 ];
 const colors = [
 	"#FF5733",
@@ -316,9 +316,18 @@ const BarChart: React.FC<BarChartProps> = ({
 
 	const items = useMemo(() => {
 		return names.map((_name, index) => {
-			const first = series?.[0]?.data?.[index];
-			const last = series?.[series.length - 1]?.data?.[index];
-			return Number(calculatePercentageChange(first, last).toFixed?.(0));
+		  let sum_differences = 0
+		  for (let i = 1; i <= series.length -1; i++) {        
+			sum_differences = sum_differences + (series?.[i]?.data?.[index] - series?.[i -1 ]?.data?.[index])
+		  }
+		  const average = sum_differences / (series.length - 1)
+		  
+		  
+		  // const first = series?.[0]?.data?.[index];
+		  // const last = series?.[series.length - 1]?.data?.[index];
+		  
+		  // return Number(calculatePercentageChange(first, last).toFixed?.(0));
+		  return Number(average.toFixed?.(1));
 		});
 	}, [series]);
 
