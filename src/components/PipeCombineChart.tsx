@@ -44,18 +44,18 @@ export interface AverageChartProps {
 }
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
-	"January", // 0
-	"February", // 1
-	"March", // 2
-	"April", // 3
+	"Jan", // 0
+	"Feb", // 1
+	"Mar", // 2
+	"Apr", // 3
 	"May", // 4
-	"June", // 5
-	"July", // 6
-	"August", // 7
-	"September", // 8
-	"October", // 9
-	"November", // 10
-	"December", // 11
+	"Jun", // 5
+	"Jul", // 6
+	"Aug", // 7
+	"Sept", // 8
+	"Oct", // 9
+	"Nov", // 10
+	"Dec", // 11
 ];
 const PipeCombineChart: React.FC<AverageChartProps> = ({
 	data: propData,
@@ -217,7 +217,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
 			plotOptions: {
 				bar: {
 					columnWidth: "45%",
-					borderRadius: 5, // Rounded corners for the bars
+					borderRadius: 0, // Rounded corners for the bars
 					distributed: false, // Set to true for separate coloring of bars,
 					dataLabels: {
 						position: "top", // Position the data label at the top
@@ -735,7 +735,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
 					isDisabled={showAllData}
 				>
 					<RangeSliderTrack bg="red.100">
-						<RangeSliderFilledTrack bg="#a8def8" />
+						<RangeSliderFilledTrack />
 					</RangeSliderTrack>
 					<RangeSliderThumb boxSize={3} index={0} />
 					<RangeSliderThumb boxSize={3} index={1} />

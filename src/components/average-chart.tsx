@@ -43,18 +43,18 @@ export interface AverageChartProps {
 }
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
-  "January", // 0
-  "February", // 1
-  "March", // 2
-  "April", // 3
+  "Jan", // 0
+  "Feb", // 1
+  "Mar", // 2
+  "Apr", // 3
   "May", // 4
-  "June", // 5
-  "July", // 6
-  "August", // 7
-  "September", // 8
-  "October", // 9
-  "November", // 10
-  "December", // 11
+  "Jun", // 5
+  "Jul", // 6
+  "Aug", // 7
+  "Sep", // 8
+  "Oct", // 9
+  "Nov", // 10
+  "Dec", // 11
 ];
 const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   // States
@@ -188,39 +188,6 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         ...item,
         color: index === 0 ? "#3bae63" : "#7444ba", // Line colors
       })),
-      fill: {
-        type: "gradient",
-        gradient: {
-          shade: "light",
-          type: "vertical",
-          gradientToColors: undefined, // Match gradient to line color
-          opacityFrom: 0.5, // Opacity at the top
-          opacityTo: 0.1, // Opacity at the bottom
-          stops: [0, 90, 100],
-          colorStops: [
-            {
-              offset: 0,
-              color: "#3bae63", // Gradient for the first line
-              opacity: 0.5,
-            },
-            {
-              offset: 100,
-              color: "#3bae63",
-              opacity: 0.1,
-            },
-            {
-              offset: 0,
-              color: "#7444ba", // Gradient for the second line
-              opacity: 0.5,
-            },
-            {
-              offset: 100,
-              color: "#7444ba",
-              opacity: 0.1,
-            },
-          ],
-        },
-      },
       title: {
         align: "left",
         offsetY: 25,
@@ -538,7 +505,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
           isDisabled={showAllData}
         >
           <RangeSliderTrack bg="red.100">
-            <RangeSliderFilledTrack bg="#a8def8" />
+            <RangeSliderFilledTrack />
           </RangeSliderTrack>
           <RangeSliderThumb boxSize={3} index={0} />
           <RangeSliderThumb boxSize={3} index={1} />

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { endPoints } from "./endpoints";
 
 interface DataPoint {
     x: string;
@@ -44,8 +45,7 @@ export async function getLocalAverageData(): Promise<{
       created_at: string;
     }[];
   }> {
-    return axios.get("http://34.201.129.52:8000/local").then((res) => res.data);
-    // return axios.get("http://127.0.0.1:8000/local").then((res) => res.data);
+    return axios.get(endPoints.localData).then((res) => res.data);
   }
 
 
@@ -83,8 +83,7 @@ export async function getLocalQuarterlyData(): Promise<{
     quarter: LocalQuarterData[];
     week: LocalQuarterData;
   }> {
-    return axios.get("http://34.201.129.52:8000/local/quarter").then((res) => res.data);
-    // return axios.get("http://localhost:8000/local/quarter").then((res) => res.data);
+    return axios.get(endPoints.localQuarter).then((res) => res.data);
 }
 
 export async function getLocalInsights(
@@ -95,8 +94,7 @@ export async function getLocalInsights(
   signal: AbortSignal
 ): Promise<Insights> {
   return axios
-    .get("http://34.201.129.52:8000/local/insights", {
-    // .get("http://localhost:8000/local/insights", {
+    .get(endPoints.localInsights, {
       params: data,
       signal,
     })
