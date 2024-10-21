@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import BarChart from "../components/comparison-chart";
-import { ComparisonData, ResData, runJob } from "../data";
+import { ComparisonData, getAverageData, ResData, runJob } from "../data";
 import {
   getLocalQuarterlyData,
   LocalQuarterData,
@@ -51,39 +51,33 @@ export const LocalOverview = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    getLocalAverageData().then((res) => {
-      // if (res?.errors && res?.errors.length) {
-      //   let str = "";
-      //   res.errors.forEach((e) => {
-      //     str += `error: ${e.message} at ${dayjs(e.created_at).format(
-      //       "YYYY-MM-DD"
-      //     )} \r\n`;
-      //   });
-      //   alert(str);
-      // }
-      // setData(
-      //   (old) => (
-      //     {
-      //       ...res,
-      //       quarterData: old.quarterData,
-      //     }
-      //   )
-      // );
-      setData((old) => ({
-        ...old,
-        ...res,
-      }))
-    });
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const [localAverageData, averageData, localQuarterlyData] = await Promise.all([
+        getLocalAverageData(),
+        getAverageData(),
+        getLocalQuarterlyData(),
+      ]);
 
-    getLocalQuarterlyData().then((res) =>
       setData((old) => ({
         ...old,
-        quarterData: res.quarter,
-        weekComparison: res.week,
-      }))
-    );
-  }, []);
+        ...localAverageData, // Merge local average data
+        weekly: {
+          ...old.weekly,
+          ...averageData.weekly, // Merge weekly data from the second API
+        },
+        quarterData: localQuarterlyData.quarter, // Update quarterData
+        weekComparison: localQuarterlyData.week, // Update weekComparison
+      }));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   const [isAzteca, setIsAzteca] = useState<[boolean, boolean, boolean]>([
     true,

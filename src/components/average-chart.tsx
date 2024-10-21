@@ -186,7 +186,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       },
       series: dataToUse.map((item, index) => ({
         ...item,
-        color: index === 0 ? "#3bae63" : "#7444ba", // Line colors
+        color: index === 0 ? "#0574cd" : "#f32e42", // Line colors
       })),
       title: {
         align: "left",

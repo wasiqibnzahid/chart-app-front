@@ -14,7 +14,7 @@ import dayjs from "dayjs";
 import VerticalRidarCharts from "../view/VerticalRidarCharts";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup";
 import { ExpandWrapper } from "../components/expand-wrapper";
-
+import {getInsights} from "../data"
 export const VerticalOverview = () => {
   const [data, setData] = useState<{
     weekly: ResData;
@@ -586,6 +586,7 @@ export const VerticalOverview = () => {
               <ExpandWrapper>
                 <BarChart
                   data={data}
+                  getinsights={getInsights}
                   titleHeading="Vertrical Overview - TVA vs. Comp. - Individual Bar Chart"
                 />
               </ExpandWrapper>
@@ -601,6 +602,7 @@ export const VerticalOverview = () => {
               <ExpandWrapper>
                 <ComparisonNoGroup
                   data={data}
+                  getinsights={getInsights}
                   titleHeading="Vertical Overview - TVA vs. Comp. - Week by Week Bar Chart"
                 />
               </ExpandWrapper>

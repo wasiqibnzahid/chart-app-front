@@ -95,9 +95,11 @@ const dropdownOptions = ["Video", "Note", "Both"];
 
 const ComparisonNoGroup: React.FC<BarChartProps> = ({
   data: propData,
+  getinsights,
   titleHeading,
   disableGrouping = false,
 }) => {
+  
   // States
   const [showdateFilter, setShowDateFilter] = useState(false);
 	const [dateFilter, setDateFilter] = useState([""]);
@@ -235,7 +237,17 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       prevReqController.current.abort();
     }
     prevReqController.current = new AbortController();
-    getLocalInsights(
+    getinsights ? getinsights(
+      {
+        start: `${quarterVal[0] > 8 ? "" : "0"}${
+          quarterVal[0] + 1
+        }-${selectedYear}`,
+        end: `${quarterVal[1] > 8 ? "" : "0"}${
+          quarterVal[1] + 1
+        }-${selectedYear}`,
+      },
+      prevReqController.current.signal
+    ).then((res) => setInsights(res)) : getLocalInsights(
       {
         start: `${quarterVal[0] > 8 ? "" : "0"}${
           quarterVal[0] + 1
