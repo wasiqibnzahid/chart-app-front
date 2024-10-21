@@ -373,11 +373,6 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       }
       const average = sum_differences / (series.length - 1)
       
-      
-      // const first = series?.[0]?.data?.[index];
-      // const last = series?.[series.length - 1]?.data?.[index];
-      
-      // return Number(calculatePercentageChange(first, last).toFixed?.(0));
       return Number(average.toFixed?.(1));
     });
   }, [series]);
