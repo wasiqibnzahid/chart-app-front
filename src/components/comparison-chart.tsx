@@ -95,6 +95,7 @@ const dropdownOptions = ["Video", "Note", "Both"];
 
 const BarChart: React.FC<BarChartProps> = ({
 	data: propData,
+	getinsights,
 	titleHeading,
 }) => {
 	// States
@@ -232,21 +233,31 @@ const BarChart: React.FC<BarChartProps> = ({
 	const prevReqController = useRef(new AbortController());
 	useEffect(() => {
 		if (prevReqController.current) {
-			prevReqController.current.abort();
+		  prevReqController.current.abort();
 		}
 		prevReqController.current = new AbortController();
-		getLocalInsights(
-			{
-				start: `${quarterVal[0] > 8 ? "" : "0"}${
-					quarterVal[0] + 1
-				}-${selectedYear}`,
-				end: `${quarterVal[1] > 8 ? "" : "0"}${
-					quarterVal[1] + 1
-				}-${selectedYear}`,
-			},
-			prevReqController.current.signal,
+		getinsights ? getinsights(
+		  {
+			start: `${quarterVal[0] > 8 ? "" : "0"}${
+			  quarterVal[0] + 1
+			}-${selectedYear}`,
+			end: `${quarterVal[1] > 8 ? "" : "0"}${
+			  quarterVal[1] + 1
+			}-${selectedYear}`,
+		  },
+		  prevReqController.current.signal
+		).then((res) => setInsights(res)) : getLocalInsights(
+		  {
+			start: `${quarterVal[0] > 8 ? "" : "0"}${
+			  quarterVal[0] + 1
+			}-${selectedYear}`,
+			end: `${quarterVal[1] > 8 ? "" : "0"}${
+			  quarterVal[1] + 1
+			}-${selectedYear}`,
+		  },
+		  prevReqController.current.signal
 		).then((res) => setInsights(res));
-	}, [quarterVal]);
+	  }, [quarterVal]);
 
 	const options: ApexOptions = {
 		chart: {
