@@ -327,18 +327,22 @@ const BarChart: React.FC<BarChartProps> = ({
 
 	const items = useMemo(() => {
 		return names.map((_name, index) => {
-		  let sum_differences = 0
-		  for (let i = 1; i <= series.length -1; i++) {        
-			sum_differences = sum_differences + (series?.[i]?.data?.[index] - series?.[i -1 ]?.data?.[index])
-		  }
-		  const average = sum_differences / (series.length - 1)
-		  
-		  
-		  // const first = series?.[0]?.data?.[index];
-		  // const last = series?.[series.length - 1]?.data?.[index];
-		  
-		  // return Number(calculatePercentageChange(first, last).toFixed?.(0));
-		  return Number(average.toFixed?.(1));
+			const values = series.map(s => s.data[index]);
+			const x = Array.from({ length: values.length }, (_, i) => i);
+			
+			// Calculate the slope using linear regression
+			const n = values.length;
+			const sumX = x.reduce((a, b) => a + b, 0);
+			const sumY = values.reduce((a, b) => a + b, 0);
+			const sumXY = x.reduce((sum, xi, i) => sum + xi * values[i], 0);
+			const sumXX = x.reduce((sum, xi) => sum + xi * xi, 0);
+			
+			const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+			
+			// Calculate the average slope
+			const averageSlope = slope / (values.length - 1);
+			
+			return Number(averageSlope.toFixed(1));
 		});
 	}, [series]);
 

@@ -99,7 +99,6 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   titleHeading,
   hideChecked = false,
 }) => {
-
   // States
   const [showdateFilter, setShowDateFilter] = useState(false);
   const [dateFilter, setDateFilter] = useState([""]);
@@ -125,37 +124,37 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     setData(propData);
   }, [propData]);
 
-
   useEffect(() => {
     if (showdateFilter === false) {
       setData(propData);
-    }
-    else{
-
-      const matchedweeklyData = propData.weekly.data.map(outerData => {
+    } else {
+      const matchedweeklyData = propData.weekly.data.map((outerData) => {
         return {
-            ...outerData,
-            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
         };
-    });
-      
+      });
 
-      const matchedchangesData = propData.weekly.changes.map(outerData => {
+      const matchedchangesData = propData.weekly.changes.map((outerData) => {
         return {
-            ...outerData,
-            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
         };
-    });
+      });
 
-    setData({
-      ...propData,
-      weekly: {
-        data: matchedweeklyData,
-        changes: matchedchangesData,
-      },
-    });
+      setData({
+        ...propData,
+        weekly: {
+          data: matchedweeklyData,
+          changes: matchedchangesData,
+        },
+      });
     }
-  }, [showdateFilter,dateFilter.length]);
+  }, [showdateFilter, dateFilter.length]);
 
   const { series, names, allNames, dateOptions } = useMemo(() => {
     // let items =
@@ -363,20 +362,41 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
         },
       },
     },
-  }; 
+  };
 
-  const items = useMemo(() => {    
+  const items = useMemo(() => {
     return names.map((_name, index) => {
-      let sum_differences = 0
-      for (let i = 1; i <= series.length -1; i++) {        
-        sum_differences = sum_differences + (series?.[i]?.data?.[index] - series?.[i -1 ]?.data?.[index])
+      const values = series
+        .map((s) => s.data[index])
+        .filter((v) => v !== undefined);
+      const x = Array.from({ length: values.length }, (_, i) => i);
+
+      if (values.length < 2) {
+        return NaN; // Not enough data points to calculate slope
       }
-      const average = sum_differences / (series.length - 1)
-      
-      return Number(average.toFixed?.(1));
+
+      const { slope } = linearRegression(x, values);
+      const averageSlope = slope / (values.length - 1);
+
+      return Number(averageSlope.toFixed(1));
     });
   }, [series]);
-
+  function linearRegression(x: number[], y: number[]) {
+    const n = x.length;
+    let sumX = 0,
+      sumY = 0,
+      sumXY = 0,
+      sumXX = 0;
+    for (let i = 0; i < n; i++) {
+      sumX += x[i];
+      sumY += y[i];
+      sumXY += x[i] * y[i];
+      sumXX += x[i] * x[i];
+    }
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+    return { slope, intercept };
+  }
 
   const insights =
     selectedOption === "Both"
@@ -401,8 +421,6 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     }
   }, [isChecked, names]);
 
-
-
   const handleSelectDateChange = (e) => {
     const value = e.target.value;
 
@@ -412,7 +430,6 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       setSelectedDate(value);
     }
   };
-
 
   return (
     <section
@@ -582,14 +599,16 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
             zIndex: 1000,
             width: "100%",
             display: "flex",
-            justifyContent: names.length === 2 ? "space-around" :  "space-between",
+            justifyContent:
+              names.length === 2 ? "space-around" : "space-between",
             fontSize: "10px",
             textAlign: "center",
           }}
           className="my-item"
         >
           {items.map((item) => (
-            <span key={item}
+            <span
+              key={item}
               style={{
                 background: isNaN(item)
                   ? "transparent"
@@ -851,18 +870,24 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   </Select>
 
                 </HStack> */}
-                
-                {showdateFilter && 
-            <>
-                <Box ml={5}>
-                  {dateFilter.length > 0 && 
-                    dateFilter.map((date) => 
-                      <Tag key={date} size="sm" variant="solid" colorScheme="teal" mb={4} mx={.5}>
-                    <TagLabel  >{date}</TagLabel> 
-                    
-                  </Tag>)
-                  }
-                </Box>
+
+              {showdateFilter && (
+                <>
+                  <Box ml={5}>
+                    {dateFilter.length > 0 &&
+                      dateFilter.map((date) => (
+                        <Tag
+                          key={date}
+                          size="sm"
+                          variant="solid"
+                          colorScheme="teal"
+                          mb={4}
+                          mx={0.5}
+                        >
+                          <TagLabel>{date}</TagLabel>
+                        </Tag>
+                      ))}
+                  </Box>
                   <HStack mb={8} mx={5}>
                     <Select
                       value={selectedDate}
@@ -874,17 +899,19 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                         borderRadius: "5px",
                       }}
                     >
-                      {
-                        propData.weekly.data?.[1].data.map((date) => (
-                          <option key={date.x} style={{color: "black" }} value={date.x}>{date.x}</option>
-                        ))
-                      }
-
+                      {propData.weekly.data?.[1].data.map((date) => (
+                        <option
+                          key={date.x}
+                          style={{ color: "black" }}
+                          value={date.x}
+                        >
+                          {date.x}
+                        </option>
+                      ))}
                     </Select>
-
                   </HStack>
-            </>
-            }
+                </>
+              )}
             </>
           )}
 
@@ -957,8 +984,8 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   </div>
                   {/* Insights SVG End */}
                   <Text style={{ lineHeight: "2rem" }}>
-                  {insights ? insights.self : "There is no insights"} <br />
-                  {insights ? insights.competition : "There is no insights"}
+                    {insights ? insights.self : "There is no insights"} <br />
+                    {insights ? insights.competition : "There is no insights"}
                   </Text>
                 </HStack>
               </Stack>
