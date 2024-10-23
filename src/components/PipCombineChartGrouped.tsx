@@ -369,6 +369,8 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       const values = series
         .map((s) => s.data[index])
         .filter((v) => v !== undefined);
+
+      // Use indices as x values (0, 1, 2, ...) if x is evenly spaced
       const x = Array.from({ length: values.length }, (_, i) => i);
 
       if (values.length < 2) {
@@ -376,11 +378,11 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       }
 
       const { slope } = linearRegression(x, values);
-      const averageSlope = slope / (values.length - 1);
 
-      return Number(averageSlope.toFixed(1));
+      return Number(slope.toFixed(1)); // Return the slope, rounded to 1 decimal place
     });
   }, [series]);
+
   function linearRegression(x: number[], y: number[]) {
     const n = x.length;
     let sumX = 0,
