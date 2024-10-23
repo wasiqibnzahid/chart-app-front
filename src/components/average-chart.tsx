@@ -43,18 +43,18 @@ export interface AverageChartProps {
 }
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
-  "Jan", // 0
-  "Feb", // 1
-  "Mar", // 2
-  "Apr", // 3
-  "May", // 4
-  "Jun", // 5
-  "Jul", // 6
-  "Aug", // 7
-  "Sep", // 8
-  "Oct", // 9
-  "Nov", // 10
-  "Dec", // 11
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   // States
@@ -73,41 +73,36 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   useEffect(() => {
     if (showdateFilter === false) {
       setData(propData);
-    }
-    else{
-
-      const matchedweeklyData = propData.weekly.data.map(outerData => {
+    } else {
+      const matchedweeklyData = propData.weekly.data.map((outerData) => {
         return {
-            ...outerData,
-            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
         };
-    });
-      
+      });
 
-      const matchedchangesData = propData.weekly.changes.map(outerData => {
+      const matchedchangesData = propData.weekly.changes.map((outerData) => {
         return {
-            ...outerData,
-            data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
         };
-    });
+      });
 
-    
-    
-    
-    setData({
-      ...propData,
-      weekly: {
-        data: matchedweeklyData,
-        changes: matchedchangesData,
-      },
-    });
+      setData({
+        ...propData,
+        weekly: {
+          data: matchedweeklyData,
+          changes: matchedchangesData,
+        },
+      });
     }
-  }, [showdateFilter,dateFilter.length]);
-  
-                              
+  }, [showdateFilter, dateFilter.length]);
 
   //
-
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [quarterVal, setQuarterVal] = useState([0, 11]);
@@ -117,9 +112,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   const [showPercentages, setShowPercentages] = useState(false);
 
   const dataToUse = useMemo(() => {
-    
     let mainDataUse = [...data.weekly.data];
-
 
     mainDataUse = mainDataUse
       .filter((item) => {
@@ -223,6 +216,34 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         position: "bottom",
         horizontalAlign: "center",
       },
+      fill: {
+        colors: ["#000", "#fff"],
+        opacity: 0.9,
+        type: "solid",
+        gradient: {
+          shade: "dark",
+          type: "horizontal",
+          shadeIntensity: 0.5,
+          gradientToColors: undefined,
+          inverseColors: true,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 50, 100],
+          colorStops: [],
+        },
+        image: {
+          src: [],
+          width: undefined,
+          height: undefined,
+        },
+        pattern: {
+          style: "verticalLines",
+          width: 6,
+          height: 6,
+          strokeWidth: 2,
+        },
+      },
+
       dataLabels: {
         offsetY:
           showVals && showPercentages
@@ -283,7 +304,6 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       },
     }),
     [dataToUse, showPercentages, showVals]
-    
   );
   const prevReqController = useRef(new AbortController());
   useEffect(() => {
@@ -310,16 +330,16 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       ? insightsData.videos
       : insightsData.notes;
 
-      const handleSelectDateChange = (e) => {
-        const value = e.target.value;
-    
-        // Check if the value is already in the dateFilter array
-        if (!dateFilter.includes(value) && value) {
-          setDateFilter([...dateFilter, value]);
-          setSelectedDate(value);
-        }
-      };
-  
+  const handleSelectDateChange = (e) => {
+    const value = e.target.value;
+
+    // Check if the value is already in the dateFilter array
+    if (!dateFilter.includes(value) && value) {
+      setDateFilter([...dateFilter, value]);
+      setSelectedDate(value);
+    }
+  };
+
   return (
     <div id="line-adwords">
       {/* Header Text */}
@@ -661,17 +681,23 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                   </Stack>
                 </div>
               </section>
-            {showdateFilter && 
-            <>
-                <Box ml={5}>
-                  {dateFilter.length > 0 && 
-                    dateFilter.map((date) => 
-                      <Tag key={date} size="sm" variant="solid" colorScheme="teal" mb={4} mx={.5}>
-                    <TagLabel  >{date}</TagLabel> 
-                    
-                  </Tag>)
-                  }
-                </Box>
+              {showdateFilter && (
+                <>
+                  <Box ml={5}>
+                    {dateFilter.length > 0 &&
+                      dateFilter.map((date) => (
+                        <Tag
+                          key={date}
+                          size="sm"
+                          variant="solid"
+                          colorScheme="teal"
+                          mb={4}
+                          mx={0.5}
+                        >
+                          <TagLabel>{date}</TagLabel>
+                        </Tag>
+                      ))}
+                  </Box>
                   <HStack mb={8} mx={5}>
                     <Select
                       value={selectedDate}
@@ -683,17 +709,19 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                         borderRadius: "5px",
                       }}
                     >
-                      {
-                        propData.weekly.data?.[1].data.map((date) => (
-                          <option key={date.x} style={{color: "black" }} value={date.x}>{date.x}</option>
-                        ))
-                      }
-
+                      {propData.weekly.data?.[1].data.map((date) => (
+                        <option
+                          key={date.x}
+                          style={{ color: "black" }}
+                          value={date.x}
+                        >
+                          {date.x}
+                        </option>
+                      ))}
                     </Select>
-
                   </HStack>
-            </>
-            }
+                </>
+              )}
             </>
           )}
 
@@ -766,8 +794,8 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                   </div>
                   {/* Insights SVG End */}
                   <Text style={{ lineHeight: "2rem" }}>
-                   {insights ? insights.self : "There is no insights"} <br />
-                   {insights ? insights.competition : "There is no insights"}
+                    {insights ? insights.self : "There is no insights"} <br />
+                    {insights ? insights.competition : "There is no insights"}
                   </Text>
                 </HStack>
               </Stack>

@@ -34,7 +34,7 @@ const citiesData = [
     performances: {},
   },
   {
-    name: "Quintanaoo",
+    name: "Quintanaroo",
     lat: 18.5036,
     lng: -88.3055,
     performances: {},
@@ -82,7 +82,7 @@ const citiesData = [
     performances: {},
   },
   {
-    name: "Baja California",
+    name: "BC",
     lat: 30.8406,
     lng: -115.2838,
     performances: {},
@@ -95,31 +95,31 @@ const citiesData = [
   },
 ];
 
-
 // Weekly and monthly general TV Azteca performance data
 const generalAztecaPerformance = {
-  week: [70],
-  month: [75],
+  week: [66],
+  month: [68],
 };
 
 const PerformanceMap = (data) => {
-  
   const [view, setView] = useState("week"); // State to toggle between week and month
-  const [cities, setCities] = useState(citiesData.map(city => ({ ...city, performances: { week: 0, month: 0 } }))); // Initialize performances
-useEffect(()=>{
-
-},[cities])
+  const [cities, setCities] = useState(
+    citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
+  ); // Initialize performances
+  useEffect(() => {}, [cities]);
   useEffect(() => {
     const updatedCities = [...cities];
-    
+
     // Process video data
+    console.log(data.data.comparison, "ASD:LSALD:SALD 222");
     data.data.comparison.total.forEach(({ name, data }) => {
       const lastFourData = data?.slice(-4);
       const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
       const average = sum / lastFourData?.length;
 
       // Update city performance
-      const city = updatedCities.find(city => city.name === name);
+      const city = updatedCities.find((city) => city.name === name);
+      console.log(updatedCities, data?.data?.comparison, "ASD:LSALD:SALD");
       if (city) {
         city.performances = {
           week: data[data.length - 1].y || 0, // Use last week's value or 0 if undefined
@@ -129,17 +129,16 @@ useEffect(()=>{
     });
 
     setCities(updatedCities);
-    toggleView()
+    toggleView();
   }, [data]);
 
   // Get the current performance data based on the selected view
   const currentPerformance =
     generalAztecaPerformance[view][generalAztecaPerformance[view].length - 1];
+  console.log("ASDASD", view, generalAztecaPerformance[view]);
 
   // Function to get the color based on updated logic
   const getColor = (performance: number, general: number) => {
-    
-    
     const lowerThreshold = general * 0.85; // 15% below the general value
     if (performance < lowerThreshold) return "red"; // More than 15% below general
     if (performance >= lowerThreshold && performance < general) return "yellow"; // Less than general but within the 15% range
@@ -150,7 +149,6 @@ useEffect(()=>{
   const toggleView = () => {
     setView(view === "week" ? "month" : "week");
   };
-    
 
   return (
     <Box p={0} mb={0} borderRadius="lg" position="relative" height="530px">
@@ -189,30 +187,31 @@ useEffect(()=>{
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
-
         {cities.map((city, idx) => {
           return (
-          <CircleMarker
-            key={`${idx}-${view}`} // Force re-render on view change
-            center={[city.lat, city.lng]}
-            color="black" // Border color
-            radius={10}
-            fillColor={getColor(city?.performances[view], currentPerformance)} // Use correct view performance
-            fillOpacity={0.8}
-          >
-            <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-              <span>
-                <strong>{city.name}</strong>
-                <br />
-                {view === "week" ? "Weekly" : "Monthly"} Performance:{" "}
-                {city.performances[view]}
-                <br />
-                General TV Azteca {view === "week" ? "Weekly" : "Monthly"}:{" "}
-                {currentPerformance}
-              </span>
-            </Tooltip>
-          </CircleMarker>
-        )})}
+            <CircleMarker
+              key={`${idx}-${view}`} // Force re-render on view change
+              center={[city.lat, city.lng]}
+              color="black" // Border color
+              radius={10}
+              fillColor={getColor(city?.performances[view], currentPerformance)} // Use correct view performance
+              fillOpacity={0.8}
+            >
+              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+                <span>
+                  <strong>{city.name}</strong>
+                  <br />
+                  {view === "week" ? "Weekly" : "Monthly"} Performance:{" "}
+                  {city.performances[view]}
+                  <br />
+                  General TV Azteca {view === "week"
+                    ? "Weekly"
+                    : "Monthly"}: {currentPerformance}
+                </span>
+              </Tooltip>
+            </CircleMarker>
+          );
+        })}
       </MapContainer>
     </Box>
   );
