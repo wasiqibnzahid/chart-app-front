@@ -168,7 +168,7 @@ const PerformanceMap = (data) => {
           overflow: "hidden",
         }}
       >
-        {view === "week" ? "Month" : "Week"}
+        {view === "week" ? "Week" : "Month"}
       </button>
 
       {/* Map container */}
