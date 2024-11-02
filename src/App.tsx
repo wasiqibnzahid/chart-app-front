@@ -1,123 +1,112 @@
-import React, { useState } from "react";
-
-// Components
-import GeneralOverview from "./Pages/GeneralOverview";
-import VerticalOverview from "./Pages/VerticalOverview";
-import LocalOverview from "./Pages/LocalOverview";
-
-// Logo Sidebar
-import Vertical from "./assets/Vertical.svg";
-import Local from "./assets/Local.svg";
-import General from "./assets/General.svg";
-
-// Icons
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import GeneralApp from "./Pages/GeneralApp";
+import React, { useState, useEffect } from 'react';
+import { ChakraProvider, Box } from '@chakra-ui/react';
 import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from 'react-router-dom';
+
+import HomeAdmin from './HomeAdmin/HomeAdmin';
+import NewPageAdmin from './NewPageAdmin/NewPageAdmin';
+import General from './General/General';
+import RequestCountGraph from './RequestCountGraph/RequestCountGraph';
+import DataTable from './DataTable/DataTable';
+import NewPage from './NewPage/NewPage';
+import LandingPage from './LandingPage/LandingPage';
+import MainLayout from './layouts/MainLayout';
+import LoginPage from './LoginPage';
+
+
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  return (
-    <div className="app-container flex">
-      <div className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
-        <div className="sidebar-header">
-          <div className="logo-container">
-            <img src="/logo.png" alt="Logo" className="logo" />
-          </div>
-          <h2 className="title">Digital</h2>
-          <h2 className="title">Benchmarks</h2>
-          <hr className="separator" />
-        </div>
+  useEffect(() => {
+    const authStatus = localStorage.getItem('isAuthenticated');
+    setIsAuthenticated(authStatus === 'true');
+  }, []);
 
-        <button
-          className={`tab-button ${activeTab === 0 ? "active" : ""}`}
-          onClick={() => setActiveTab(0)}
-        >
-          <img
-            src={General}
-            height={10}
-            width={20}
-            style={{
-              marginRight: "10px",
-            }}
-          />{" "}
-          General Overview
-        </button>
+  const handleLogin = () => {
+    localStorage.setItem('isAuthenticated', 'true');
+    setIsAuthenticated(true);
+  };
 
-        <button
-          className={`tab-button ${activeTab === 1 ? "active" : ""}`}
-          onClick={() => setActiveTab(1)}
-        >
-          <img
-            src={Vertical}
-            height={10}
-            width={20}
-            style={{
-              marginRight: "10px",
-            }}
-          />{" "}
-          Vertical Overview
-        </button>
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    setIsAuthenticated(false);
+  };
 
-        <button
-          className={`tab-button ${activeTab === 2 ? "active" : ""}`}
-          onClick={() => setActiveTab(2)}
-        >
-          <img
-            src={Local}
-            height={10}
-            width={20}
-            style={{
-              marginRight: "10px",
-            }}
-          />{" "}
-          Local Overview
-        </button>
-      </div>
 
-      <button
-        className="toggle-sidebar"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        style={{
-          border: "none",
-          outline: "none",
-        }}
+
+return (
+  <>
+  
+    <ChakraProvider>
+      <Box
+        width="100vw"
+        minHeight="100vh"
+        bg="linear-gradient(90deg, #000000, #7800ff)"
+        color="white"
       >
-        {isSidebarOpen ? (
-          <FontAwesomeIcon icon={faChevronLeft} />
-        ) : (
-          <FontAwesomeIcon icon={faChevronRight} />
-        )}
-      </button>
-
-      {/* <button
-        className="toggle-sidebar"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        style={{
-          border:"none",
-          outline:"none",
-        }}
-      >
-        {isSidebarOpen ? <AiOutlineArrowLeft /> : <AiOutlineArrowRight />}
-      </button> */}
-
-      <div className="content">
-        <section
-          className={`ContainerSetting ${
-            isSidebarOpen ? "sidebar-open" : "sidebar-closed"
-          }`}
-        >
-          {activeTab === 0 && <GeneralOverview />}
-          {activeTab === 1 && <VerticalOverview />}
-          {activeTab === 2 && <LocalOverview />}
-        </section>
-      </div>
-    </div>
-  );
+        <Router>
+          {isAuthenticated ? (
+            <AuthenticatedRoutes handleLogout={handleLogout} />
+          ) : (
+            <UnauthenticatedRoutes handleLogin={handleLogin} />
+          )}
+        </Router>
+      </Box>
+    </ChakraProvider>
+  </>
+);
 };
+
+const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({ handleLogout }) => (
+<Routes>
+  <Route path="/login" element={<Navigate to="/landing" replace />} />
+  <Route
+    path="/landing"
+    element={<LandingPage handleLogout={handleLogout} />}
+  />
+  <Route path="/" element={<Navigate to="/landing" replace />} />
+
+  {/* Admin Routes */}
+  <Route path="/ADMIN-PopularObjects" element={<HomeAdmin />} />
+  <Route path="/ADMIN-DIGITAL-CALENDAR" element={<NewPageAdmin />} />
+  <Route path="/Digital-Calendar" element={<NewPage />} />
+  {/* Authenticated Route for GeneralApp */}
+<Route path="/general-app" element={<GeneralApp />} />
+
+
+  {/* Main Application Route */}
+  <Route
+    path="/*"
+    element={
+      <MainLayout>
+        {/* Main Content */}
+        <Box maxW="1600px" py={10} bg="transparent">
+          <General />
+          <RequestCountGraph />
+          <DataTable />
+        </Box>
+      </MainLayout>
+    }
+  />
+
+  {/* Catch-all Route */}
+  <Route path="*" element={<Navigate to="/landing" replace />} />
+</Routes>
+);
+
+const UnauthenticatedRoutes: React.FC<{ handleLogin: () => void }> = ({ handleLogin }) => (
+<Routes>
+  <Route path="*" element={<Navigate to="/login" replace />} />
+  <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+</Routes>
+);
+   
+  
 
 export default App;

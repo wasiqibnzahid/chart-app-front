@@ -716,7 +716,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
         type="line"
         height={500}
       /> */}
-			<div>ASD</div>
+			{/* <div>ASD</div> */}
 			<Chart options={optionsBar} series={dataToUse} type="bar" height={228} />
 			{/* Range Line */}
 			<div

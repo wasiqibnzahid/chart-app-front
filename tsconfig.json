@@ -1,3 +1,16 @@
+// {
+//   "files": [],
+//   "references": [
+//     { "path": "./tsconfig.app.json" },
+//     { "path": "./tsconfig.node.json" }
+//   ],
+//   "compilerOptions": {
+//     "allowJs": true, // Allow JavaScript files
+//     "strictNullChecks": false
+//   }
+  
+// }
+
 {
   "files": [],
   "references": [
@@ -6,7 +19,9 @@
   ],
   "compilerOptions": {
     "allowJs": true, // Allow JavaScript files
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "jsx": "react-jsx", // Ensure JSX is correctly compiled
+    "module": "ESNext",  // Use ESNext modules
+    "target": "ESNext"   // Use ESNext target
   }
-  
 }
