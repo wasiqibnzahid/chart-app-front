@@ -48,7 +48,7 @@ return (
         width="100vw"
         minHeight="100vh"
         bg="linear-gradient(90deg, #000000, #7800ff)"
-        color="white"
+        color="black"
       >
         <Router>
           {isAuthenticated ? (
