@@ -1,4 +1,4 @@
-const baseURL = "http://34.201.129.52:8000/"
+const baseURL = "http://35.170.248.57:8000/"
 // const baseURL = "http://localhost:8000/"
 
 export const endPoints = {
