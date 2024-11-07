@@ -614,7 +614,8 @@ export const LocalOverview = () => {
               <Heatmap
                 data={data}
                 onCalculate={(month, week) => {
-                  if (monthWeek[0][0] === 0) {
+                  console.log("ASDLASDLAS:D FEFEFE", month, week)
+                  if (!monthWeek[0][0]) {
                     setMonthWeek([month, week]);
                   }
                 }}

@@ -1,22 +1,22 @@
 import { ExpandWrapper } from "../components/expand-wrapper";
 import RadarChart from "../components/RadarChart";
-import { useEffect,  useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ComparisonData,
   getAverageData,
   getQuarterlyData,
   QuarterData,
-  ResData
+  ResData,
 } from "../data";
 
-function Heatmap(data:any) {
+function Heatmap(data: any) {
   // Data for the local companies
-  
-  const companyLabels:string[] = [];
 
-  
-  data.data.comparison.videos.map((name:{name:string,data:[]}) => companyLabels.push(name.name))
+  const companyLabels: string[] = [];
 
+  data.data.comparison.videos.map((name: { name: string; data: [] }) =>
+    companyLabels.push(name.name)
+  );
 
   // Sample Data (Week/Month data for Video, Nota, and General TV Azteca)
   const companyDataSets = {
@@ -34,33 +34,36 @@ function Heatmap(data:any) {
     },
   };
 
+  // Push data to videos
+  data.data.comparison.videos.map(
+    (name: { name: string; data: [{ x: string; y: number }] }) => {
+      // Get the last four data points
+      const lastFourData = name.data.slice(-4); // Slice to get the last four entries
 
-  
-  // Push data to videos 
-  data.data.comparison.videos.map((name: { name: string, data: [{ x: string, y: number }] }) => {
-    // Get the last four data points
-    const lastFourData = name.data.slice(-4); // Slice to get the last four entries
-    
-    const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
-    const average = sum / lastFourData.length; // Calculate the average
-  
-    // Push the average to companyDataSets.Video.Week
-    companyDataSets.Video.Month.push(average);
-    companyDataSets.Video.Week.push(name.data[name.data.length - 1].y)
-  });
+      const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+      const average = sum / lastFourData.length; // Calculate the average
 
-  // Push data to Nota 
-  data.data.comparison.notes.map((name: { name: string, data: [{ x: string, y: number }] }) => {
-    // Get the last four data points
-    const lastFourData = name.data.slice(-4); // Slice to get the last four entries
-    const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
-    const average = sum / lastFourData.length; // Calculate the average
-  
-    // Push the average to companyDataSets.Nota.Week
-    companyDataSets.Nota.Month.push(average);
-    companyDataSets.Nota.Week.push(name.data[name.data.length - 1].y)
-  });
+      // Push the average to companyDataSets.Video.Week
+      companyDataSets.Video.Month.push(average.toFixed(0));
+      companyDataSets.Video.Week.push(
+        name.data[name.data.length - 1].y.toFixed(0)
+      );
+    }
+  );
 
+  // Push data to Nota
+  data.data.comparison.notes.map(
+    (name: { name: string; data: [{ x: string; y: number }] }) => {
+      // Get the last four data points
+      const lastFourData = name.data.slice(-4); // Slice to get the last four entries
+      const sum = lastFourData.reduce((acc, point) => acc + point.y, 0); // Sum the y values
+      const average = sum / lastFourData.length; // Calculate the average
+
+      // Push the average to companyDataSets.Nota.Week
+      companyDataSets.Nota.Month.push(average);
+      companyDataSets.Nota.Week.push(name.data[name.data.length - 1].y);
+    }
+  );
 
   const [TvData, setTvData] = useState<{
     weekly: ResData;
@@ -108,12 +111,11 @@ function Heatmap(data:any) {
       }))
     );
   }, []);
-  // Push General Tv Azteca 
-  const weeklyTvAzteca = TvData?.weekComparison?.["TV Azteca Avg"]
-  
-  
-  companyDataSets.General.Week.push(weeklyTvAzteca?.toFixed(0))
-  
+  // Push General Tv Azteca
+  const weeklyTvAzteca = TvData?.weekComparison?.["TV Azteca Avg"];
+
+  companyDataSets.General.Week.push(weeklyTvAzteca?.toFixed(0));
+
   let currentlyQuarter = 0;
   const currentMonth = new Date().getMonth();
   for (let i = 0; i < 4; i++) {
@@ -123,14 +125,18 @@ function Heatmap(data:any) {
     }
   }
   const currentYear = new Date().getFullYear();
-  const str = `Q${currentMonth+1}-${currentYear}`;
-  
-  const quarterTvAzteca = TvData?.quarterData.find((quarter) => quarter.Date === str)?.["TV Azteca Avg"]
-  
-    
-  companyDataSets.General.Month.push(quarterTvAzteca?.toFixed(0))
-  if(data?.onCalculate) {
-    data.onCalculate(companyDataSets.General.Month, companyDataSets.General.Week)
+  const str = `Q${currentMonth + 1}-${currentYear}`;
+
+  const quarterTvAzteca = TvData?.quarterData.find(
+    (quarter) => quarter.Date === str
+  )?.["TV Azteca Avg"];
+
+  companyDataSets.General.Month.push(quarterTvAzteca?.toFixed(0));
+  if (data?.onCalculate) {
+    data.onCalculate(
+      companyDataSets.General.Month,
+      companyDataSets.General.Week
+    );
   }
   return (
     <ExpandWrapper>

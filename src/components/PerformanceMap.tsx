@@ -102,6 +102,7 @@ const PerformanceMap = (data) => {
     week: data.week,
     month: data.month,
   };
+  console.log("ASDLASDLAS:D", data.month, data.week)
   const [view, setView] = useState("week"); // State to toggle between week and month
   const [cities, setCities] = useState(
     citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
@@ -111,7 +112,6 @@ const PerformanceMap = (data) => {
     const updatedCities = [...cities];
 
     // Process video data
-    console.log(data.data.comparison, "ASD:LSALD:SALD 222");
     data.data.comparison.total.forEach(({ name, data }) => {
       const lastFourData = data?.slice(-4);
       const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
@@ -119,11 +119,10 @@ const PerformanceMap = (data) => {
 
       // Update city performance
       const city = updatedCities.find((city) => city.name === name);
-      console.log(updatedCities, data?.data?.comparison, "ASD:LSALD:SALD");
       if (city) {
         city.performances = {
-          week: data[data.length - 1].y || 0, // Use last week's value or 0 if undefined
-          month: average || 0, // Use average or 0 if undefined
+          week: data[data.length - 1].y.toFixed(0) || 0, // Use last week's value or 0 if undefined
+          month: average.toFixed(0) || 0, // Use average or 0 if undefined
         };
       }
     });
