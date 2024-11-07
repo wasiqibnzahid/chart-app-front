@@ -96,12 +96,12 @@ const citiesData = [
 ];
 
 // Weekly and monthly general TV Azteca performance data
-const generalAztecaPerformance = {
-  week: [66],
-  month: [68],
-};
 
 const PerformanceMap = (data) => {
+  const generalAztecaPerformance = {
+    week: data.week,
+    month: data.month,
+  };
   const [view, setView] = useState("week"); // State to toggle between week and month
   const [cities, setCities] = useState(
     citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
@@ -129,7 +129,7 @@ const PerformanceMap = (data) => {
     });
 
     setCities(updatedCities);
-    toggleView();
+    // toggleView();
   }, [data]);
 
   // Get the current performance data based on the selected view

@@ -51,33 +51,33 @@ export const LocalOverview = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const [localAverageData, averageData, localQuarterlyData] = await Promise.all([
-        getLocalAverageData(),
-        getAverageData(),
-        getLocalQuarterlyData(),
-      ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [localAverageData, averageData, localQuarterlyData] =
+          await Promise.all([
+            getLocalAverageData(),
+            getAverageData(),
+            getLocalQuarterlyData(),
+          ]);
 
-      setData((old) => ({
-        ...old,
-        ...localAverageData, // Merge local average data
-        weekly: {
-          ...old.weekly,
-          ...averageData.weekly, // Merge weekly data from the second API
-        },
-        quarterData: localQuarterlyData.quarter, // Update quarterData
-        weekComparison: localQuarterlyData.week, // Update weekComparison
-      }));
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+        setData((old) => ({
+          ...old,
+          ...localAverageData, // Merge local average data
+          weekly: {
+            ...old.weekly,
+            ...averageData.weekly, // Merge weekly data from the second API
+          },
+          quarterData: localQuarterlyData.quarter, // Update quarterData
+          weekComparison: localQuarterlyData.week, // Update weekComparison
+        }));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-  fetchData();
-}, []);
-
+    fetchData();
+  }, []);
 
   const [isAzteca, setIsAzteca] = useState<[boolean, boolean, boolean]>([
     true,
@@ -91,34 +91,38 @@ useEffect(() => {
     if (topbarMode === "week") {
       return data.weekComparison;
     }
+
     let currentlyQuarter = 0;
     const currentMonth = new Date().getMonth();
-    for (let i = 0; i < 4; i++) {
-      if (currentMonth > i * 3 && currentMonth <= i * 3 + 3) {
-        currentlyQuarter = i + 1;
-        break;
-      }
-    }
+
     const currentYear = new Date().getFullYear();
-    const str = `Q${currentlyQuarter}-${currentYear}`;
+    const str = `Q${currentMonth + 1}-${currentYear}`;
+    console.log("LOCAL ASDLASDLAS:D", currentMonth, currentYear, str, {
+      ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
+    });
     return {
       ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
     };
   }, [data, topbarMode]);
-
+  type f = typeof currentQuarter;
+  const a = useMemo<f>(() => {
+    console.log("ASDASD 22312", data);
+    return currentQuarter;
+  }, [data, topbarMode]);
   function changeTopbarMode() {
     setTopbarMode(topbarMode === "week" ? "month" : "week");
   }
 
-
   const combinedData = useMemo(() => {
-    if(currentQuarter?.azteca?.length > 0 && currentQuarter?.competition?.length > 0) {
-      return [...currentQuarter.azteca, ...currentQuarter.competition]
+    if (
+      currentQuarter?.azteca?.length > 0 &&
+      currentQuarter?.competition?.length > 0
+    ) {
+      return [...currentQuarter.azteca, ...currentQuarter.competition];
     }
-    return []
-  }, [currentQuarter])
-
-
+    return [];
+  }, [currentQuarter]);
+  const [monthWeek, setMonthWeek] = useState<[number[], number[]]>([[0], [0]]);
   return (
     <div className="main">
       {/* Row 1 */}
@@ -600,10 +604,21 @@ useEffect(() => {
         <div className="col-12">
           <SimpleGrid columns={[1, 2]} spacing={5}>
             <section className="boxHeatmap">
-              <PerformanceMap data={data} />
+              <PerformanceMap
+                data={data}
+                month={monthWeek?.[0] || [0]}
+                week={monthWeek?.[1] || [0]}
+              />
             </section>
             <section className="box">
-              <Heatmap data={data} />
+              <Heatmap
+                data={data}
+                onCalculate={(month, week) => {
+                  if (monthWeek[0][0] === 0) {
+                    setMonthWeek([month, week]);
+                  }
+                }}
+              />
             </section>
           </SimpleGrid>
         </div>

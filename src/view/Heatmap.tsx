@@ -123,13 +123,15 @@ function Heatmap(data:any) {
     }
   }
   const currentYear = new Date().getFullYear();
-  const str = `Q${currentlyQuarter}-${currentYear}`;
+  const str = `Q${currentMonth+1}-${currentYear}`;
   
   const quarterTvAzteca = TvData?.quarterData.find((quarter) => quarter.Date === str)?.["TV Azteca Avg"]
   
     
   companyDataSets.General.Month.push(quarterTvAzteca?.toFixed(0))
-
+  if(data?.onCalculate) {
+    data.onCalculate(companyDataSets.General.Month, companyDataSets.General.Week)
+  }
   return (
     <ExpandWrapper>
       <RadarChart

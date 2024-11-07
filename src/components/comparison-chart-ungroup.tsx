@@ -5,13 +5,8 @@ import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 
 // Api
-import {
-  ComparisonData,
-  Insights,
-  QuarterData,
-  ResData,
-} from "../data";
-import {getLocalInsights} from "../data/local_data_api_calls"
+import { ComparisonData, Insights, QuarterData, ResData } from "../data";
+import { getLocalInsights } from "../data/local_data_api_calls";
 
 // UI Elements
 import {
@@ -26,7 +21,8 @@ import {
   Text,
   HStack,
   Tag,
-	TagLabel,
+  TagLabel,
+  Button,
 } from "@chakra-ui/react";
 
 const months = [
@@ -99,10 +95,9 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
   titleHeading,
   disableGrouping = false,
 }) => {
-  
   // States
   const [showdateFilter, setShowDateFilter] = useState(false);
-	const [dateFilter, setDateFilter] = useState([""]);
+  const [dateFilter, setDateFilter] = useState([""]);
   const [quarterVal, setQuarterVal] = useState([0, 11]);
   const [showAllData, setShowAllData] = useState(false);
   const [data, setData] = useState(propData);
@@ -126,39 +121,36 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
   }, [propData]);
 
   useEffect(() => {
-		if (showdateFilter === false) {
-		  setData(propData);
-		}
-		else{
-	
-		  const matchedvideosData = propData.comparison.videos.map(outerData => {
-			return {
-				...outerData,
-				data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
-			};
-		});
-		  
-	
-		  const matchednotesData = propData.comparison.notes.map(outerData => {
-			return {
-				...outerData,
-				data: outerData.data.filter(innerData => dateFilter.includes(innerData.x))
-			};
-		});
-	
-		
-		
-		
-		setData({
-		  ...propData,
-		  comparison: {
-			videos: matchedvideosData,
-			notes: matchednotesData,
-		  },
-		});
-		}
-	  }, [showdateFilter,dateFilter.length]);
-	  
+    if (showdateFilter === false) {
+      setData(propData);
+    } else {
+      const matchedvideosData = propData.comparison.videos.map((outerData) => {
+        return {
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
+        };
+      });
+
+      const matchednotesData = propData.comparison.notes.map((outerData) => {
+        return {
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
+        };
+      });
+
+      setData({
+        ...propData,
+        comparison: {
+          videos: matchedvideosData,
+          notes: matchednotesData,
+        },
+      });
+    }
+  }, [showdateFilter, dateFilter.length]);
 
   const { series, names, allNames, dateOptions } = useMemo(() => {
     let items =
@@ -167,7 +159,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
         : selectedOption === "Video"
         ? data.comparison.videos
         : data.comparison.notes;
-      
+
     const allNames = items.map((item) => item.name);
     items = items.filter((item) => !removedNames.includes(item.name));
     const names = items.map((item) => item.name);
@@ -237,27 +229,29 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       prevReqController.current.abort();
     }
     prevReqController.current = new AbortController();
-    getinsights ? getinsights(
-      {
-        start: `${quarterVal[0] > 8 ? "" : "0"}${
-          quarterVal[0] + 1
-        }-${selectedYear}`,
-        end: `${quarterVal[1] > 8 ? "" : "0"}${
-          quarterVal[1] + 1
-        }-${selectedYear}`,
-      },
-      prevReqController.current.signal
-    ).then((res) => setInsights(res)) : getLocalInsights(
-      {
-        start: `${quarterVal[0] > 8 ? "" : "0"}${
-          quarterVal[0] + 1
-        }-${selectedYear}`,
-        end: `${quarterVal[1] > 8 ? "" : "0"}${
-          quarterVal[1] + 1
-        }-${selectedYear}`,
-      },
-      prevReqController.current.signal
-    ).then((res) => setInsights(res));
+    getinsights
+      ? getinsights(
+          {
+            start: `${quarterVal[0] > 8 ? "" : "0"}${
+              quarterVal[0] + 1
+            }-${selectedYear}`,
+            end: `${quarterVal[1] > 8 ? "" : "0"}${
+              quarterVal[1] + 1
+            }-${selectedYear}`,
+          },
+          prevReqController.current.signal
+        ).then((res) => setInsights(res))
+      : getLocalInsights(
+          {
+            start: `${quarterVal[0] > 8 ? "" : "0"}${
+              quarterVal[0] + 1
+            }-${selectedYear}`,
+            end: `${quarterVal[1] > 8 ? "" : "0"}${
+              quarterVal[1] + 1
+            }-${selectedYear}`,
+          },
+          prevReqController.current.signal
+        ).then((res) => setInsights(res));
   }, [quarterVal]);
 
   const options: ApexOptions = {
@@ -276,7 +270,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
         formatter(val) {
           return val.toString();
         },
-        },
+      },
     },
     xaxis: {
       // categories: names,
@@ -355,8 +349,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
     }
   }, [isChecked, names]);
 
-
-	const handleSelectDateChange = (e) => {
+  const handleSelectDateChange = (e) => {
     const value = e.target.value;
 
     // Check if the value is already in the dateFilter array
@@ -602,6 +595,24 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
             </span>
           ))}
         </div>
+        <div className="mt-2 d-flex justify-content-between align-items-center">
+          <Button
+            size="sm"
+            colorScheme="purple"
+            isDisabled={showAllData}
+            onClick={() => setSelectedYear(selectedYear - 1)}
+          >
+            &larr;
+          </Button>
+          <Button
+            size="sm"
+            colorScheme="purple"
+            isDisabled={showAllData || selectedYear >= new Date().getFullYear()}
+            onClick={() => setSelectedYear(selectedYear + 1)}
+          >
+            &rarr;
+          </Button>
+        </div>
       </div>
 
       {/* Open When user click on Zoom in then show this */}
@@ -763,17 +774,17 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       Show Raw Values
                     </Checkbox>
                     <Checkbox
-										id="datefilter"
-										checked={showdateFilter}
-										onChange={(e) => setShowDateFilter(e.target.checked)}
-										colorScheme="transparent"
-										outline="none"
-										iconColor="white"
-										borderColor="white"
-										size="lg"
-                    					>
-										Show Date Filter
-										</Checkbox>
+                      id="datefilter"
+                      checked={showdateFilter}
+                      onChange={(e) => setShowDateFilter(e.target.checked)}
+                      colorScheme="transparent"
+                      outline="none"
+                      iconColor="white"
+                      borderColor="white"
+                      size="lg"
+                    >
+                      Show Date Filter
+                    </Checkbox>
                   </Stack>
                 </div>
               </section>
@@ -801,17 +812,23 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
 
                 </HStack> */}
 
-{showdateFilter && 
-            <>
-                <Box ml={5}>
-                  {dateFilter.length > 0 && 
-                    dateFilter.map((date) => 
-                      <Tag key={date} size="sm" variant="solid" colorScheme="teal" mb={4} mx={.5}>
-                    <TagLabel  >{date}</TagLabel> 
-                    
-                  </Tag>)
-                  }
-                </Box>
+              {showdateFilter && (
+                <>
+                  <Box ml={5}>
+                    {dateFilter.length > 0 &&
+                      dateFilter.map((date) => (
+                        <Tag
+                          key={date}
+                          size="sm"
+                          variant="solid"
+                          colorScheme="teal"
+                          mb={4}
+                          mx={0.5}
+                        >
+                          <TagLabel>{date}</TagLabel>
+                        </Tag>
+                      ))}
+                  </Box>
                   <HStack mb={8} mx={5}>
                     <Select
                       value={selectedDate}
@@ -823,17 +840,19 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                         borderRadius: "5px",
                       }}
                     >
-                      {
-                        propData.weekly.data?.[1].data.map((date) => (
-                          <option key={date.x} style={{color: "black" }} value={date.x}>{date.x}</option>
-                        ))
-                      }
-
+                      {propData.weekly.data?.[1].data.map((date) => (
+                        <option
+                          key={date.x}
+                          style={{ color: "black" }}
+                          value={date.x}
+                        >
+                          {date.x}
+                        </option>
+                      ))}
                     </Select>
-
                   </HStack>
-            </>
-            }
+                </>
+              )}
             </>
           )}
 
@@ -906,8 +925,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                   </div>
                   {/* Insights SVG End */}
                   <Text style={{ lineHeight: "2rem" }}>
-                  {insights ? insights.self : "There is no insights"} <br />
-                  {insights ? insights.competition : "There is no insights"}
+                    {insights ? insights.self : "There is no insights"} <br />
+                    {insights ? insights.competition : "There is no insights"}
                   </Text>
                 </HStack>
               </Stack>

@@ -26,7 +26,7 @@ const RadarChart = ({ title, labels, dataSets }) => {
   const generalData = dataSets["General"][timeFrame];
   const videoData = dataSets["Video"][timeFrame];
   const notaData = dataSets["Nota"][timeFrame];
-
+  console.log("ASDSADASDASVVF", generalData)
   const data = {
     labels,
     datasets: [

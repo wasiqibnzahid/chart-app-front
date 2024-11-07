@@ -92,7 +92,7 @@ export const VerticalOverview = () => {
       }
     }
     const currentYear = new Date().getFullYear();
-    const str = `Q${currentlyQuarter}-${currentYear}`;
+    const str = `Q${currentMonth+1}-${currentYear}`;
     return {
       ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
     };

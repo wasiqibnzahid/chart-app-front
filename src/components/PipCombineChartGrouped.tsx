@@ -27,6 +27,7 @@ import {
   HStack,
   Tag,
   TagLabel,
+  Button,
 } from "@chakra-ui/react";
 
 const months = [
@@ -671,6 +672,24 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
               {month}
             </span>
           ))}
+        </div>
+        <div className="mt-2 d-flex justify-content-between align-items-center">
+          <Button
+            size="sm"
+            colorScheme="purple"
+            isDisabled={showAllData}
+            onClick={() => setSelectedYear(selectedYear - 1)}
+          >
+            &larr;
+          </Button>
+          <Button
+            size="sm"
+            colorScheme="purple"
+            isDisabled={showAllData || selectedYear >= new Date().getFullYear()}
+            onClick={() => setSelectedYear(selectedYear + 1)}
+          >
+            &rarr;
+          </Button>
         </div>
       </div>
 

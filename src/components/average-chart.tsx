@@ -4,10 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 
-// Images
-import InsightsLogo from "../assets/Insights.svg";
-import ControlsLogo from "../assets/Controls.svg";
-
 // Api
 import {
   ComparisonData,
@@ -43,22 +39,22 @@ export interface AverageChartProps {
 }
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  "Jan", // 0
+  "Feb", // 1
+  "Mar", // 2
+  "Apr", // 3
+  "May", // 4
+  "Jun", // 5
+  "Jul", // 6
+  "Aug", // 7
+  "Sep", // 8
+  "Oct", // 9
+  "Nov", // 10
+  "Dec", // 11
 ];
 const seriesColors: { [key: string]: string } = {
-  "TV Azteca": "#3357FF",      // Vibrant Blue
-  "Competition": "#FF5733",    // Vibrant Red
+  "TV Azteca": "#3357FF", // Vibrant Blue
+  Competition: "#FF5733", // Vibrant Red
   // Add more series colors here if needed
 };
 const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
@@ -106,8 +102,6 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       });
     }
   }, [showdateFilter, dateFilter.length]);
-
-  //
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [quarterVal, setQuarterVal] = useState([0, 11]);
@@ -170,22 +164,24 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   const optionsLine = useMemo<ApexOptions>(
     () => ({
       chart: {
-        animations: {},
+        animations: {
+          enabled: true,
+          easing: "easeinout",
+          speed: 800,
+        },
         height: 328,
-        type: "line",
-        zoom: {},
+        type: "area", // Area chart
+        zoom: {
+          enabled: true,
+        },
         toolbar: {
-          show: false,
+          show: false, // We'll handle custom toolbar
         },
       },
       stroke: {
         curve: "smooth",
         width: 2,
       },
-      series: dataToUse.map((item, index) => ({
-        ...item,
-        color: index === 0 ? "#0574cd" : "#f32e42", // Line colors
-      })),
       title: {
         align: "left",
         offsetY: 25,
@@ -205,10 +201,13 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         },
       },
       xaxis: {
+        type: "datetime",
+        labels: {
+          datetimeUTC: false,
+        },
         tooltip: {
           enabled: false,
         },
-        type: "datetime",
       },
       yaxis: {
         labels: {
@@ -221,42 +220,16 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         position: "bottom",
         horizontalAlign: "center",
       },
+      colors: dataToUse.map((item) => seriesColors[item.name] || "#000"), // Assign colors based on series
       fill: {
-        colors: ["#000", "#fff"],
-        opacity: 0.9,
-        type: "solid",
+        type: "gradient", // Enable gradient fill
         gradient: {
-          shade: "dark",
-          type: "horizontal",
-          shadeIntensity: 0.5,
-          gradientToColors: undefined,
-          inverseColors: true,
-          opacityFrom: 1,
-          opacityTo: 1,
-          stops: [0, 50, 100],
-          colorStops: [],
-        },
-        image: {
-          src: [],
-          width: undefined,
-          height: undefined,
-        },
-        pattern: {
-          style: "verticalLines",
-          width: 6,
-          height: 6,
-          strokeWidth: 2,
+          shadeIntensity: 1,
+          opacityFrom: 0.5, // Increased opacity for more vibrant fill
+          opacityTo: 0.1, // Increased opacity to make the area more colorful
+          stops: [0, 90, 100],
         },
       },
-      // fill: {
-        // type: "gradient", // Enable gradient fill
-        // gradient: {
-        //   shadeIntensity: 1,
-        //   opacityFrom: 0.5, // Increased opacity for more vibrant fill
-        //   opacityTo: 0.1,   // Increased opacity to make the area more colorful
-        //   stops: [0, 90, 100],
-        // },
-      // },
       dataLabels: {
         offsetY:
           showVals && showPercentages
@@ -266,13 +239,13 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
             : showPercentages
             ? -10
             : 0,
-        enabled: true,
-        formatter(val, data): any {
+        enabled: showVals || showPercentages, // Enable based on state
+        formatter(val, data): string {
           const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
           const prevItem =
             dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
           let str = "";
-          if (item && prevItem) {
+          if (item !== undefined && prevItem !== undefined) {
             if (item > prevItem) {
               str += "▲ ";
             } else if (item < prevItem) {
@@ -281,10 +254,9 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
               str += "- ";
             }
             let difference = item - prevItem;
-            let percentageDifference = +(
-              (difference / prevItem) *
-              100
-            ).toFixed?.(1);
+            let percentageDifference = +((difference / prevItem) * 100).toFixed(
+              1
+            );
             str += percentageDifference;
           }
           const res = [];
@@ -292,34 +264,46 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
             res.push(val.toString());
           }
           if (str && showPercentages) {
-            res.unshift(str + "%");
+            res.unshift(`${str}%`);
           }
-          return res;
+          return res.join(" "); // Return as a single string
         },
         background: {
           enabled: true,
           borderColor: "transparent",
         },
-        distributed: true,
+        distributed: false, // Set to false to use series colors
         style: {
-          colors: [
-            function (data: any): any {
-              const item = data.series[data.seriesIndex][data.dataPointIndex];
-              const prevItem =
-                data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
-              if (item && prevItem) {
-                if (item > prevItem) return "#3bae63";
-                else if (item < prevItem) return "#dc2c3e";
-              }
-            },
-          ],
+          colors: dataToUse.map((item) => seriesColors[item.name] || "#000"),
+        },
+      },
+      tooltip: {
+        enabled: true,
+        x: {
+          format: "dd MMM yyyy",
+        },
+        y: {
+          formatter: function (val) {
+            return `${val} units`; // Customize this to show your units
+          },
         },
       },
     }),
     [dataToUse, showPercentages, showVals]
   );
 
-  
+  // Define 'seriesLine' separately
+  const seriesLine = useMemo(() => {
+    return dataToUse.map((item) => ({
+      name: item.name,
+      data: item.data.map((d) => ({
+        x: d.x,
+        y: d.y,
+      })),
+      // Color is handled via the 'colors' array in ApexOptions
+    }));
+  }, [dataToUse]);
+
   const prevReqController = useRef(new AbortController());
   useEffect(() => {
     if (prevReqController.current) {
@@ -518,8 +502,8 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       {/* Chart */}
       <Chart
         options={optionsLine}
-        series={optionsLine.series}
-        type="line"
+        series={seriesLine}
+        type="area"
         height={250}
       />
 
@@ -557,6 +541,24 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
               {month}
             </span>
           ))}
+        </div>
+        <div className="mt-2 d-flex justify-content-between align-items-center">
+          <Button
+            size="sm"
+            colorScheme="purple"
+            isDisabled={showAllData}
+            onClick={() => setSelectedYear(selectedYear - 1)}
+          >
+            &larr;
+          </Button>
+          <Button
+            size="sm"
+            colorScheme="purple"
+            isDisabled={showAllData || selectedYear >= new Date().getFullYear()}
+            onClick={() => setSelectedYear(selectedYear + 1)}
+          >
+            &rarr;
+          </Button>
         </div>
       </div>
 
