@@ -7,6 +7,7 @@ import LocalOverview from "./LocalOverview";
 // Logo Sidebar
 import Vertical from "../assets/Vertical.svg";
 import Local from "../assets/Local.svg";
+import ampIcon from '../assets/amp-svgrepo-com.svg';
 import General from "../assets/General.svg";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,6 +15,7 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import AmpOverview from "./AmpOverview";
 
 
 const GeneralApp: React.FC = () => {
@@ -78,6 +80,21 @@ const GeneralApp: React.FC = () => {
             />{" "}
             Local Overview
           </button>
+
+          <button
+            className={`tab-button ${activeTab === 3 ? "active" : ""}`}
+            onClick={() => setActiveTab(3)}
+          >
+            <img
+              src={ampIcon}
+              height={10}
+              width={20}
+              style={{
+                marginRight: "10px",
+              }}
+            />{" "}
+            AMP
+          </button>
         </div>
   
         <button
@@ -115,6 +132,7 @@ const GeneralApp: React.FC = () => {
             {activeTab === 0 && <GeneralOverview />}
             {activeTab === 1 && <VerticalOverview />}
             {activeTab === 2 && <LocalOverview />}
+            {activeTab === 3 && <AmpOverview />}
           </section>
         </div>
       </div>
