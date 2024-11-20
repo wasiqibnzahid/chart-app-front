@@ -3,7 +3,8 @@ export const localData = {
         '2024-09-07',
         '2024-09-16',
         '2024-09-23'
-    ],                                                                                      'Azteca Veracruz (Note)': [58, 60, 62],
+    ],                                                                                      
+    'Azteca Veracruz (Note)': [58, 60, 62],
     'Azteca Veracruz (Video)': [60, 61, 63],
     
     'Azteca Quintanaroo (Note)': [63, 61, 59],

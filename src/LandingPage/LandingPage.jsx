@@ -142,7 +142,7 @@ const LandingPage = ({ handleLogout }) => {
           </Flex>
 
           {/* Lighthouse AMP (Static) */}
-          <Flex
+          {/* <Flex
             direction="column"
             align="center"
             justify="center"
@@ -172,7 +172,7 @@ const LandingPage = ({ handleLogout }) => {
             >
               Lighthouse AMP
             </Text>
-          </Flex>
+          </Flex> */}
 
           {/* Popular Objects */}
           <Flex
