@@ -55,6 +55,7 @@ const months = [
 const seriesColors: { [key: string]: string } = {
   "TV Azteca": "#3357FF", // Vibrant Blue
   Competition: "#FF5733", // Vibrant Red
+  AMP: "yellow", // Vibrant Red
   // Add more series colors here if needed
 };
 const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {

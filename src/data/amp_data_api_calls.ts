@@ -36,22 +36,6 @@ export interface ComparisonData {
     total: ChartData;
     insights: Insights;
   }
-export async function getAmpAverageData(): Promise<{
-    weekly: ResData;
-    comparison: ComparisonData;
-    errors: {
-      id: number;
-      message: string;
-      created_at: string;
-    }[];
-  }> {
-    return axios.get(endPoints.ampData).then((res) => res.data);
-  }
-
-
-
-// qarter 
-
 
 interface AmpCompanyInsights {
     name: string;
@@ -79,6 +63,41 @@ export interface AmpQuarterData {
     competition: AmpCompanyInsights[];
     azteca: AmpCompanyInsights[];
   }
+
+ export async function getAmpAverageData(): Promise<{
+    weekly: ResData;
+    comparison: ComparisonData;
+    errors: {
+      id: number;
+      message: string;
+      created_at: string;
+    }[];
+  }> {
+    return axios
+      .get<{
+        weekly: ResData;
+        comparison: ComparisonData;
+        errors: {
+          id: number;
+          message: string;
+          created_at: string;
+        }[];
+      }>(endPoints.ampData)
+      .then((res) => {
+        res.data.comparison.notes = res.data.comparison.notes.filter(
+          (item) => !item.name.includes("Avg") && !item.name.includes("Change")
+        );
+        res.data.comparison.videos = res.data.comparison.videos.filter(
+          (item) => !item.name.includes("Avg") && !item.name.includes("Change")
+        );
+        res.data.comparison.total = res.data.comparison.total.filter(
+          (item) => !item.name.includes("Avg") && !item.name.includes("Change")
+        );
+        return res.data;
+      });
+    // return axios.get("http://127.0.0.1:8000/").then((res) => res.data);
+  }
+
 export async function getAmpQuarterlyData(): Promise<{
     quarter: AmpQuarterData[];
     week: AmpQuarterData;

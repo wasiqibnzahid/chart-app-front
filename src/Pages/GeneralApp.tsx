@@ -93,7 +93,7 @@ const GeneralApp: React.FC = () => {
                 marginRight: "10px",
               }}
             />{" "}
-            AMP
+            AMP Overview
           </button>
         </div>
   
