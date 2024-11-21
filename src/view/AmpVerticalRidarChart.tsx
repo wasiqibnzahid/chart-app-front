@@ -5,6 +5,9 @@ import { ExpandWrapper } from "../components/expand-wrapper";
 const AmpVerticalRidarCharts = (data) => {
   // Data for the two charts
   const ampLabels = [
+    'Azteca UNO', 'Azteca 7',
+    'Deportes', 'ADN40',
+    'Noticias',
     'Veracruz', 'Quintanaroo',
     'Sinaloa', 'BC',
     'CJ', 'Aguascalientes',

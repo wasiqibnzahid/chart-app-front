@@ -119,6 +119,7 @@ export const AmpOverview = () => {
         if (
             currentQuarter?.amp?.length > 0
         ) {
+            console.log("hallo123",currentQuarter?.amp)
             return [...currentQuarter.amp];
         }
         return [];
@@ -127,6 +128,7 @@ export const AmpOverview = () => {
         [0],
         [0]
     ]);
+    console.log("combinedData", combinedData)
     return (
         <div className="main">
             {/* Row 1 */}
