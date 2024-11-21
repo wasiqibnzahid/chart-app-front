@@ -523,7 +523,7 @@ export const AmpOverview = () => {
                             <ExpandWrapper>
                                 <BarChart
                                     data={data}
-                                    titleHeading="AMP Overview - TVA - Individual Bar Chart"
+                                    titleHeading="AMP Overview - Individual Bar Chart"
                                 />
                             </ExpandWrapper>
                         </div>
@@ -539,7 +539,7 @@ export const AmpOverview = () => {
                             <ExpandWrapper>
                                 <ComparisonNoGroup
                                     data={data}
-                                    titleHeading="AMP Overview - TVA - Week by Week Bar Chart"
+                                    titleHeading="AMP Overview - Week by Week Bar Chart"
                                 />
                             </ExpandWrapper>
                         </div>
