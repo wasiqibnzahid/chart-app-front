@@ -6,16 +6,11 @@ import {
     AmpQuarterData,
     getAmpAverageData
 } from "../data/amp_data_api_calls.ts";
-import { SimpleGrid } from "@chakra-ui/react";
 
 import AnimateNumber from "../components/animate-number";
-import PerformanceMap from "../components/PerformanceMap";
-import Heatmap from "../view/Heatmap";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup.tsx";
 import { ExpandWrapper } from "../components/expand-wrapper.tsx";
-import AverageChart from "../components/average-chart.tsx";
 import AmpAverageChart from "../components/amp-average-chart.tsx";
-import VerticalRidarCharts from "../view/VerticalRidarCharts.tsx";
 import AmpVerticalRidarCharts from "../view/AmpVerticalRidarChart.tsx";
 
 export const AmpOverview = () => {
@@ -268,13 +263,13 @@ export const AmpOverview = () => {
                     </div>
                     <div
                         className={`d-flex justify-content-center align-items-center percentage-change ${
-                            (currentQuarter?.["AMP Note Avg"] || 1) > 0
+                            (currentQuarter?.["AMP Note Change"] || 1) > 0
                                 ? "text-green"
                                 : "text-red"
                         }`}
                     >
                         <span className="arrow">
-                            {(currentQuarter?.["AMP Note Avg"] || 1) > 0 ? (
+                            {(currentQuarter?.["AMP Note Change"] || 1) > 0 ? (
                                 <>&uarr;</>
                             ) : (
                                 <>&darr;</>
