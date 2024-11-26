@@ -4,6 +4,12 @@ import "leaflet/dist/leaflet.css";
 import { Box, Text, Button, HStack } from "@chakra-ui/react";
 const citiesData = [
   {
+    name: "Laguna",
+    lat: 25.544430,
+    lng: -103.406786,
+    performances: {},
+  },
+  {
     name: "Chihuahua",
     lat: 28.632996,
     lng: -106.0691,
