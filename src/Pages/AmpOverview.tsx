@@ -12,6 +12,7 @@ import ComparisonNoGroup from "../components/comparison-chart-ungroup.tsx";
 import { ExpandWrapper } from "../components/expand-wrapper.tsx";
 import AmpAverageChart from "../components/amp-average-chart.tsx";
 import AmpVerticalRidarCharts from "../view/AmpVerticalRidarChart.tsx";
+import General from "../view/General.jsx";
 
 export const AmpOverview = () => {
     const [data, setData] = useState<{
@@ -548,6 +549,16 @@ export const AmpOverview = () => {
                     </div>
                 </div>
             </div>
+
+            <div className="row custom-row mt-2 ">
+                <div className="col-12">
+                    <div className="box shadow mt-2">
+                        <General />
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     );
 };

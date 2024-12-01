@@ -113,6 +113,7 @@ export const GeneralOverview = () => {
 
   return (
     <div className="main">
+
       <div className="d-flex top-row text-white custom-row">
         <div className="box pt-2 px-3 ">
           <div className="d-flex align-items-center justify-content-between">
