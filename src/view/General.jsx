@@ -37,7 +37,6 @@ import { FaFilter, FaExpand } from "react-icons/fa";
 import Plot from "react-plotly.js";
 import { Loader } from "../components/common/Loader";
 import { useAsyncFn } from "../hooks/useAsync";
-import { fetchPlotData } from "../api/generalPlotService";
 
 // Helper function to parse "YYYY-MM-DD" to Date object
 const parseDate = (dateStr) => {
@@ -65,37 +64,6 @@ const formatNumber = (numStr) => {
     return Number.isInteger(num) ? num.toString() : num.toFixed(1);
 };
 
-// Define the groups and their member companies
-const GROUPS = [
-    "AZTECA UNO",
-    "AZTECA 7",
-    "DEPORTES",
-    "ADN40",
-    "NOTICIAS",
-    "AZTECA VERACRUZ",
-    "AZTECA QUINTANAROO",
-    "AZTECA BC",
-    "AZTECA SINALOA",
-    "AZTECA CJ",
-    "AZTECA AGUASCALIENTES",
-    "AZTECA QUERETARO",
-    "AZTECA CHIAPAS",
-    "AZTECA PUEBLA",
-    "AZTECA YUCATAN",
-    "AZTECA CHIHUAHUA",
-    "AZTECA MORELOS",
-    "AZTECA JALISCO",
-    "AZTECA GUERRERO",
-    "AZTECA BAJIO"
-]
-
-// Extract group names and individual companies
-const GROUP_NAMES = Object.keys(GROUPS);
-const INDIVIDUAL_COMPANIES = GROUP_NAMES.reduce(
-    (acc, group) => acc.concat(GROUPS[group]),
-    []
-);
-console.log(INDIVIDUAL_COMPANIES)
 // Define the metrics to display (ensure unique names and updated order)
 const METRICS = [
     "First Contentful Paint",
@@ -179,7 +147,16 @@ const calculateSlope = (x, y) => {
     return numerator / denominator;
 };
 
-const General = () => {
+const General = ({ fetchData, groups }) => {
+    // Define the groups and their member companies
+
+    const GROUPS = groups;
+    // Extract group names and individual companies
+    const GROUP_NAMES = Object.keys(GROUPS);
+    const INDIVIDUAL_COMPANIES = GROUP_NAMES.reduce(
+        (acc, group) => acc.concat(GROUPS[group]),
+        []
+    );
     // State variables
     const [data, setData] = useState([]);
 
@@ -204,7 +181,7 @@ const General = () => {
         onOpen();
     };
 
-    const { isLoading, error, execute } = useAsyncFn(fetchPlotData);
+    const { isLoading, error, execute } = useAsyncFn(fetchData);
 
     useEffect(() => {
         execute().then((res) => {
@@ -221,8 +198,7 @@ const General = () => {
                     speedIndex: item["note_speed_index"], // Column F
                     largestContentfulPaint:
                         item["note_largest_contentful_paint"], // Column G
-                    cumulativeLayoutShift:
-                        item["note_cumulative_layout_shift"], // Column H
+                    cumulativeLayoutShift: item["note_cumulative_layout_shift"], // Column H
                     week: weekStart // Added week information
                 };
                 const videoValues = {
@@ -267,7 +243,6 @@ const General = () => {
     // Generate company options including groups and individual companies
     const companyOptions = useMemo(() => {
         const options = [];
-
 
         // Add individual company options
         INDIVIDUAL_COMPANIES.forEach((company) => {
@@ -469,14 +444,16 @@ const General = () => {
         METRICS.forEach((metric) => {
             const current = parseFloat(+averages?.[metric] || 0);
             const comparison = parseFloat(+comparisonAverages?.[metric] || 0);
-            console.log(comparison, comparison, averages, comparisonAverages)
+            console.log(comparison, comparison, averages, comparisonAverages);
             if (isNaN(current) || isNaN(comparison)) {
                 differences[metric] = 0;
             } else {
                 // Calculate percentage difference and round to whole number
-                const diff = ((current - comparison) / (comparison || current || 1)) * 100;
+                const diff =
+                    ((current - comparison) / (comparison || current || 1)) *
+                    100;
                 differences[metric] = Math.round(diff);
-                console.log(differences[metric], diff, Math.round(diff))
+                console.log(differences[metric], diff, Math.round(diff));
             }
         });
 
@@ -526,12 +503,12 @@ const General = () => {
 
     // Handle category selection
     const handleCategoryChange = (values) => {
-      console.log(values);
-      if(values !== "") {
-        setSelectedCategories(values);
-        return;
-      }
-      setSelectedCategories(["note", "video"]);
+        console.log(values);
+        if (values !== "") {
+            setSelectedCategories(values);
+            return;
+        }
+        setSelectedCategories(["note", "video"]);
         // Removed setSelectedWeek to persist week selection
     };
 
@@ -713,7 +690,7 @@ const General = () => {
                                 onChange={handleCompanyChange}
                                 width="200px" // Reduced width if necessary
                                 bg="transparent" // Changed from "white" to "transparent"
-                                color="white" // Changed text color to white for readability
+                                color="gray" // Changed text color to white for readability
                                 borderRadius="md"
                                 size="sm" // Smaller size to reduce padding
                                 border="1px solid rgba(255, 255, 255, 0.6)" // Added semi-transparent white border
@@ -1074,7 +1051,9 @@ const General = () => {
                                                         bg={getPerformanceColor(
                                                             metric,
                                                             parseFloat(
-                                                                +averages[metric]
+                                                                +averages[
+                                                                    metric
+                                                                ]
                                                             )
                                                         )}
                                                         borderRadius="50%"
