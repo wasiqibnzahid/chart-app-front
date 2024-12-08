@@ -16,9 +16,6 @@ import PipeChart from "../components/PipeChart";
 import PipeCombineChart from "../components/PipeCombineChart";
 import PipCombineGrouped from "../components/PipCombineChartGrouped";
 import { ExpandWrapper } from "../components/expand-wrapper";
-import General from "../view/General.jsx";
-import { fetchGeneralPlotData } from "../api/generalPlotService";
-import { GENERAL_SITES } from "../data/all_sites.js";
 
 export const GeneralOverview = () => {
     const [data, setData] = useState<{
@@ -695,17 +692,6 @@ export const GeneralOverview = () => {
                                 />
                             </ExpandWrapper>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="row custom-row mt-2 ">
-                <div className="col-12">
-                    <div className="box shadow mt-2">
-                        <General
-                            fetchData={fetchGeneralPlotData}
-                            groups={GENERAL_SITES}
-                        />
                     </div>
                 </div>
             </div>
