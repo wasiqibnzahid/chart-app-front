@@ -502,6 +502,18 @@ export const AmpOverview = () => {
             <div className="row custom-row mt-2 ">
                 <div className="col-12">
                     <div className="box shadow mt-2">
+                        <General
+                            fetchData={fetchAmpPlotData}
+                            groups={AMP_SITES}
+                            preSelectedWebsites={"Laguna"}
+                        />
+                    </div>
+                </div>
+            </div>
+                               
+            <div className="row custom-row mt-2 ">
+                <div className="col-12">
+                    <div className="box shadow mt-2">
                         <div id="line-adwords" className="">
                             <ExpandWrapper>
                                 <AmpAverageChart data={data} />
@@ -546,17 +558,6 @@ export const AmpOverview = () => {
                                 />
                             </ExpandWrapper>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="row custom-row mt-2 ">
-                <div className="col-12">
-                    <div className="box shadow mt-2">
-                        <General
-                            fetchData={fetchAmpPlotData}
-                            groups={AMP_SITES}
-                        />
                     </div>
                 </div>
             </div>

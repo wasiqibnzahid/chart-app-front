@@ -147,7 +147,7 @@ const calculateSlope = (x, y) => {
     return numerator / denominator;
 };
 
-const General = ({ fetchData, groups }) => {
+const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
     // Define the groups and their member companies
 
     const GROUPS = groups;
@@ -160,7 +160,7 @@ const General = ({ fetchData, groups }) => {
     // State variables
     const [data, setData] = useState([]);
 
-    const [selectedCompany, setSelectedCompany] = useState("ADN40"); // Preselect "AMP"
+    const [selectedCompany, setSelectedCompany] = useState(preSelectedWebsites);
     const [selectedCategories, setSelectedCategories] = useState([
         "nota",
         "video"
@@ -247,7 +247,7 @@ const General = ({ fetchData, groups }) => {
         // Add individual company options
         INDIVIDUAL_COMPANIES.forEach((company) => {
             options.push(
-                <option key={company} value={company}>
+                <option key={company} value={company} style={{ color: "black" }}>
                     {company}
                 </option>
             );
@@ -688,18 +688,17 @@ const General = ({ fetchData, groups }) => {
                             <Select
                                 value={selectedCompany}
                                 onChange={handleCompanyChange}
-                                width="200px" // Reduced width if necessary
-                                bg="transparent" // Changed from "white" to "transparent"
-                                color="gray" // Changed text color to white for readability
-                                borderRadius="md"
-                                size="sm" // Smaller size to reduce padding
-                                border="1px solid rgba(255, 255, 255, 0.6)" // Added semi-transparent white border
-                                _placeholder={{ color: "gray.300" }} // Placeholder color
-                                _focus={{
-                                    borderColor: "teal.300",
-                                    boxShadow: "none"
-                                }} // Focus state
-                                _hover={{ borderColor: "teal.200" }} // Hover state
+                                width="200px"
+                                size="sm"
+                                border="2px"
+                                borderColor="#cbd5e0"
+                                borderRadius="8px"
+                                color="white"
+                                bg="transparent"
+                                _hover={{ borderColor: "gray.300" }}
+                                _focus={{ borderColor: "gray.300", boxShadow: "none" }}
+                                iconColor="white"
+                                _placeholder={{ color: "gray.300" }}
                             >
                                 {companyOptions}
                             </Select>

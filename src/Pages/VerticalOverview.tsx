@@ -575,7 +575,19 @@ export const VerticalOverview = () => {
           </p>
         </div>
       </div>
-
+      
+      <div className="row custom-row mt-2 ">
+        <div className="col-12">
+            <div className="box shadow mt-2">
+                <General
+                    fetchData={fetchGeneralPlotData}
+                    groups={GENERAL_SITES}
+                    preSelectedWebsites={"Terra"}
+                />
+            </div>
+        </div>
+      </div>
+      
       <div className="row custom-row">
         <div className="col-12">
           <VerticalRidarCharts data={data} />
@@ -611,18 +623,6 @@ export const VerticalOverview = () => {
               </ExpandWrapper>
             </div>
           </div>
-        </div>
-      </div>
-
-
-      <div className="row custom-row mt-2 ">
-        <div className="col-12">
-            <div className="box shadow mt-2">
-                <General
-                    fetchData={fetchGeneralPlotData}
-                    groups={GENERAL_SITES}
-                />
-            </div>
         </div>
       </div>
 

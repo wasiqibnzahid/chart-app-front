@@ -659,7 +659,19 @@ export const LocalOverview = () => {
                     </p>
                 </div>
             </div>
-
+            
+            <div className="row custom-row mt-2 ">
+                <div className="col-12">
+                    <div className="box shadow mt-2">
+                        <General
+                            fetchData={fetchLocalPlotData}
+                            groups={LOCAL_SITES}
+                            preSelectedWebsites={"Laguna"}
+                        />
+                    </div>
+                </div>
+            </div>
+            
             {/* Row 2 */}
             <div className="row custom-row">
                 <div className="col-12">
@@ -723,16 +735,6 @@ export const LocalOverview = () => {
                 </div>
             </div>
 
-            <div className="row custom-row mt-2 ">
-                <div className="col-12">
-                    <div className="box shadow mt-2">
-                        <General
-                            fetchData={fetchLocalPlotData}
-                            groups={LOCAL_SITES}
-                        />
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
