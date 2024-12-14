@@ -12,6 +12,9 @@ import ComparisonNoGroup from "../components/comparison-chart-ungroup.tsx";
 import { ExpandWrapper } from "../components/expand-wrapper.tsx";
 import AmpAverageChart from "../components/amp-average-chart.tsx";
 import AmpVerticalRidarCharts from "../view/AmpVerticalRidarChart.tsx";
+import General from "../view/General.jsx";
+import { fetchAmpPlotData } from "../api/generalPlotService";
+import { AMP_SITES } from "../data/all_sites.js";
 
 export const AmpOverview = () => {
     const [data, setData] = useState<{
@@ -116,10 +119,8 @@ export const AmpOverview = () => {
     }
 
     const combinedData = useMemo(() => {
-        if (
-            currentQuarter?.amp?.length > 0
-        ) {
-            console.log("hallo123",currentQuarter?.amp)
+        if (currentQuarter?.amp?.length > 0) {
+            console.log("hallo123", currentQuarter?.amp);
             return [...currentQuarter.amp];
         }
         return [];
@@ -128,7 +129,7 @@ export const AmpOverview = () => {
         [0],
         [0]
     ]);
-    console.log("combinedData", combinedData)
+    console.log("combinedData", combinedData);
     return (
         <div className="main">
             {/* Row 1 */}
@@ -498,6 +499,18 @@ export const AmpOverview = () => {
                 </div>
             </div>
 
+            <div className="row custom-row mt-2 ">
+                <div className="col-12">
+                    <div className="box shadow mt-2">
+                        <General
+                            fetchData={fetchAmpPlotData}
+                            groups={AMP_SITES}
+                            preSelectedWebsites={"Laguna"}
+                        />
+                    </div>
+                </div>
+            </div>
+                               
             <div className="row custom-row mt-2 ">
                 <div className="col-12">
                     <div className="box shadow mt-2">

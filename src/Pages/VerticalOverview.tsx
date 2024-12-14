@@ -14,6 +14,9 @@ import dayjs from "dayjs";
 import VerticalRidarCharts from "../view/VerticalRidarCharts";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup";
 import { ExpandWrapper } from "../components/expand-wrapper";
+import General from "../view/General.jsx";
+import { fetchGeneralPlotData } from "../api/generalPlotService";
+import { GENERAL_SITES } from "../data/all_sites.js";
 import {getInsights} from "../data"
 export const VerticalOverview = () => {
   const [data, setData] = useState<{
@@ -572,7 +575,19 @@ export const VerticalOverview = () => {
           </p>
         </div>
       </div>
-
+      
+      <div className="row custom-row mt-2 ">
+        <div className="col-12">
+            <div className="box shadow mt-2">
+                <General
+                    fetchData={fetchGeneralPlotData}
+                    groups={GENERAL_SITES}
+                    preSelectedWebsites={"Terra"}
+                />
+            </div>
+        </div>
+      </div>
+      
       <div className="row custom-row">
         <div className="col-12">
           <VerticalRidarCharts data={data} />
@@ -610,6 +625,7 @@ export const VerticalOverview = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };
