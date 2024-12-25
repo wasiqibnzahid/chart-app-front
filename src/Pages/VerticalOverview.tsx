@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import BarChart from "../components/comparison-chart";
 import {
   ComparisonData,
@@ -6,63 +6,59 @@ import {
   getQuarterlyData,
   QuarterData,
   ResData,
-  runJob,
 } from "../data";
-import { Button, Radio, RadioGroup } from "@chakra-ui/react";
+import { Radio, RadioGroup } from "@chakra-ui/react";
 import AnimateNumber from "../components/animate-number";
-import dayjs from "dayjs";
 import VerticalRidarCharts from "../view/VerticalRidarCharts";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup";
 import { ExpandWrapper } from "../components/expand-wrapper";
-import General from "../view/General.jsx";
+import General from "../view/General";
 import { fetchGeneralPlotData } from "../api/generalPlotService";
 import { GENERAL_SITES } from "../data/all_sites.js";
-import {getInsights} from "../data"
+import { getInsights } from "../data";
+import DateDisplay from "../components/common/DateDisplay";
+import useSelectedData from "../hooks/useSelectedData";
+
 export const VerticalOverview = () => {
   const [data, setData] = useState<{
-    weekly: ResData;
-    comparison: ComparisonData;
-    quarterData: QuarterData[];
-    weekComparison?: QuarterData;
-  }>({
-    quarterData: [],
-    weekly: {
-      changes: [],
-      data: [],
-    },
-    comparison: {
-      notes: [],
-      total: [],
-      videos: [],
-      insights: {
-        notes: {
-          competition: "",
-          self: "",
+        weekly: ResData;
+        comparison: ComparisonData;
+        quarterData: QuarterData[];
+        yearData:  QuarterData[];
+        allTimeData?:  QuarterData;
+        weekComparison: QuarterData[];
+    }>({
+        quarterData: [],
+        yearData: [],
+        weekComparison: [],
+        weekly: {
+            changes: [],
+            data: []
         },
-        total: {
-          competition: "",
-          self: "",
-        },
-        videos: {
-          competition: "",
-          self: "",
-        },
-      },
-    },
-  });
+        comparison: {
+            notes: [],
+            total: [],
+            videos: [],
+            insights: {
+                notes: {
+                    competition: "",
+                    self: ""
+                },
+                total: {
+                    competition: "",
+                    self: ""
+                },
+                videos: {
+                    competition: "",
+                    self: ""
+                }
+            }
+        }
+    });
 
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     getAverageData().then((res) => {
-      // if (res?.errors && res?.errors.length) {
-      //   let str = "";
-      //   res.errors.forEach((e) => {
-      //     str += `error: ${e.message} at ${dayjs(e.created_at).format(
-      //       "YYYY-MM-DD"
-      //     )} \r\n`;
-      //   });
-      //   alert(str);
-      // }
       setData((old) => ({
         ...old,
         ...res,
@@ -72,7 +68,9 @@ export const VerticalOverview = () => {
       setData((old) => ({
         ...old,
         quarterData: res.quarter,
-        weekComparison: res.week,
+        yearData: res.yearly,
+        allTimeData: res.all_time,
+        weekComparison: res.week
       }))
     );
   }, []);
@@ -81,31 +79,19 @@ export const VerticalOverview = () => {
     true,
     true,
   ]);
-  const [topbarMode, setTopbarMode] = useState<"month" | "week">("month");
-  const currentQuarter = useMemo(() => {
-    if (topbarMode === "week") {
-      return data.weekComparison;
-    }
-    let currentlyQuarter = 0;
-    const currentMonth = new Date().getMonth();
-    for (let i = 0; i < 4; i++) {
-      if (currentMonth > i * 3 && currentMonth <= i * 3 + 3) {
-        currentlyQuarter = i + 1;
-        break;
-      }
-    }
-    const currentYear = new Date().getFullYear();
-    const str = `Q${currentMonth+1}-${currentYear}`;
-    return {
-      ...(data.quarterData.find((quarter) => quarter.Date === str) || {}),
-    };
-  }, [data, topbarMode]);
 
-  function changeTopbarMode() {
-    setTopbarMode(topbarMode === "week" ? "month" : "week");
-  }
+  const {
+    selectedData: currentQuarter,
+    setCurrentRecordIndex,
+    topbarMode,
+    currentRecordIndex,
+    selectedFilterRecordsLength,
+    changeTopbarMode
+  } = useSelectedData(data);
+
   return (
     <div className="main">
+      <DateDisplay currentRecordIndex={currentRecordIndex} setCurrentRecordIndex={setCurrentRecordIndex} totalLength={selectedFilterRecordsLength} date={currentQuarter?.Date} />
       <div className="d-flex top-row text-white custom-row">
         <div className="box pt-2 px-3 ">
           <div className="d-flex align-items-center justify-content-between">
@@ -157,13 +143,12 @@ export const VerticalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${
-              ((isAzteca[0]
+            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[0]
                 ? currentQuarter?.["TV Azteca Change"]
                 : currentQuarter?.["Competition Change"]) || 1) > 0
                 ? "text-green"
                 : "text-red"
-            }`}
+              }`}
           >
             <span className="arrow">
               {((isAzteca[0]
@@ -200,9 +185,9 @@ export const VerticalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                    height: "0",
-                    overflow: "hidden",
-                  }
+                  height: "0",
+                  overflow: "hidden",
+                }
             }
           >
             {(isAzteca[0]
@@ -222,9 +207,8 @@ export const VerticalOverview = () => {
                 </span>{" "}
                 {company.total.toFixed?.(0)}%{" "}
                 <span
-                  className={`${
-                    company.total_change < 0 ? "text-red" : "text-green"
-                  }`}
+                  className={`${company.total_change < 0 ? "text-red" : "text-green"
+                    }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -314,13 +298,12 @@ export const VerticalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${
-              ((isAzteca[1]
+            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[1]
                 ? currentQuarter?.["TV Azteca Note Change"]
                 : currentQuarter?.["Competition Note Change"]) || 1) > 0
                 ? "text-green"
                 : "text-red"
-            }`}
+              }`}
           >
             <span className="arrow">
               {((isAzteca[1]
@@ -357,9 +340,9 @@ export const VerticalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                    height: "0",
-                    overflow: "hidden",
-                  }
+                  height: "0",
+                  overflow: "hidden",
+                }
             }
           >
             {(isAzteca[1]
@@ -378,9 +361,8 @@ export const VerticalOverview = () => {
                 </span>{" "}
                 {company.note.toFixed?.(0)}%{" "}
                 <span
-                  className={`${
-                    company.note_change < 0 ? "text-red" : "text-green"
-                  }`}
+                  className={`${company.note_change < 0 ? "text-red" : "text-green"
+                    }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -469,13 +451,12 @@ export const VerticalOverview = () => {
             %
           </div>
           <div
-            className={`d-flex justify-content-center align-items-center percentage-change ${
-              ((isAzteca[2]
+            className={`d-flex justify-content-center align-items-center percentage-change ${((isAzteca[2]
                 ? currentQuarter?.["TV Azteca Video Change"]
                 : currentQuarter?.["Competition Video Change"]) || 1) > 0
                 ? "text-green"
                 : "text-red"
-            }`}
+              }`}
           >
             <span className="arrow">
               {((isAzteca[2]
@@ -511,9 +492,9 @@ export const VerticalOverview = () => {
               isOpen
                 ? { marginTop: "1rem", transitionDuration: "250ms" }
                 : {
-                    height: "0",
-                    overflow: "hidden",
-                  }
+                  height: "0",
+                  overflow: "hidden",
+                }
             }
           >
             {(isAzteca[2]
@@ -533,9 +514,8 @@ export const VerticalOverview = () => {
                 </span>{" "}
                 {company.video.toFixed?.(0)}%{" "}
                 <span
-                  className={`${
-                    company.video_change < 0 ? "text-red" : "text-green"
-                  }`}
+                  className={`${company.video_change < 0 ? "text-red" : "text-green"
+                    }`}
                   style={{
                     fontSize: "14px",
                   }}
@@ -575,7 +555,7 @@ export const VerticalOverview = () => {
           </p>
         </div>
       </div>
-      
+
       <div className="row custom-row">
         <div className="col-12">
           <VerticalRidarCharts data={data} />
@@ -616,13 +596,13 @@ export const VerticalOverview = () => {
 
       <div className="row custom-row mt-2 ">
         <div className="col-12">
-            <div className="box shadow mt-2">
-                <General
-                    fetchData={fetchGeneralPlotData}
-                    groups={GENERAL_SITES}
-                    preSelectedWebsites={"Terra"}
-                />
-            </div>
+          <div className="box shadow mt-2">
+            <General
+              fetchData={fetchGeneralPlotData}
+              groups={GENERAL_SITES}
+              preSelectedWebsites={"Terra"}
+            />
+          </div>
         </div>
       </div>
 

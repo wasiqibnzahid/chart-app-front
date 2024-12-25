@@ -99,7 +99,9 @@ export interface QuarterData {
 }
 export async function getQuarterlyData(): Promise<{
   quarter: QuarterData[];
-  week: QuarterData;
+  yearly: QuarterData[];
+  week: QuarterData[];
+  all_time: QuarterData;
 }> {
   return axios.get(endPoints.quarter).then((res) => res.data);
 }

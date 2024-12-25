@@ -81,7 +81,9 @@ export interface LocalQuarterData {
   }
 export async function getLocalQuarterlyData(): Promise<{
     quarter: LocalQuarterData[];
-    week: LocalQuarterData;
+    year: LocalQuarterData[];
+    all_time: LocalQuarterData;
+    week: LocalQuarterData[];
   }> {
     return axios.get(endPoints.localQuarter).then((res) => res.data);
 }

@@ -1,30 +1,33 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import AverageChart from "../components/average-chart";
-import BarChart from "../components/comparison-chart";
 import {
     ComparisonData,
     getAverageData,
     getQuarterlyData,
     QuarterData,
     ResData,
-    runJob
+    
 } from "../data";
-import { Button, Radio, RadioGroup } from "@chakra-ui/react";
+import { Radio, RadioGroup } from "@chakra-ui/react";
 import AnimateNumber from "../components/animate-number";
-import dayjs from "dayjs";
-import PipeChart from "../components/PipeChart";
 import PipeCombineChart from "../components/PipeCombineChart";
 import PipCombineGrouped from "../components/PipCombineChartGrouped";
 import { ExpandWrapper } from "../components/expand-wrapper";
+import DateDisplay from "../components/common/DateDisplay";
+import useSelectedData from "../hooks/useSelectedData";
 
 export const GeneralOverview = () => {
     const [data, setData] = useState<{
         weekly: ResData;
         comparison: ComparisonData;
         quarterData: QuarterData[];
-        weekComparison?: QuarterData;
+        yearData:  QuarterData[];
+        weekComparison: QuarterData[];
+        allTimeData?: QuarterData;
     }>({
         quarterData: [],
+        yearData: [],
+        weekComparison: [],
         weekly: {
             changes: [],
             data: []
@@ -53,15 +56,6 @@ export const GeneralOverview = () => {
     const [isOpen, setIsOpen] = useState(false);
     useEffect(() => {
         getAverageData().then((res) => {
-            // if (res?.errors && res?.errors.length) {
-            //   let str = "";
-            //   res.errors.forEach((e) => {
-            //     str += `error: ${e.message} at ${dayjs(e.created_at).format(
-            //       "YYYY-MM-DD"
-            //     )} \r\n`;
-            //   });
-            //   alert(str);
-            // }
             setData((old) => ({
                 ...old,
                 ...res
@@ -71,7 +65,9 @@ export const GeneralOverview = () => {
             setData((old) => ({
                 ...old,
                 quarterData: res.quarter,
-                weekComparison: res.week
+                yearData: res.yearly,
+                weekComparison: res.week,
+                allTimeData: res.all_time,
             }))
         );
     }, []);
@@ -80,39 +76,18 @@ export const GeneralOverview = () => {
         true,
         true
     ]);
-    const [topbarMode, setTopbarMode] = useState<"month" | "week">("month");
-    const currentQuarter = useMemo(() => {
-        if (topbarMode === "week") {
-            return data.weekComparison;
-        }
-        let currentlyQuarter = 0;
-        const currentMonth = new Date().getMonth();
-        for (let i = 0; i < 4; i++) {
-            if (currentMonth > i * 3 && currentMonth <= i * 3 + 3) {
-                currentlyQuarter = i + 1;
-                console.log(currentlyQuarter);
-                break;
-            }
-        }
-
-        const currentYear = new Date().getFullYear();
-        const str = `Q${currentMonth + 1}-${currentYear}`;
-        console.log("ASDLASDLAS:D", str, data.quarterData);
-        const dataa =
-            data.quarterData.find((quarter) => quarter.Date === str) || {};
-        console.log("ASDLASDLAS:D", dataa);
-
-        return {
-            ...dataa
-        };
-    }, [data, topbarMode]);
-
-    function changeTopbarMode() {
-        setTopbarMode(topbarMode === "week" ? "month" : "week");
-    }
+    const { 
+        selectedData: currentQuarter, 
+        setCurrentRecordIndex,
+        topbarMode,
+        currentRecordIndex,
+        selectedFilterRecordsLength,
+        changeTopbarMode
+    } = useSelectedData(data);
 
     return (
         <div className="main">
+            <DateDisplay currentRecordIndex={currentRecordIndex} setCurrentRecordIndex={setCurrentRecordIndex}  totalLength={selectedFilterRecordsLength} date={currentQuarter?.Date}   />
             <div className="d-flex top-row text-white custom-row">
                 <div className="box pt-2 px-3 ">
                     <div className="d-flex align-items-center justify-content-between">
@@ -230,7 +205,7 @@ export const GeneralOverview = () => {
                         {(isAzteca[0]
                             ? currentQuarter?.azteca
                             : currentQuarter?.competition
-                        )?.map((company) => (
+                        )?.map((company: { name: string; total: number; total_change: number; }) => (
                             <div
                                 key={company.name}
                                 style={{
@@ -412,7 +387,7 @@ export const GeneralOverview = () => {
                         {(isAzteca[1]
                             ? currentQuarter?.azteca
                             : currentQuarter?.competition
-                        )?.map((company) => (
+                        )?.map((company: { name: string; note: number; note_change: number; }) => (
                             <div
                                 style={{
                                     paddingLeft: "20%",
@@ -590,7 +565,7 @@ export const GeneralOverview = () => {
                         {(isAzteca[2]
                             ? currentQuarter?.azteca
                             : currentQuarter?.competition
-                        )?.map((company) => (
+                        )?.map((company: { name: string; video: number; video_change: number; }) => (
                             <div
                                 key={company.name}
                                 style={{

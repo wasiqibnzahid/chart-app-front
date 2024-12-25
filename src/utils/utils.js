@@ -191,3 +191,28 @@ function calculateQuarterlyAverages(data) {
 }
 export const finalData = calculateQuarterlyAverages(data);
 export const averageLabels = Object.keys(finalData);
+
+export function parseAndFormatDate(inputDate) {
+  let date = inputDate;
+  if(!inputDate) return "";
+
+  if (inputDate.includes("Q")) {
+    const [quarter, year] = inputDate.split("-");
+    const month = (parseInt(quarter.replace("Q", ""), 10) - 1) + 1;
+    date = new Date(`${year}-${String(month).padStart(2, "0")}-01`);
+    console.log(date, inputDate, month)
+  } else {
+    date = new Date(inputDate);
+  }
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+
+  return formattedDate;
+}
+
+

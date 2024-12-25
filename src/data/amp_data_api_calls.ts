@@ -100,7 +100,9 @@ export interface AmpQuarterData {
 
 export async function getAmpQuarterlyData(): Promise<{
     quarter: AmpQuarterData[];
-    week: AmpQuarterData;
+    year: AmpQuarterData[];
+    all_time: AmpQuarterData;
+    week: AmpQuarterData[];
   }> {
     return axios.get(endPoints.ampQuarter).then((res) => res.data);
 }

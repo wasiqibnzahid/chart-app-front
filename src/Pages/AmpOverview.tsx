@@ -15,15 +15,21 @@ import AmpVerticalRidarCharts from "../view/AmpVerticalRidarChart.tsx";
 import General from "../view/General.jsx";
 import { fetchAmpPlotData } from "../api/generalPlotService";
 import { AMP_SITES } from "../data/all_sites.js";
+import DateDisplay from "../components/common/DateDisplay";
+import useSelectedData from "../hooks/useSelectedData";
 
 export const AmpOverview = () => {
     const [data, setData] = useState<{
         weekly: ResData;
         comparison: ComparisonData;
         quarterData: AmpQuarterData[];
-        weekComparison?: AmpQuarterData;
+        yearData: AmpQuarterData[];
+        allTimeData?: AmpQuarterData;
+        weekComparison: AmpQuarterData[];
     }>({
         quarterData: [],
+        yearData: [],
+        weekComparison: [],
         weekly: {
             changes: [],
             data: []
@@ -74,8 +80,10 @@ export const AmpOverview = () => {
                             ...ampAverageData.weekly.changes
                         ]
                     },
-                    quarterData: ampQuarterlyData.quarter, // Update quarterData
-                    weekComparison: ampQuarterlyData.week // Update weekComparison
+                    quarterData: ampQuarterlyData.quarter, 
+                    yearData: ampQuarterlyData.year, 
+                    allTimeData: ampQuarterlyData.all_time, 
+                    weekComparison: ampQuarterlyData.week
                 }));
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -84,39 +92,15 @@ export const AmpOverview = () => {
 
         fetchData();
     }, []);
-
-    const [isAzteca] = useState<[boolean, boolean, boolean]>([
-        true,
-        true,
-        true
-    ]);
-
-    const [topbarMode, setTopbarMode] = useState<"month" | "week">("month");
-
-    const currentQuarter = useMemo(() => {
-        if (topbarMode === "week") {
-            return data.weekComparison;
-        }
-
-        const currentlyQuarter = 0;
-        const currentMonth = new Date().getMonth();
-
-        const currentYear = new Date().getFullYear();
-        const str = `Q${currentMonth + 1}-${currentYear}`;
-        console.log("LOCAL ASDLASDLAS:D", currentMonth, currentYear, str, {
-            ...(data.quarterData.find((quarter) => quarter.Date === str) || {})
-        });
-        return {
-            ...(data.quarterData.find((quarter) => quarter.Date === str) || {})
-        };
-    }, [data, topbarMode]);
-    type f = typeof currentQuarter;
-    const a = useMemo<f>(() => {
-        return currentQuarter;
-    }, [data, topbarMode]);
-    function changeTopbarMode() {
-        setTopbarMode(topbarMode === "week" ? "month" : "week");
-    }
+  
+  const {
+    selectedData: currentQuarter,
+    setCurrentRecordIndex,
+    topbarMode,
+    currentRecordIndex,
+    selectedFilterRecordsLength,
+    changeTopbarMode
+  } = useSelectedData(data);
 
     const combinedData = useMemo(() => {
         if (currentQuarter?.amp?.length > 0) {
@@ -125,13 +109,10 @@ export const AmpOverview = () => {
         }
         return [];
     }, [currentQuarter]);
-    const [monthWeek, setMonthWeek] = useState<[number[], number[]]>([
-        [0],
-        [0]
-    ]);
-    console.log("combinedData", combinedData);
+
     return (
         <div className="main">
+            <DateDisplay currentRecordIndex={currentRecordIndex} setCurrentRecordIndex={setCurrentRecordIndex} totalLength={selectedFilterRecordsLength} date={currentQuarter?.Date} />
             {/* Row 1 */}
             <div className="d-flex top-row text-white custom-row">
                 {/* General */}

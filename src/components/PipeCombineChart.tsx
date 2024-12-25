@@ -1,12 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 // Charts
-import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
-
-// Images
-import InsightsLogo from "../assets/Insights.svg";
-import ControlsLogo from "../assets/Controls.svg";
 
 // Api
 import {
@@ -64,7 +59,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
   // States
   const [showZoomIn, setShowZoomIn] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const [showDataFromDate, setShowDataFromDate] = useState(false);
+  const [showDataFromDate] = useState(false);
 
   const [showdateFilter, setShowDateFilter] = useState(false);
   const [dateFilter, setDateFilter] = useState([""]);
@@ -79,7 +74,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
   }, [propData]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [quarterVal, setQuarterVal] = useState([0, 11]);
-  const [dataFromDate, setDataFromDate] = useState([0, 11]);
+  const [dataFromDate] = useState([0, 11]);
 
   const [selectedDropdown, setSelectedDropdown] = useState(dropdownOptions[0]);
   const [showVals, setShowVals] = useState(false);

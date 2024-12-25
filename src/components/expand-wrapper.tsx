@@ -1,16 +1,12 @@
 import {
-  AlertDialog,
-  AlertDialogBody,
   Modal,
-  ModalBody,
   ModalContent,
   ModalOverlay,
 } from "@chakra-ui/react";
-import React, { PropsWithChildren, useRef, useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 
 export const ExpandWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
   return (
     <>
       <div

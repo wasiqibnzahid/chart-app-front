@@ -1,32 +1,36 @@
 import { useEffect, useMemo, useState } from "react";
 import BarChart from "../components/comparison-chart";
-import { ComparisonData, getAverageData, ResData, runJob } from "../data";
+import { ComparisonData, getAverageData, ResData } from "../data";
 import {
     getLocalQuarterlyData,
     LocalQuarterData,
     getLocalAverageData
 } from "../data/local_data_api_calls.ts";
-import { Radio, RadioGroup, SimpleGrid } from "@chakra-ui/react";
+import { SimpleGrid } from "@chakra-ui/react";
 
 import AnimateNumber from "../components/animate-number";
-import dayjs from "dayjs";
 import PerformanceMap from "../components/PerformanceMap";
 import Heatmap from "../view/Heatmap";
-import WeekChart from "../components/WeekChart";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup.tsx";
 import { ExpandWrapper } from "../components/expand-wrapper.tsx";
 import General from "../view/General.jsx";
 import { fetchLocalPlotData } from "../api/generalPlotService";
 import { LOCAL_SITES } from "../data/all_sites.js";
+import DateDisplay from "../components/common/DateDisplay";
+import useSelectedData from "@/hooks/useSelectedData"
 
 export const LocalOverview = () => {
     const [data, setData] = useState<{
         weekly: ResData;
         comparison: ComparisonData;
         quarterData: LocalQuarterData[];
-        weekComparison?: LocalQuarterData;
+        yearData: LocalQuarterData[];
+        allTimeData?: LocalQuarterData;
+        weekComparison: LocalQuarterData[];
     }>({
         quarterData: [],
+        yearData: [],
+        weekComparison: [],
         weekly: {
             changes: [],
             data: []
@@ -71,8 +75,10 @@ export const LocalOverview = () => {
                         ...old.weekly,
                         ...averageData.weekly // Merge weekly data from the second API
                     },
-                    quarterData: localQuarterlyData.quarter, // Update quarterData
-                    weekComparison: localQuarterlyData.week // Update weekComparison
+                    quarterData: localQuarterlyData.quarter, 
+                    yearData: localQuarterlyData.year,
+                    allTimeData: localQuarterlyData.all_time, 
+                    weekComparison: localQuarterlyData.week 
                 }));
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -82,39 +88,20 @@ export const LocalOverview = () => {
         fetchData();
     }, []);
 
-    const [isAzteca, setIsAzteca] = useState<[boolean, boolean, boolean]>([
+    const [isAzteca] = useState<[boolean, boolean, boolean]>([
         true,
         true,
         true
     ]);
 
-    const [topbarMode, setTopbarMode] = useState<"month" | "week">("month");
-
-    const currentQuarter = useMemo(() => {
-        if (topbarMode === "week") {
-            return data.weekComparison;
-        }
-
-        let currentlyQuarter = 0;
-        const currentMonth = new Date().getMonth();
-
-        const currentYear = new Date().getFullYear();
-        const str = `Q${currentMonth + 1}-${currentYear}`;
-        console.log("LOCAL ASDLASDLAS:D", currentMonth, currentYear, str, {
-            ...(data.quarterData.find((quarter) => quarter.Date === str) || {})
-        });
-        return {
-            ...(data.quarterData.find((quarter) => quarter.Date === str) || {})
-        };
-    }, [data, topbarMode]);
-    type f = typeof currentQuarter;
-    const a = useMemo<f>(() => {
-        console.log("ASDASD 22312", data);
-        return currentQuarter;
-    }, [data, topbarMode]);
-    function changeTopbarMode() {
-        setTopbarMode(topbarMode === "week" ? "month" : "week");
-    }
+    const { 
+        selectedData: currentQuarter, 
+        setCurrentRecordIndex,
+        topbarMode,
+        currentRecordIndex,
+        selectedFilterRecordsLength,
+        changeTopbarMode
+    } = useSelectedData(data);
 
     const combinedData = useMemo(() => {
         if (
@@ -131,6 +118,7 @@ export const LocalOverview = () => {
     ]);
     return (
         <div className="main">
+            <DateDisplay currentRecordIndex={currentRecordIndex} setCurrentRecordIndex={setCurrentRecordIndex} totalLength={selectedFilterRecordsLength} date={currentQuarter?.Date} />
             {/* Row 1 */}
             <div className="d-flex top-row text-white custom-row">
                 {/* General */}
