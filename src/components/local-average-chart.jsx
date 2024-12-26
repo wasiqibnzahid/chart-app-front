@@ -1,16 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-// Charts
-import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 
 // Api
 import {
-  ComparisonData,
   getInsights,
-  Insights,
-  QuarterData,
-  ResData,
 } from "../data";
 
 // UI Elements
@@ -30,13 +24,6 @@ import {
   TagLabel,
 } from "@chakra-ui/react";
 
-export interface AverageChartProps {
-  data: {
-    weekly: ResData;
-    comparison: ComparisonData;
-    quarterData: QuarterData[];
-  };
-}
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
   "Jan", // 0
@@ -52,12 +39,17 @@ const months = [
   "Nov", // 10
   "Dec", // 11
 ];
-const seriesColors: { [key: string]: string } = {
-  "TV Azteca": "#3357FF",
-  Competition: "#FF5733",
-  AMP: "yellow",
+const tvAztecaLabel = "TV Azteca";
+const tvCompetition = "TV Competition";
+const Competition = "Competition";
+const localAztecaLabel = "Local Azteca";
+const generalAzetaLabel = "General Azteca";
+const seriesColors = {
+  "General Azteca": "#3357FF", // Vibrant Blue
+  "Local Azteca": "#FF5733", // Vibrant Red
+  // Add more series colors here if needed
 };
-const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
+const LocalAverageChart = ({ data: propData }) => {
   // States
   const [showZoomIn, setShowZoomIn] = useState(false);
   const [showControls, setShowControls] = useState(false);
@@ -147,7 +139,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     return mainDataUse;
   }, [data, selectedDropdown, quarterVal, selectedYear, showAllData]);
 
-  const [insightsData, setInsights] = useState<Insights>({
+  const [insightsData, setInsights] = useState({
     notes: {
       competition: "",
       self: "",
@@ -161,7 +153,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       self: "",
     },
   });
-  const optionsLine = useMemo<ApexOptions>(
+  const optionsLine = useMemo(
     () => ({
       chart: {
         animations: {
@@ -240,7 +232,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
             ? -10
             : 0,
         enabled: showVals || showPercentages, // Enable based on state
-        formatter(val, data): string {
+        formatter(val, data) {
           const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
           const prevItem =
             dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
@@ -344,7 +336,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       {/* Header Text */}
       <div className="justify-content-between align-items-center mb-4">
         <div>
-          <h5>AMP vs Azteca vs Competition Overview</h5>
+          <h5>Local Azteca vs General Azteca Overview</h5>
         </div>
 
         <section className="VerticalBarChart__legend">
@@ -811,8 +803,8 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                   </div>
                   {/* Insights SVG End */}
                   <Text style={{ lineHeight: "2rem" }}>
-                    {insights ? insights.self : "There is no insights"} <br />
-                    {insights ? insights.competition : "There is no insights"}
+                    {insights ? insights.self.replaceAll(tvAztecaLabel, localAztecaLabel) : "There is no insights"} <br />
+                    {insights ? insights.competition.replaceAll(Competition, generalAzetaLabel) : "There is no insights"}
                   </Text>
                 </HStack>
               </Stack>
@@ -824,4 +816,4 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   );
 };
 
-export default AmpAverageChart;
+export default LocalAverageChart;

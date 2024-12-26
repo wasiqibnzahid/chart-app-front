@@ -17,7 +17,9 @@ import General from "../view/General.jsx";
 import { fetchLocalPlotData } from "../api/generalPlotService";
 import { LOCAL_SITES } from "../data/all_sites.js";
 import DateDisplay from "../components/common/DateDisplay";
-import useSelectedData from "../hooks/useSelectedData"
+import useSelectedData from "../hooks/useSelectedData";
+import LocalAverageChart from "../components/local-average-chart.jsx";
+import {changeLabel} from "../utils/utils.js"
 
 export const LocalOverview = () => {
     const [data, setData] = useState<{
@@ -70,10 +72,16 @@ export const LocalOverview = () => {
 
                 setData((old) => ({
                     ...old,
-                    ...localAverageData, // Merge local average data
+                    ...localAverageData, // Merge amp average data
                     weekly: {
-                        ...old.weekly,
-                        ...averageData.weekly // Merge weekly data from the second API
+                        data: [
+                            ...changeLabel(averageData.weekly.data, 'TV Azteca', 'General Azteca'),
+                            ...changeLabel(localAverageData.weekly.data, 'TV Azteca', 'Local Azteca'),
+                        ],
+                        changes: [
+                            ...changeLabel(averageData.weekly.changes, 'TV Azteca', 'General Azteca'),
+                            ...changeLabel(localAverageData.weekly.changes, 'TV Azteca', 'Local Azteca'),
+                        ]
                     },
                     quarterData: localQuarterlyData.quarter, 
                     yearData: localQuarterlyData.year,
@@ -645,6 +653,18 @@ export const LocalOverview = () => {
                             />
                         </span>
                     </p>
+                </div>
+            </div>
+
+            <div className="row custom-row mt-2 ">
+                <div className="col-12">
+                    <div className="box shadow mt-2">
+                        <div id="line-adwords" className="">
+                            <ExpandWrapper>
+                                <LocalAverageChart data={data} />
+                            </ExpandWrapper>
+                        </div>
+                    </div>
                 </div>
             </div>
             
