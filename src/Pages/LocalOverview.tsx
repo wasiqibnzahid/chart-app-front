@@ -212,7 +212,9 @@ export const LocalOverview = () => {
                         </span>
                     </div>
                     <div className="d-flex justify-content-center align-items-center vs-quarter text-green">
-                        vs previous&nbsp;{" "}
+                        {
+                            topbarMode != 'all time' && `vs previous `
+                        }&nbsp;
                         <span
                             onClick={changeTopbarMode}
                             style={{
@@ -387,7 +389,9 @@ export const LocalOverview = () => {
                         </span>
                     </div>
                     <div className="d-flex justify-content-center align-items-center vs-quarter text-green">
-                        vs previous&nbsp;{" "}
+                        {
+                            topbarMode != 'all time' && `vs previous `
+                        }&nbsp;
                         <span
                             onClick={changeTopbarMode}
                             style={{
@@ -566,7 +570,9 @@ export const LocalOverview = () => {
                     </div>
 
                     <div className="d-flex justify-content-center align-items-center vs-quarter">
-                        vs previous&nbsp;{" "}
+                        {
+                            topbarMode != 'all time' && `vs previous `
+                        }&nbsp;
                         <span
                             onClick={changeTopbarMode}
                             style={{
