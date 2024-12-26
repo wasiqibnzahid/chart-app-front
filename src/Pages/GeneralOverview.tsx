@@ -177,7 +177,9 @@ export const GeneralOverview = () => {
                     </div>
 
                     <div className="d-flex justify-content-center align-items-center vs-quarter text-green">
-                        vs previous&nbsp;{" "}
+                        {
+                            topbarMode != 'all time' && `vs previous `
+                        }
                         <span
                             onClick={changeTopbarMode}
                             style={{
@@ -185,7 +187,7 @@ export const GeneralOverview = () => {
                                 textDecoration: "underline"
                             }}
                         >
-                            {topbarMode}
+                            &nbsp;{topbarMode}
                         </span>
                     </div>
 
@@ -360,7 +362,9 @@ export const GeneralOverview = () => {
                         </span>
                     </div>
                     <div className="d-flex justify-content-center align-items-center vs-quarter text-green">
-                        vs previous&nbsp;{" "}
+                        {
+                            topbarMode != 'all time' && `vs previous `
+                        }
                         <span
                             onClick={changeTopbarMode}
                             style={{
@@ -368,7 +372,7 @@ export const GeneralOverview = () => {
                                 textDecoration: "underline"
                             }}
                         >
-                            {topbarMode}
+                            &nbsp;{topbarMode}
                         </span>
                     </div>
                     <div
@@ -538,7 +542,9 @@ export const GeneralOverview = () => {
                         %
                     </div>
                     <div className="d-flex justify-content-center align-items-center vs-quarter">
-                        vs previous&nbsp;{" "}
+                        {
+                            topbarMode != 'all time' && `vs previous `
+                        } &nbsp;
                         <span
                             onClick={changeTopbarMode}
                             style={{

@@ -215,4 +215,14 @@ export function parseAndFormatDate(inputDate) {
   return formattedDate;
 }
 
+export function changeLabel(data, oldLabel, newLable){
+  const filteredData = data.filter((item) => item.name.includes(oldLabel));
+  return filteredData.map((item) => {
+    console.log(item);
+    item.name = item.name.replace(oldLabel, newLable);
+    console.log(item);
+    return item;
+  })
+}
+
 
