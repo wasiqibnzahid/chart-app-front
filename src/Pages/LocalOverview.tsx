@@ -17,7 +17,7 @@ import General from "../view/General.jsx";
 import { fetchLocalPlotData } from "../api/generalPlotService";
 import { LOCAL_SITES } from "../data/all_sites.js";
 import DateDisplay from "../components/common/DateDisplay";
-import useSelectedData from "@/hooks/useSelectedData"
+import useSelectedData from "../hooks/useSelectedData"
 
 export const LocalOverview = () => {
     const [data, setData] = useState<{

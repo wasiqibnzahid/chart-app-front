@@ -199,7 +199,28 @@ const VerticalRadarChart = ({ title, labels, dataSets }) => {
 
   // Toggle between week and month
   const toggleTimeFrame = () => {
-    setTimeFrame(timeFrame === 'Week' ? 'Month' : 'Week');
+    let newTimeFrame = timeFrame;
+    switch(timeFrame){
+      case 'Week':
+        newTimeFrame = 'Month';
+        break;
+
+      case 'Month':
+        newTimeFrame = 'Year';
+        break;
+
+      case 'Year':
+        newTimeFrame = 'AllTime';
+        break;
+
+      case 'AllTime':
+        newTimeFrame = 'Week';
+        break;
+      default:
+        newTimeFrame = 'Week';
+      
+    }
+    setTimeFrame(newTimeFrame);
   };
 
   return (

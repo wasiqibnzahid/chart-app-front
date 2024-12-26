@@ -29,10 +29,14 @@ const VerticalRidarCharts = (data) => {
     Video: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
     Nota: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
   };
 
@@ -40,10 +44,14 @@ const VerticalRidarCharts = (data) => {
     Video: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
     Nota: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
   };
 
@@ -64,6 +72,20 @@ const VerticalRidarCharts = (data) => {
 
     // Push the average to companyDataSets.Video.Month
     tvAztecaDataSets.Video.Month.push(average);
+
+    // Calculate Year data
+    const lastYearData = tvAztecaVideoData.data.slice(-52);
+    const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+    const yearAverage = yearSum / lastYearData.length; 
+
+    tvAztecaDataSets.Video.Year.push(yearAverage);
+
+    // Calculate All Time data
+    const allTimeData = tvAztecaVideoData.data;
+    const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+    const allTimeAverage = allTimeSum / allTimeData.length; 
+
+    tvAztecaDataSets.Video.AllTime.push(allTimeAverage);
     
     // Push the last value of y to companyDataSets.Video.Week
     tvAztecaDataSets.Video.Week.push(tvAztecaVideoData.data[tvAztecaVideoData.data.length - 1].y);
@@ -71,6 +93,8 @@ const VerticalRidarCharts = (data) => {
     // If there's no matching data, you might want to handle it (e.g., push a default value)
     tvAztecaDataSets.Video.Month.push(0); // or another default value
     tvAztecaDataSets.Video.Week.push(0); // or another default value
+    tvAztecaDataSets.Video.Year.push(0); // or another default value
+    tvAztecaDataSets.Video.AllTime.push(0); // or another default value
   }
   if (tvAztecaNoteData) {
     // Get the last four data points
@@ -84,10 +108,26 @@ const VerticalRidarCharts = (data) => {
     
     // Push the last value of y to companyDataSets.Video.Week
     tvAztecaDataSets.Nota.Week.push(tvAztecaNoteData.data[tvAztecaNoteData.data.length - 1].y);
+
+    // Calculate Year data
+    const lastYearData = tvAztecaNoteData.data.slice(-52);
+    const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+    const yearAverage = yearSum / lastYearData.length; 
+
+    tvAztecaDataSets.Nota.Year.push(yearAverage);
+
+    // Calculate All Time data
+    const allTimeData = tvAztecaNoteData.data;
+    const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+    const allTimeAverage = allTimeSum / allTimeData.length; 
+
+    tvAztecaDataSets.Nota.AllTime.push(allTimeAverage);
   } else {
     // If there's no matching data, you might want to handle it (e.g., push a default value)
     tvAztecaDataSets.Nota.Month.push(0); // or another default value
     tvAztecaDataSets.Nota.Week.push(0); // or another default value
+    tvAztecaDataSets.Nota.Year.push(0); // or another default value
+    tvAztecaDataSets.Nota.AllTime.push(0); // or another default value
   }
 });
 
@@ -114,10 +154,26 @@ competitorLabels.forEach((label) => {
     
     // Push the last value of y to companyDataSets.Video.Week
     competitorDataSets.Video.Week.push(competitorVideoData.data[competitorVideoData.data.length - 1].y);
+
+    // Calculate Year data
+    const lastYearData = competitorVideoData.data.slice(-52);
+    const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+    const yearAverage = yearSum / lastYearData.length; 
+
+    competitorDataSets.Video.Year.push(yearAverage);
+
+    // Calculate All Time data
+    const allTimeData = competitorVideoData.data;
+    const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+    const allTimeAverage = allTimeSum / allTimeData.length; 
+
+    competitorDataSets.Video.AllTime.push(allTimeAverage);
   } else {
     // If there's no matching data, you might want to handle it (e.g., push a default value)
     competitorDataSets.Video.Month.push(0); // or another default value
     competitorDataSets.Video.Week.push(0); // or another default value
+    competitorDataSets.Video.Year.push(0); // or another default value
+    competitorDataSets.Video.AllTime.push(0); // or another default value
   }
   if (competitorNoteData) {
     // Get the last four data points
@@ -131,10 +187,27 @@ competitorLabels.forEach((label) => {
     
     // Push the last value of y to companyDataSets.Video.Week
     competitorDataSets.Nota.Week.push(competitorNoteData.data[competitorNoteData.data.length - 1].y);
+
+    // Calculate Year data
+    const lastYearData = competitorNoteData.data.slice(-52);
+    const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+    const yearAverage = yearSum / lastYearData.length; 
+
+    competitorDataSets.Nota.Year.push(yearAverage);
+
+    // Calculate All Time data
+    const allTimeData = competitorNoteData.data;
+    const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+    const allTimeAverage = allTimeSum / allTimeData.length; 
+
+    competitorDataSets.Nota.AllTime.push(allTimeAverage);
+    
   } else {
     // If there's no matching data, you might want to handle it (e.g., push a default value)
     competitorDataSets.Nota.Month.push(0); // or another default value
     competitorDataSets.Nota.Week.push(0); // or another default value
+    competitorDataSets.Nota.Year.push(0); // or another default value
+    competitorDataSets.Nota.AllTime.push(0); // or another default value
   }
 });
 
