@@ -227,9 +227,6 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                 return dateA - dateB;
             });
 
-            //  console.log("Available Weeks:", weeks); // Debugging
-            //  console.log("Parsed Data:", parsedData); // Debugging
-
             setAvailableWeeks(weeks);
             setData(parsedData);
 
@@ -401,7 +398,6 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
             ).toFixed(2);
         });
 
-        console.log("Current Averages:", metricAverages); // Debugging
         return metricAverages;
     }, [filteredDataMemo]);
 
@@ -431,7 +427,6 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
             ).toFixed(2);
         });
 
-        console.log("Comparison Averages:", metricAverages); // Debugging
         return metricAverages;
     }, [comparisonData]);
 
@@ -444,7 +439,6 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
         METRICS.forEach((metric) => {
             const current = parseFloat(+averages?.[metric] || 0);
             const comparison = parseFloat(+comparisonAverages?.[metric] || 0);
-            console.log(comparison, comparison, averages, comparisonAverages);
             if (isNaN(current) || isNaN(comparison)) {
                 differences[metric] = 0;
             } else {
@@ -453,11 +447,9 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                     ((current - comparison) / (comparison || current || 1)) *
                     100;
                 differences[metric] = Math.round(diff);
-                console.log(differences[metric], diff, Math.round(diff));
             }
         });
 
-        console.log("Percentage Differences:", differences); // Debugging
         return differences;
     }, [averages, comparisonAverages, comparisonDate]);
 
@@ -503,7 +495,6 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
 
     // Handle category selection
     const handleCategoryChange = (values) => {
-        console.log(values);
         if (values !== "") {
             setSelectedCategories(values);
             return;

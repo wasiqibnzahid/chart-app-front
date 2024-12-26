@@ -385,7 +385,6 @@ const RequestCountGraph = () => {
 
   // Handler for relayout events (e.g., range slider)
   const handleRelayout = (event) => {
-    console.log("Relayout Event:", event);
     let newStart, newEnd;
 
     if (event["xaxis.range[0]"] && event["xaxis.range[1]"]) {
@@ -396,7 +395,6 @@ const RequestCountGraph = () => {
     }
 
     if (newStart && newEnd) {
-      console.log("Updating Visible Range:", [newStart, newEnd]);
       setVisibleRange([newStart, newEnd]);
 
       // Convert string dates to Date objects
@@ -414,7 +412,6 @@ const RequestCountGraph = () => {
 
       // Set the y-axis range with a 10% buffer
       const newYRange = [0, maxY > 0 ? maxY * 1.1 : 100];
-      console.log("Calculated Y-Axis Range:", newYRange);
       setYAxisRange(newYRange);
     }
   };
@@ -437,7 +434,6 @@ const RequestCountGraph = () => {
 
     const maxRequest = Math.max(...visibleData.map((d) => d.totalRequests), 0);
     const calculatedRange = maxRequest > 0 ? [0, maxRequest * 1.1] : [0, 100];
-    console.log("Calculated Y-Axis Range from useEffect:", calculatedRange);
     setYAxisRange(calculatedRange);
   }, [visibleRange, filteredData]);
 

@@ -23,22 +23,18 @@ const useSelectedData = (data) => {
         }
 
         if (topbarMode === "week") {
-            console.log("set week data");
             return { ...getTotalRecordsAndData(data?.weekComparison) };
         }
 
         if (topbarMode === "month") {
-            console.log("set month data");
             return { ...getTotalRecordsAndData(data?.quarterData) };
         }
 
         if (topbarMode === "year") {
-            console.log("set year data");
             return { ...getTotalRecordsAndData(data?.yearData) };
         }
 
         if (topbarMode === "all time") {
-            console.log("set year data");
             return { ...data?.allTimeData };
         }
 

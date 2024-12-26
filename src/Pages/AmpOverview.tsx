@@ -104,7 +104,6 @@ export const AmpOverview = () => {
 
     const combinedData = useMemo(() => {
         if (currentQuarter?.amp?.length > 0) {
-            console.log("hallo123", currentQuarter?.amp);
             return [...currentQuarter.amp];
         }
         return [];

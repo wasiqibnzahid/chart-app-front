@@ -200,7 +200,6 @@ export function parseAndFormatDate(inputDate) {
     const [quarter, year] = inputDate.split("-");
     const month = (parseInt(quarter.replace("Q", ""), 10) - 1) + 1;
     date = new Date(`${year}-${String(month).padStart(2, "0")}-01`);
-    console.log(date, inputDate, month)
   } else {
     date = new Date(inputDate);
   }
@@ -218,9 +217,7 @@ export function parseAndFormatDate(inputDate) {
 export function changeLabel(data, oldLabel, newLable){
   const filteredData = data.filter((item) => item.name.includes(oldLabel));
   return filteredData.map((item) => {
-    console.log(item);
     item.name = item.name.replace(oldLabel, newLable);
-    console.log(item);
     return item;
   })
 }
