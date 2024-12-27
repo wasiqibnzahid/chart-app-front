@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Box, Text, Button, HStack } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 const citiesData = [
   {
     name: "Laguna",
@@ -107,8 +107,10 @@ const PerformanceMap = (data) => {
   const generalAztecaPerformance = {
     week: data.week,
     month: data.month,
+    year: data.year,
+    allTime: data.allTime
   };
-  console.log("ASDLASDLAS:D", data.month, data.week)
+
   const [view, setView] = useState("week"); // State to toggle between week and month
   const [cities, setCities] = useState(
     citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
@@ -123,12 +125,22 @@ const PerformanceMap = (data) => {
       const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
       const average = sum / lastFourData?.length;
 
+      const lastYearData = data?.slice(-52);
+      const yearSum = lastYearData?.reduce((acc, point) => acc + point.y, 0);
+      const yearAverage = yearSum / lastYearData?.length;
+
+      const allTimeData = data;
+      const allTimeSum = allTimeData?.reduce((acc, point) => acc + point.y, 0);
+      const allTimeAverage = allTimeSum / allTimeData?.length;
+
       // Update city performance
       const city = updatedCities.find((city) => city.name === name);
       if (city) {
         city.performances = {
           week: data[data.length - 1].y.toFixed(0) || 0, // Use last week's value or 0 if undefined
           month: average.toFixed(0) || 0, // Use average or 0 if undefined
+          year: yearAverage.toFixed(0) || 0, 
+          allTime: allTimeAverage.toFixed(0) || 0,
         };
       }
     });
@@ -140,7 +152,6 @@ const PerformanceMap = (data) => {
   // Get the current performance data based on the selected view
   const currentPerformance =
     generalAztecaPerformance[view][generalAztecaPerformance[view].length - 1];
-  console.log("ASDASD", view, generalAztecaPerformance[view]);
 
   // Function to get the color based on updated logic
   const getColor = (performance: number, general: number) => {
@@ -150,9 +161,26 @@ const PerformanceMap = (data) => {
     return "green"; // Meets or exceeds general performance
   };
 
-  // Toggle view between 'week' and 'month'
   const toggleView = () => {
-    setView(view === "week" ? "month" : "week");
+    let newView = "";
+    switch(view){
+      case "week":
+        newView = "month"
+        break;
+      case "month":
+        newView = "year"
+        break;
+      case "year":
+        newView = "allTime"
+        break;
+      case "allTime":
+        newView = "week"
+        break;
+      default:
+          newView = "month"
+
+    }
+    setView(newView);
   };
 
   return (
@@ -173,7 +201,7 @@ const PerformanceMap = (data) => {
           overflow: "hidden",
         }}
       >
-        {view === "week" ? "Week" : "Month"}
+        {view === "week" ? "Week" : view === "month"? "Month": view === "year"? "Year": "AllTime"}
       </button>
 
       {/* Map container */}
@@ -206,12 +234,10 @@ const PerformanceMap = (data) => {
                 <span>
                   <strong>{city.name}</strong>
                   <br />
-                  {view === "week" ? "Weekly" : "Monthly"} Performance:{" "}
+                  {view === "week" ? "Week" : view === "month"? "Month": view === "year"? "Year": "AllTime"} Performance:{" "}
                   {city.performances[view]}
                   <br />
-                  General TV Azteca {view === "week"
-                    ? "Weekly"
-                    : "Monthly"}: {currentPerformance}
+                  General TV Azteca {view === "week" ? "Week" : view === "month"? "Month": view === "year"? "Year": "AllTime"}: {currentPerformance}
                 </span>
               </Tooltip>
             </CircleMarker>

@@ -24,10 +24,14 @@ const AmpVerticalRidarCharts = (data) => {
     Video: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
     Nota: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
   };
 
@@ -49,10 +53,27 @@ const AmpVerticalRidarCharts = (data) => {
     
     // Push the last value of y to companyDataSets.Video.Week
     ampDataSets.Video.Week.push(ampVideoData.data[ampVideoData.data.length - 1].y);
+
+    // Calculate Year data
+    const lastYearData = ampVideoData.data.slice(-52);
+    const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+    const yearAverage = yearSum / lastYearData.length; 
+
+    ampDataSets.Video.Year.push(yearAverage);
+
+    // Calculate All Time data
+    const allTimeData = ampVideoData.data;
+    const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+    const allTimeAverage = allTimeSum / allTimeData.length; 
+
+    ampDataSets.Video.AllTime.push(allTimeAverage);
+    
   } else {
     // If there's no matching data, you might want to handle it (e.g., push a default value)
     ampDataSets.Video.Month.push(0); // or another default value
     ampDataSets.Video.Week.push(0); // or another default value
+    ampDataSets.Video.Year.push(0); // or another default value
+    ampDataSets.Video.AllTime.push(0); // or another default value
   }
   if (ampNoteData) {
     // Get the last four data points
@@ -66,10 +87,26 @@ const AmpVerticalRidarCharts = (data) => {
     
     // Push the last value of y to companyDataSets.Video.Week
     ampDataSets.Nota.Week.push(ampNoteData.data[ampNoteData.data.length - 1].y);
+
+    // Calculate Year data
+    const lastYearData = ampNoteData.data.slice(-52);
+    const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+    const yearAverage = yearSum / lastYearData.length; 
+
+    ampDataSets.Nota.Year.push(yearAverage);
+
+    // Calculate All Time data
+    const allTimeData = ampNoteData.data;
+    const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+    const allTimeAverage = allTimeSum / allTimeData.length; 
+
+    ampDataSets.Nota.AllTime.push(allTimeAverage);
   } else {
     // If there's no matching data, you might want to handle it (e.g., push a default value)
     ampDataSets.Nota.Month.push(0); // or another default value
     ampDataSets.Nota.Week.push(0); // or another default value
+    ampDataSets.Nota.Year.push(0); // or another default value
+    ampDataSets.Nota.AllTime.push(0); // or another default value
   }
 });
 

@@ -72,7 +72,7 @@ export const LocalOverview = () => {
 
                 setData((old) => ({
                     ...old,
-                    ...localAverageData, // Merge amp average data
+                    ...localAverageData,
                     weekly: {
                         data: [
                             ...changeLabel(averageData.weekly.data, 'TV Azteca', 'General Azteca'),
@@ -120,9 +120,11 @@ export const LocalOverview = () => {
         }
         return [];
     }, [currentQuarter]);
-    const [monthWeek, setMonthWeek] = useState<[number[], number[]]>([
+    const [monthWeek, setMonthWeek] = useState<[number[], number[], number[], number[]]>([
         [0],
-        [0]
+        [0],
+        [0],
+        [0],
     ]);
     return (
         <div className="main">
@@ -683,14 +685,16 @@ export const LocalOverview = () => {
                                 data={data}
                                 month={monthWeek?.[0] || [0]}
                                 week={monthWeek?.[1] || [0]}
+                                year={monthWeek?.[2] || [0]}
+                                allTime={monthWeek?.[3] || [0]}
                             />
                         </section>
                         <section className="box">
                             <Heatmap
                                 data={data}
-                                onCalculate={(month, week) => {
+                                onCalculate={(month, week, year, allTime) => {
                                     if (!monthWeek[0][0] && month[0]) {
-                                        setMonthWeek([month, week]);
+                                        setMonthWeek([month, week, year, allTime]);
                                     }
                                 }}
                             />

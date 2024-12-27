@@ -110,7 +110,25 @@ const RadarChart = ({ title, labels, dataSets }) => {
   };
 
   const toggleTimeFrame = () => {
-    setTimeFrame(timeFrame === "Week" ? "Month" : "Week");
+    let newTimeFrom = "";
+    switch(timeFrame){
+      case "Week":
+        newTimeFrom = "Month"
+        break;
+      case "Month":
+        newTimeFrom = "Year"
+        break;
+      case "Year":
+        newTimeFrom = "AllTime"
+        break;
+      case "AllTime":
+        newTimeFrom = "Week"
+        break;
+      default:
+          newTimeFrom = "Month"
+
+    }
+    setTimeFrame(newTimeFrom);
   };
 
   return (

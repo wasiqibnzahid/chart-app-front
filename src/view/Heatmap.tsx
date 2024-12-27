@@ -14,23 +14,30 @@ function Heatmap(data: any) {
 
   const companyLabels: string[] = [];
 
-  data.data.comparison.videos.map((name: { name: string; data: [] }) =>
+  data.data.comparison.videos.map((name: { name: string; data: [] }) => {
     companyLabels.push(name.name)
-  );
+    return name
+  });
 
   // Sample Data (Week/Month data for Video, Nota, and General TV Azteca)
   const companyDataSets = {
     Video: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
     Nota: {
       Week: [],
       Month: [],
+      Year: [],
+      AllTime: [],
     },
     General: {
       Week: [], // Example: dynamically updated general percentage for the week
       Month: [], // Example: dynamically updated general percentage for the month
+      Year: [],
+      AllTime: [],
     },
   };
 
@@ -48,6 +55,20 @@ function Heatmap(data: any) {
       companyDataSets.Video.Week.push(
         name.data[name.data.length - 1].y.toFixed(0)
       );
+
+      // Calculate Year data
+      const lastYearData = name.data.slice(-52);
+      const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+      const yearAverage = yearSum / lastYearData.length; 
+
+      companyDataSets.Video.Year.push(yearAverage.toFixed(0));
+
+      // Calculate All Time data
+      const allTimeData = name.data;
+      const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+      const allTimeAverage = allTimeSum / allTimeData.length; 
+
+      companyDataSets.Video.AllTime.push(allTimeAverage.toFixed(0));
     }
   );
 
@@ -62,6 +83,20 @@ function Heatmap(data: any) {
       // Push the average to companyDataSets.Nota.Week
       companyDataSets.Nota.Month.push(average);
       companyDataSets.Nota.Week.push(name.data[name.data.length - 1].y);
+
+      // Calculate Year data
+      const lastYearData = name.data.slice(-52);
+      const yearSum = lastYearData.reduce((acc, point) => acc + point.y, 0); 
+      const yearAverage = yearSum / lastYearData.length; 
+
+      companyDataSets.Nota.Year.push(yearAverage);
+
+      // Calculate All Time data
+      const allTimeData = name.data;
+      const allTimeSum = allTimeData.reduce((acc, point) => acc + point.y, 0); 
+      const allTimeAverage = allTimeSum / allTimeData.length; 
+
+      companyDataSets.Nota.AllTime.push(allTimeAverage);
     }
   );
 
@@ -69,9 +104,13 @@ function Heatmap(data: any) {
     weekly: ResData;
     comparison: ComparisonData;
     quarterData: QuarterData[];
-    weekComparison?: QuarterData;
+    yearData: QuarterData[];
+    allTimeData?: QuarterData;
+    weekComparison: QuarterData[];
   }>({
     quarterData: [],
+    yearData: [],
+    weekComparison: [],
     weekly: {
       changes: [],
       data: [],
@@ -108,11 +147,13 @@ function Heatmap(data: any) {
         ...old,
         quarterData: res.quarter,
         weekComparison: res.week,
+        yearData: res.yearly,
+        allTimeData: res.all_time
       }))
     );
   }, []);
   // Push General Tv Azteca
-  const weeklyTvAzteca = TvData?.weekComparison?.["TV Azteca Avg"];
+  const weeklyTvAzteca = TvData?.weekComparison?.[TvData.weekComparison.length - 1]?.["TV Azteca Avg"];
 
   companyDataSets.General.Week.push(weeklyTvAzteca?.toFixed(0));
 
@@ -132,10 +173,22 @@ function Heatmap(data: any) {
   )?.["TV Azteca Avg"];
 
   companyDataSets.General.Month.push(quarterTvAzteca?.toFixed(0));
+
+  const currentYearDate = `Q${1}-${currentYear}`;
+  const yearTvAzteca = TvData?.yearData.find(
+    (year) => year.Date === currentYearDate
+  )?.["TV Azteca Avg"];
+  const allTimeTvAzteca = TvData?.allTimeData?.["TV Azteca Avg"];
+
+  companyDataSets.General.Year.push(yearTvAzteca?.toFixed(0));
+  companyDataSets.General.AllTime.push(allTimeTvAzteca?.toFixed(0));
+
   if (data?.onCalculate) {
     data.onCalculate(
       companyDataSets.General.Month,
-      companyDataSets.General.Week
+      companyDataSets.General.Week,
+      companyDataSets.General.Year,
+      companyDataSets.General.AllTime,
     );
   }
   return (
