@@ -18,6 +18,8 @@ import { GENERAL_SITES } from "../data/all_sites.js";
 import { getInsights } from "../data";
 import DateDisplay from "../components/common/DateDisplay";
 import useSelectedData from "../hooks/useSelectedData";
+import PerformanceMapVertical from "../components/PerformanceMapVertical.jsx";
+
 
 export const VerticalOverview = () => {
   const [data, setData] = useState<{
@@ -608,6 +610,14 @@ export const VerticalOverview = () => {
               groups={GENERAL_SITES}
               preSelectedWebsites={"Terra"}
             />
+          </div>
+        </div>
+      </div>
+
+      <div className="row custom-row mt-2 ">
+        <div className="col-12">
+          <div className="box shadow mt-2">
+            <PerformanceMapVertical/>
           </div>
         </div>
       </div>

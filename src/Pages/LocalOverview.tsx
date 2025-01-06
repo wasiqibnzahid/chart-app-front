@@ -14,6 +14,7 @@ import Heatmap from "../view/Heatmap";
 import ComparisonNoGroup from "../components/comparison-chart-ungroup.tsx";
 import { ExpandWrapper } from "../components/expand-wrapper.tsx";
 import General from "../view/General.jsx";
+import PerformanceMapLocal from "../components/PerformanceMapLocal.jsx";
 import { fetchLocalPlotData } from "../api/generalPlotService";
 import { LOCAL_SITES } from "../data/all_sites.js";
 import DateDisplay from "../components/common/DateDisplay";
@@ -744,6 +745,14 @@ export const LocalOverview = () => {
                             groups={LOCAL_SITES}
                             preSelectedWebsites={"Laguna"}
                         />
+                    </div>
+                </div>
+            </div>
+
+            <div className="row custom-row mt-2 ">
+                <div className="col-12">
+                    <div className="box shadow mt-2">
+                        <PerformanceMapLocal />
                     </div>
                 </div>
             </div>
