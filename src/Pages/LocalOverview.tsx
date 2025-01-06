@@ -693,7 +693,8 @@ export const LocalOverview = () => {
                             <Heatmap
                                 data={data}
                                 onCalculate={(month, week, year, allTime) => {
-                                    if (!monthWeek[0][0] && month[0]) {
+                                    if ((!monthWeek[0][0] && month[0]) || (!monthWeek[1][0] && week[0]) || (!monthWeek[2][0] && year[0]) || (!monthWeek[3][0] && allTime[0])) {
+                                        console.log("month", month, "week", week, "year", year, "all-time", allTime)
                                         setMonthWeek([month, week, year, allTime]);
                                     }
                                 }}
