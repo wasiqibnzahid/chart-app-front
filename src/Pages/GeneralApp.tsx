@@ -8,6 +8,7 @@ import LocalOverview from "./LocalOverview";
 import Vertical from "../assets/Vertical.svg";
 import Local from "../assets/Local.svg";
 import ampIcon from '../assets/amp-svgrepo-com.svg';
+import testIcon from '../assets/test-svgrepo-com.svg';
 import General from "../assets/General.svg";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,10 +17,11 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import AmpOverview from "./AmpOverview";
+import { TestManager } from "./TestManager";
 
 
 const GeneralApp: React.FC = () => {
-    const [activeTab, setActiveTab] = useState(0);
+    const [activeTab, setActiveTab] = useState(4);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
    
@@ -95,6 +97,20 @@ const GeneralApp: React.FC = () => {
             />{" "}
             AMP Overview
           </button>
+          <button
+            className={`tab-button ${activeTab === 4 ? "active" : ""}`}
+            onClick={() => setActiveTab(4)}
+          >
+            <img
+              src={testIcon}
+              height={10}
+              width={20}
+              style={{
+                marginRight: "10px",
+              }}
+            />{" "}
+            Test Manager
+          </button>
         </div>
   
         <button
@@ -133,6 +149,7 @@ const GeneralApp: React.FC = () => {
             {activeTab === 1 && <VerticalOverview />}
             {activeTab === 2 && <LocalOverview />}
             {activeTab === 3 && <AmpOverview />}
+            {activeTab === 4 && <TestManager />}
           </section>
         </div>
       </div>

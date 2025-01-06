@@ -193,27 +193,35 @@ strong {
 }
 
 .sparkboxes .box1 {
-  background-image: linear-gradient(135deg,
-      #abdcff 10%,
-      #0396ff 100%) !important;
+  background-image: linear-gradient(
+    135deg,
+    #abdcff 10%,
+    #0396ff 100%
+  ) !important;
 }
 
 .sparkboxes .box2 {
-  background-image: linear-gradient(135deg,
-      #2afadf 10%,
-      #4c83ff 100%) !important;
+  background-image: linear-gradient(
+    135deg,
+    #2afadf 10%,
+    #4c83ff 100%
+  ) !important;
 }
 
 .sparkboxes .box3 {
-  background-image: linear-gradient(135deg,
-      #ffd3a5 10%,
-      #fd6585 100%) !important;
+  background-image: linear-gradient(
+    135deg,
+    #ffd3a5 10%,
+    #fd6585 100%
+  ) !important;
 }
 
 .sparkboxes .box4 {
-  background-image: linear-gradient(135deg,
-      #ee9ae5 10%,
-      #5961f9 100%) !important;
+  background-image: linear-gradient(
+    135deg,
+    #ee9ae5 10%,
+    #5961f9 100%
+  ) !important;
 }
 
 text,
@@ -274,9 +282,28 @@ li {
   margin-bottom: 2rem;
   justify-content: space-between;
 
-  >div {
+  > div {
     /* flex-grow: 1; */
     width: 30%;
+  }
+
+  /* gap: 2; */
+}
+.top-row-dual {
+  padding: 0 0rem;
+  /* gap: 10rem; */
+  margin-bottom: 2rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  > div {
+    /* flex-grow: 1; */
+
+    width: 49%;
+  }
+  > div:nth-child(2),
+  > div:nth-child(1) {
+    margin-bottom: 2rem;
   }
 
   /* gap: 2; */
@@ -319,6 +346,21 @@ li {
 .text-red {
   color: #dc2c3e !important;
 }
+.text-orange {
+  color: #ff9900 !important;
+}
+
+.bg-green {
+  background: #3dae63 !important;
+}
+
+.bg-red {
+  background: #dc2c3e !important;
+}
+
+.bg-orange {
+  background: #ff9900 !important;
+}
 
 .percentage-change {
   font-size: 30px !important;
@@ -334,7 +376,8 @@ li {
   color: #6e7172 !important;
 }
 
-h5 {}
+h5 {
+}
 
 .toggle-container {
   label {
@@ -350,7 +393,6 @@ h5 {}
 }
 
 .slider-custom-text {
-
   /* :nth-child(2) {
     position: absolute;
     left: 32.5%;
@@ -393,7 +435,6 @@ h5 {}
   align-items: center;
 }
 
-
 /* Starter Code */
 
 .app-container {
@@ -422,7 +463,7 @@ h5 {}
 }
 
 .toggle-sidebar {
-  color:white;
+  color: white;
   background: none;
   border: none;
   cursor: pointer;
@@ -463,7 +504,6 @@ h5 {}
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 .tab-button {
@@ -546,7 +586,11 @@ h5 {}
 }
 
 .custom-select option {
-  background: linear-gradient(45deg, #000000, #7800ff); /* Change option background color */
+  background: linear-gradient(
+    45deg,
+    #000000,
+    #7800ff
+  ); /* Change option background color */
   color: #333; /* Change option text color */
 }
 
@@ -562,4 +606,86 @@ h5 {}
 
 .custom-select option:disabled {
   color: white; /* Placeholder color */
+}
+
+.test-container {
+  padding: 0;
+  margin-bottom: 2rem;
+  justify-content: space-between;
+  > div:first-child {
+    width: 70%;
+  }
+  > div:last-child {
+    width: 23%;
+  }
+}
+
+.search-container {
+  align-items: center;
+  justify-content: start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  button {
+    width: 120px;
+    margin-top: 0 !important;
+  }
+}
+
+.box-large {
+  height: 250px;
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* justify-content: space-between; */
+  /* align-items: center; */
+  > div:nth-child(2) {
+    margin-top: 3rem;
+  }
+}
+
+.circle {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+}
+.table {
+  width: 100%;
+  /* remove all borders */
+  border-collapse: collapse;
+  border-color: transparent !important;
+  color: #fff;
+  border: none !important;
+  td, th {
+    text-align: center;
+    font-weight: bold;
+  }
+  * {
+    border: none !important;
+  }
+}
+
+.sidebar-test {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  height: 100%;
+  > .button {
+    display: flex;
+    width: 200px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+    border: none;
+    background-color: transparent;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-size: 18px;
+    font-family: Livvic;
+    color: #fff;
+    &:hover {
+      text-decoration: underline;
+      
+    }
+  }
 }
