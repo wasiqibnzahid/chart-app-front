@@ -669,13 +669,17 @@ h5 {
   align-items: flex-start;
   justify-content: center;
   height: 100%;
+  padding-top: 2rem;
+  gap: 1rem;
   > .button {
+    
     display: flex;
     width: 200px;
     cursor: pointer;
     align-items: center;
-    justify-content: start;
-    gap: 10px;
+    justify-content: space-between;
+    /* gap: 10px; */
+    
     border: none;
     background-color: transparent;
     font-weight: 600;
@@ -683,7 +687,17 @@ h5 {
     font-size: 18px;
     font-family: Livvic;
     color: #fff;
-    &:hover {
+    .text {
+      padding-top: 12px;
+    }
+    span:not(.text) {
+      font-size: 30px;
+    }
+    /* span {
+      font-size: 25px;
+      
+    } */
+    &:hover .text {
       text-decoration: underline;
       
     }

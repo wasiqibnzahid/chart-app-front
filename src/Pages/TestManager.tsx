@@ -75,11 +75,22 @@ export const TestManager = () => {
     getWebsiteData();
   }
   const latestItem = useMemo(() => {
-    return data.find((item, index) => {
-      console.log("FAFA", index);
-      return item.status === "failed";
+    return data.find((item) => {
+      return item.status === "done";
     });
   }, [data]);
+
+  function downloadJson() {
+    if (latestItem?.json && Object.keys(latestItem.json).length > 0) {
+      const jsonString = JSON.stringify(latestItem.json, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${latestItem.url}-${latestItem.id}.json`;
+      a.click();
+    }
+  }
 
   return (
     <div className="main">
@@ -235,12 +246,19 @@ export const TestManager = () => {
           </div>
         </div>
         <div className="sidebar-test">
-            <div className="button">
-                Download JSON {">"}
-            </div>
-            <div className="button">
-                Github Viewer {">"}
-            </div>
+          <div className="button" onClick={() => {
+            downloadJson();
+          }}>
+            {/* chevron right */}
+            <span className="text">Download JSON</span>
+            <span>&rarr;</span>
+          </div>
+          <div className="button" onClick={() => {
+            window.open("https://googlechrome.github.io/lighthouse/viewer/", "_blank");
+          }}>
+            <span className="text">Github Viewer</span>
+            <span>&rarr;</span>
+          </div>
         </div>
       </div>
       {data?.length > 0 && (
