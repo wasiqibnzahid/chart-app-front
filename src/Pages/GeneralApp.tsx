@@ -21,7 +21,7 @@ import { TestManager } from "./TestManager";
 
 
 const GeneralApp: React.FC = () => {
-    const [activeTab, setActiveTab] = useState(4);
+    const [activeTab, setActiveTab] = useState(0);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
    

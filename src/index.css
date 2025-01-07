@@ -741,3 +741,6 @@ h5 {
     transform: rotate(360deg);
   }
 }
+.text-white {
+  color: #fff !important;
+}

@@ -49,7 +49,7 @@ const getEndOfWeek = (date) => {
 
 // Helper function to parse dates as local dates
 const parseLocalDate = (dateStr) => {
-  const [year, month, day] = dateStr.split('-').map(Number);
+  const [year, month, day] = dateStr.split("-").map(Number);
   return new Date(year, month - 1, day); // Months are 0-indexed
 };
 
@@ -72,7 +72,7 @@ const General = () => {
     totalAvg: "N/A",
     envivoAvg: "N/A",
   });
-  
+
   // **New State for Selected Date**
   const [selectedDate, setSelectedDate] = useState(null); // Stores the user-selected date
 
@@ -105,7 +105,11 @@ const General = () => {
             const requestCount = parseInt(requestCountStr, 10);
 
             if (!date || isNaN(requestCount)) {
-              console.warn(`Skipping row ${index + 2} due to missing date or request count.`);
+              console.warn(
+                `Skipping row ${
+                  index + 2
+                } due to missing date or request count.`
+              );
               return;
             }
 
@@ -163,7 +167,8 @@ const General = () => {
 
   // **Helper Function to Filter Data Based on Selected Period or Selected Date**
   const filterData = (period, date) => {
-    if (totalData.length === 0) return { filteredTotal: [], filteredEnvivo: [] };
+    if (totalData.length === 0)
+      return { filteredTotal: [], filteredEnvivo: [] };
 
     if (date) {
       // If a specific date is selected
@@ -179,7 +184,7 @@ const General = () => {
       const latestDate = parseLocalDate(latestDateStr);
 
       console.log(`Selected Period: ${period}`);
-      console.log(`Latest Date: ${latestDate.toISOString().split('T')[0]}`);
+      console.log(`Latest Date: ${latestDate.toISOString().split("T")[0]}`);
 
       let filteredTotal = [];
       let filteredEnvivo = [];
@@ -188,8 +193,12 @@ const General = () => {
         case PERIODS.CURRENT_WEEK:
           const startOfWeek = getStartOfWeek(latestDate);
           const endOfWeek = getEndOfWeek(latestDate);
-          console.log(`Start of Week (Monday): ${startOfWeek.toISOString().split('T')[0]}`);
-          console.log(`End of Week (Sunday): ${endOfWeek.toISOString().split('T')[0]}`);
+          console.log(
+            `Start of Week (Monday): ${startOfWeek.toISOString().split("T")[0]}`
+          );
+          console.log(
+            `End of Week (Sunday): ${endOfWeek.toISOString().split("T")[0]}`
+          );
           filteredTotal = totalData.filter((d) => {
             const current = parseLocalDate(d.date);
             return current >= startOfWeek && current <= endOfWeek;
@@ -241,7 +250,10 @@ const General = () => {
 
   // Calculate averages based on selected period or selected date
   useEffect(() => {
-    const { filteredTotal, filteredEnvivo } = filterData(selectedPeriod, selectedDate);
+    const { filteredTotal, filteredEnvivo } = filterData(
+      selectedPeriod,
+      selectedDate
+    );
 
     if (filteredTotal.length === 0) {
       setAverageData({
@@ -252,16 +264,25 @@ const General = () => {
     }
 
     const totalSum = filteredTotal.reduce((sum, d) => sum + d.totalRequests, 0);
-    const envivoSum = filteredEnvivo.reduce((sum, d) => sum + d.envivoRequests, 0);
+    const envivoSum = filteredEnvivo.reduce(
+      (sum, d) => sum + d.envivoRequests,
+      0
+    );
 
-    const totalAvg = (totalSum / filteredTotal.length).toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }); // No decimals
-    const envivoAvg = (envivoSum / filteredEnvivo.length).toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }); // No decimals
+    const totalAvg = (totalSum / filteredTotal.length).toLocaleString(
+      undefined,
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }
+    ); // No decimals
+    const envivoAvg = (envivoSum / filteredEnvivo.length).toLocaleString(
+      undefined,
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }
+    ); // No decimals
 
     setAverageData({
       totalAvg,
@@ -296,13 +317,18 @@ const General = () => {
   }, [totalData, currentTotalRequest, selectedDate]);
 
   const totalRequestChange = useMemo(() => {
-    if (previousTotalRequest === null || currentTotalRequest === null) return "N/A";
+    if (previousTotalRequest === null || currentTotalRequest === null)
+      return "N/A";
     const change = currentTotalRequest - previousTotalRequest;
-    return change.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }); // No decimals
+    return change.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }); // No decimals
   }, [currentTotalRequest, previousTotalRequest]);
 
   const totalPercentageChange = useMemo(() => {
-    if (previousTotalRequest === null || currentTotalRequest === null) return "N/A";
+    if (previousTotalRequest === null || currentTotalRequest === null)
+      return "N/A";
     return calculatePercentageChange(currentTotalRequest, previousTotalRequest);
   }, [currentTotalRequest, previousTotalRequest]);
 
@@ -324,14 +350,22 @@ const General = () => {
   }, [envivoData, currentEnvivoRequest, selectedDate]);
 
   const envivoRequestChange = useMemo(() => {
-    if (previousEnvivoRequest === null || currentEnvivoRequest === null) return "N/A";
+    if (previousEnvivoRequest === null || currentEnvivoRequest === null)
+      return "N/A";
     const change = currentEnvivoRequest - previousEnvivoRequest;
-    return change.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }); // No decimals
+    return change.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }); // No decimals
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
   const envivoPercentageChange = useMemo(() => {
-    if (previousEnvivoRequest === null || currentEnvivoRequest === null) return "N/A";
-    return calculatePercentageChange(currentEnvivoRequest, previousEnvivoRequest);
+    if (previousEnvivoRequest === null || currentEnvivoRequest === null)
+      return "N/A";
+    return calculatePercentageChange(
+      currentEnvivoRequest,
+      previousEnvivoRequest
+    );
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
   // Toggle comparison mode
@@ -343,15 +377,31 @@ const General = () => {
   const latestDateLabel = useMemo(() => {
     if (selectedDate) {
       const selected = parseLocalDate(selectedDate);
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      return `Viewing data for ${selected.toLocaleDateString(undefined, options)}`;
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      return `Viewing data for ${selected.toLocaleDateString(
+        undefined,
+        options
+      )}`;
     }
 
     if (totalData.length === 0) return "No data available";
     const latestDateStr = totalData[totalData.length - 1].date;
     const latestDate = parseLocalDate(latestDateStr);
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return `Viewing data for ${latestDate.toLocaleDateString(undefined, options)}`;
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return `Viewing data for ${latestDate.toLocaleDateString(
+      undefined,
+      options
+    )}`;
   }, [selectedDate, totalData]);
 
   // **Handle Date Selection**
@@ -438,7 +488,7 @@ const General = () => {
           width="100%"
           maxW="1200px"
           align="center"
-          bg="transparent"  // Explicitly set the background to transparent
+          bg="transparent" // Explicitly set the background to transparent
           mx="auto" // Center this Flex container
         >
           {/* **Header with Latest Date Label and Navigation Icons** */}
@@ -468,9 +518,9 @@ const General = () => {
 
               {/* Date Label */}
               <Text
-                fontSize="lg"          // Uniform font size
-                fontWeight="bold"      // Bold font
-                color="white"          // White color
+                fontSize="lg" // Uniform font size
+                fontWeight="bold" // Bold font
+                color="white" // White color
               >
                 {latestDateLabel}
               </Text>
@@ -519,7 +569,11 @@ const General = () => {
                   <Input
                     type="date"
                     onChange={handleDateChange}
-                    max={totalData.length > 0 ? totalData[totalData.length - 1].date : undefined}
+                    max={
+                      totalData.length > 0
+                        ? totalData[totalData.length - 1].date
+                        : undefined
+                    }
                     min={totalData.length > 0 ? totalData[0].date : undefined}
                     value={selectedDate || ""}
                     bg="transparent" // Transparent background
@@ -550,6 +604,7 @@ const General = () => {
           <Flex
             direction={{ base: "column", md: "row" }}
             gap={10}
+            className="text-white"
             width="100%"
             maxW="800px"
             justifyContent="center"
@@ -565,21 +620,31 @@ const General = () => {
             >
               <Flex justifyContent="space-between" alignItems="center" mb={4}>
                 <Text
-                  fontSize="lg"          // Uniform font size
-                  fontWeight="bold"      // Bold font
-                  color="white"          // White color
+                  fontSize="lg" // Uniform font size
+                  fontWeight="bold" // Bold font
+                  color="white" // White color
+                  className="text-white"
                 >
                   Daily Request Count
                 </Text>
-                <Button onClick={toggleComparisonMode} colorScheme="teal" size="sm">
+                <Button
+                  onClick={toggleComparisonMode}
+                  colorScheme="teal"
+                  size="sm"
+                >
                   Show {comparisonMode === "percentage" ? "Raw" : "Percentage"}
                 </Button>
               </Flex>
               <Flex direction="column" alignItems="center">
-                <Text fontSize="4xl" fontWeight="bold">
+                <Text fontSize="4xl" fontWeight="bold" className="text-white">
                   {selectedDate
-                    ? (totalData.find((d) => d.date === selectedDate)?.totalRequests || "N/A").toLocaleString()
-                    : (currentTotalRequest !== null ? currentTotalRequest.toLocaleString() : "N/A")}
+                    ? (
+                        totalData.find((d) => d.date === selectedDate)
+                          ?.totalRequests || "N/A"
+                      ).toLocaleString()
+                    : currentTotalRequest !== null
+                    ? currentTotalRequest.toLocaleString()
+                    : "N/A"}
                 </Text>
                 <Flex alignItems="center" mt={2}>
                   {comparisonMode === "percentage" ? (
@@ -589,9 +654,13 @@ const General = () => {
                         color={comparisonColor(totalPercentageChange)}
                         mr={2}
                       >
-                        {totalPercentageChange === "N/A" ? "N/A" : `${totalPercentageChange}%`}
+                        {totalPercentageChange === "N/A"
+                          ? "N/A"
+                          : `${totalPercentageChange}%`}
                       </Text>
-                      <Text fontSize="md">compared to last week</Text>
+                      <Text fontSize="md" className="text-white">
+                        compared to last week
+                      </Text>
                     </>
                   ) : (
                     <>
@@ -602,9 +671,13 @@ const General = () => {
                       >
                         {totalRequestChange === "N/A"
                           ? "N/A"
-                          : `${totalRequestChange >= 0 ? "+" : ""}${totalRequestChange}`}
+                          : `${
+                              totalRequestChange >= 0 ? "+" : ""
+                            }${totalRequestChange}`}
                       </Text>
-                      <Text fontSize="md">compared to last week</Text>
+                      <Text fontSize="md" className="text-white">
+                        compared to last week
+                      </Text>
                     </>
                   )}
                 </Flex>
@@ -622,23 +695,32 @@ const General = () => {
             >
               <Flex justifyContent="space-between" alignItems="center" mb={4}>
                 <Text
-                  fontSize="lg"          // Uniform font size
-                  fontWeight="bold"      // Bold font
-                  color="white"          // White color
+                  fontSize="lg" // Uniform font size
+                  fontWeight="bold" // Bold font
+                  color="white" // White color
+                  className="text-white"
                 >
                   Daily Envivo Query Count
                 </Text>
-                <Button onClick={toggleComparisonMode} colorScheme="teal" size="sm">
+                <Button
+                  onClick={toggleComparisonMode}
+                  colorScheme="teal"
+                  size="sm"
+                  
+                >
                   Show {comparisonMode === "percentage" ? "Raw" : "Percentage"}
                 </Button>
               </Flex>
               <Flex direction="column" alignItems="center">
-                <Text fontSize="4xl" fontWeight="bold">
+                <Text fontSize="4xl" fontWeight="bold" className="text-white">
                   {selectedDate
-                    ? (envivoData.find((d) => d.date === selectedDate)?.envivoRequests || "N/A").toLocaleString()
-                    : (currentEnvivoRequest !== null
-                      ? currentEnvivoRequest.toLocaleString()
-                      : "N/A")}
+                    ? (
+                        envivoData.find((d) => d.date === selectedDate)
+                          ?.envivoRequests || "N/A"
+                      ).toLocaleString()
+                    : currentEnvivoRequest !== null
+                    ? currentEnvivoRequest.toLocaleString()
+                    : "N/A"}
                 </Text>
                 <Flex alignItems="center" mt={2}>
                   {comparisonMode === "percentage" ? (
@@ -648,9 +730,11 @@ const General = () => {
                         color={comparisonColor(envivoPercentageChange)}
                         mr={2}
                       >
-                        {envivoPercentageChange === "N/A" ? "N/A" : `${envivoPercentageChange}%`}
+                        {envivoPercentageChange === "N/A"
+                          ? "N/A"
+                          : `${envivoPercentageChange}%`}
                       </Text>
-                      <Text fontSize="md">compared to last week</Text>
+                      <Text fontSize="md" className="text-white">compared to last week</Text>
                     </>
                   ) : (
                     <>
@@ -661,9 +745,11 @@ const General = () => {
                       >
                         {envivoRequestChange === "N/A"
                           ? "N/A"
-                          : `${envivoRequestChange >= 0 ? "+" : ""}${envivoRequestChange}`}
+                          : `${
+                              envivoRequestChange >= 0 ? "+" : ""
+                            }${envivoRequestChange}`}
                       </Text>
-                      <Text fontSize="md">compared to last week</Text>
+                      <Text fontSize="md" className="text-white">compared to last week</Text>
                     </>
                   )}
                 </Flex>
@@ -684,9 +770,9 @@ const General = () => {
           >
             <Flex justifyContent="space-between" alignItems="center" mb={4}>
               <Text
-                fontSize="lg"          // Uniform font size
-                fontWeight="bold"      // Bold font
-                color="white"          // White color
+                fontSize="lg" // Uniform font size
+                fontWeight="bold" // Bold font
+                color="white" // White color
               >
                 Averages for {selectedPeriod}
               </Text>
@@ -712,13 +798,13 @@ const General = () => {
             <Grid templateColumns="repeat(2, 1fr)" gap={6}>
               <Box textAlign="center">
                 <Text
-                  fontSize="md"          // Uniform font size
-                  fontWeight="bold"      // Bold font
-                  color="white"          // White color
+                  fontSize="md" // Uniform font size
+                  fontWeight="bold" // Bold font
+                  color="white" // White color
                 >
                   Request Count
                 </Text>
-                <Text fontSize="2xl">
+                <Text fontSize="2xl" className="text-white">
                   {averageData.totalAvg !== "N/A"
                     ? averageData.totalAvg.toLocaleString()
                     : "N/A"}
@@ -726,13 +812,13 @@ const General = () => {
               </Box>
               <Box textAlign="center">
                 <Text
-                  fontSize="md"          // Uniform font size
-                  fontWeight="bold"      // Bold font
-                  color="white"          // White color
+                  fontSize="md" // Uniform font size
+                  fontWeight="bold" // Bold font
+                  color="white" // White color
                 >
                   Envivo Query Count
                 </Text>
-                <Text fontSize="2xl">
+                <Text fontSize="2xl" className="text-white">
                   {averageData.envivoAvg !== "N/A"
                     ? averageData.envivoAvg.toLocaleString()
                     : "N/A"}
