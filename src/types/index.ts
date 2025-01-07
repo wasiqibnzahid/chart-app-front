@@ -5,7 +5,7 @@ export interface WebCheck {
   created_at: string;
   updated_at: string;
   metrics: WebCheckMetrics;
-  json: Record<string, any>;
+  json_url: string;
 }
 export interface WebCheckMetrics {
   speed_index: number;

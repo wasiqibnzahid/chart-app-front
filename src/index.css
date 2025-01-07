@@ -654,7 +654,8 @@ h5 {
   border-color: transparent !important;
   color: #fff;
   border: none !important;
-  td, th {
+  td,
+  th {
     text-align: center;
     font-weight: bold;
   }
@@ -672,14 +673,13 @@ h5 {
   padding-top: 2rem;
   gap: 1rem;
   > .button {
-    
     display: flex;
     width: 200px;
     cursor: pointer;
     align-items: center;
     justify-content: space-between;
     /* gap: 10px; */
-    
+
     border: none;
     background-color: transparent;
     font-weight: 600;
@@ -699,7 +699,45 @@ h5 {
     } */
     &:hover .text {
       text-decoration: underline;
-      
     }
+  }
+}
+
+.box:has(.test-row) {
+  padding: 0 !important;
+}
+.test-row {
+  /* slight gray */
+  cursor: pointer;
+  transition: 0.3s ease;
+  &:hover {
+    background-color: rgba(66, 10, 131, 0.2) !important;
+  }
+}
+
+.relative {
+  position: relative;
+}
+
+.spinner-border {
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  margin: 0 !important;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

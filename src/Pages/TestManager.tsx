@@ -74,15 +74,51 @@ export const TestManager = () => {
     }
     getWebsiteData();
   }
-  const latestItem = useMemo(() => {
-    return data.find((item) => {
+
+  const [latestItem, setLatestItem] = useState<WebCheck | null>(null);
+  function selectRow(row: WebCheck) {
+    if (!gettingJson) {
+      if (row.status === "done" && row.json_url) {
+        setLatestItem(row);
+      }
+    }
+  }
+  const [selectedJsonData, setSelectedJsonData] = useState<Record<
+    string,
+    any
+  > | null>(null);
+  const [gettingJson, setGettingJson] = useState(false);
+  useEffect(() => {
+    const latestItem = data.find((item) => {
       return item.status === "done";
     });
+    setLatestItem(latestItem || null);
   }, [data]);
 
+  useEffect(() => {
+    if (latestItem && latestItem.json_url) {
+      setGettingJson(true);
+      axios
+        .get(latestItem.json_url.replace("https://", "http://"))
+        .then((res) => {
+          setSelectedJsonData(res.data);
+          setGettingJson(false);
+        })
+        .catch((e) => {
+          setGettingJson(false);
+          setSelectedJsonData(null);
+        });
+    }
+  }, [latestItem]);
+
   function downloadJson() {
-    if (latestItem?.json && Object.keys(latestItem.json).length > 0) {
-      const jsonString = JSON.stringify(latestItem.json, null, 2);
+    if (
+      !gettingJson &&
+      latestItem &&
+      selectedJsonData &&
+      Object.keys(selectedJsonData).length > 0
+    ) {
+      const jsonString = JSON.stringify(selectedJsonData, null, 2);
       const blob = new Blob([jsonString], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -149,113 +185,141 @@ export const TestManager = () => {
       </div>
       <div className="d-flex test-container">
         <div className="d-flex top-row-dual text-white custom-row">
-          <div className="box box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3 ">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">Performance</div>
             </div>
-            <div className="d-flex justify-content-center align-items-center percentage">
-              <div
-                className={`circle mr-2 ${
-                  !latestItem?.metrics.performance_score
-                    ? ""
-                    : latestItem?.metrics.performance_score >= 0.9
-                    ? "bg-green"
-                    : latestItem?.metrics.performance_score >= 0.5
-                    ? "bg-orange"
-                    : "bg-red"
-                }`}
-              ></div>
-              <AnimateNumber
-                number={(latestItem?.metrics.performance_score ?? 0) * 100}
-              />
-              %
-            </div>
+            {gettingJson ? (
+              <div className="spinner-border"></div>
+            ) : (
+              <>
+                <div className="d-flex justify-content-center align-items-center percentage">
+                  <div
+                    className={`circle mr-2 ${
+                      !latestItem?.metrics.performance_score
+                        ? ""
+                        : latestItem?.metrics.performance_score >= 0.9
+                        ? "bg-green"
+                        : latestItem?.metrics.performance_score >= 0.5
+                        ? "bg-orange"
+                        : "bg-red"
+                    }`}
+                  ></div>
+                  <AnimateNumber
+                    number={(latestItem?.metrics.performance_score ?? 0) * 100}
+                  />
+                  %
+                </div>
+              </>
+            )}
           </div>
-          <div className="box box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3 ">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">SEO</div>
             </div>
-            <div className="d-flex justify-content-center align-items-center percentage">
-              <div
-                className={`circle mr-2 ${
-                  !latestItem?.json?.categories?.seo.score
-                    ? ""
-                    : latestItem?.json?.categories?.seo.score >= 0.9
-                    ? "bg-green"
-                    : latestItem?.json?.categories?.seo.score >= 0.5
-                    ? "bg-orange"
-                    : "bg-red"
-                }`}
-              ></div>
-              <AnimateNumber
-                number={(latestItem?.json?.categories?.seo.score || 0) * 100}
-              />
-              %
-            </div>
+            {gettingJson ? (
+              <div className="spinner-border"></div>
+            ) : (
+              <div className="d-flex justify-content-center align-items-center percentage">
+                <div
+                  className={`circle mr-2 ${
+                    !selectedJsonData?.categories?.seo.score
+                      ? ""
+                      : selectedJsonData?.categories?.seo.score >= 0.9
+                      ? "bg-green"
+                      : selectedJsonData?.categories?.seo.score >= 0.5
+                      ? "bg-orange"
+                      : "bg-red"
+                  }`}
+                ></div>
+                <AnimateNumber
+                  number={(selectedJsonData?.categories?.seo.score || 0) * 100}
+                />
+                %
+              </div>
+            )}
           </div>
-          <div className="box box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3 ">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">Accessibility</div>
             </div>
-            <div className="d-flex justify-content-center align-items-center percentage">
-              <div
-                className={`circle mr-2 ${
-                  !latestItem?.json?.categories?.accessibility.score
-                    ? ""
-                    : latestItem?.json?.categories?.accessibility.score >= 0.9
-                    ? "bg-green"
-                    : latestItem?.json?.categories?.accessibility.score >= 0.5
-                    ? "bg-orange"
-                    : "bg-red"
-                }`}
-              ></div>
-              <AnimateNumber
-                number={
-                  (latestItem?.json?.categories?.accessibility.score || 0) * 100
-                }
-              />
-              %
-            </div>
+            {gettingJson ? (
+              <div className="spinner-border"></div>
+            ) : (
+              <div className="d-flex justify-content-center align-items-center percentage">
+                <div
+                  className={`circle mr-2 ${
+                    !selectedJsonData?.categories?.accessibility.score
+                      ? ""
+                      : selectedJsonData?.categories?.accessibility.score >= 0.9
+                      ? "bg-green"
+                      : selectedJsonData?.categories?.accessibility.score >= 0.5
+                      ? "bg-orange"
+                      : "bg-red"
+                  }`}
+                ></div>
+                <AnimateNumber
+                  number={
+                    (selectedJsonData?.categories?.accessibility.score || 0) *
+                    100
+                  }
+                />
+                %
+              </div>
+            )}
           </div>
-          <div className="box box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3 ">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">Best Practices</div>
             </div>
-            <div className="d-flex justify-content-center align-items-center percentage">
-              <div
-                className={`circle mr-2 ${
-                  !latestItem?.json?.categories?.["best-practices"].score
-                    ? ""
-                    : latestItem?.json?.categories?.["best-practices"].score >=
-                      0.9
-                    ? "bg-green"
-                    : latestItem?.json?.categories?.["best-practices"].score >=
-                      0.5
-                    ? "bg-orange"
-                    : "bg-red"
-                }`}
-              ></div>
-              <AnimateNumber
-                number={
-                  (latestItem?.json?.categories?.["best-practices"].score ||
-                    0) * 100
-                }
-              />
-              %
-            </div>
+            {gettingJson ? (
+              <div className="spinner-border"></div>
+            ) : (
+              <div className="d-flex justify-content-center align-items-center percentage">
+                <div
+                  className={`circle mr-2 ${
+                    !selectedJsonData?.categories?.["best-practices"].score
+                      ? ""
+                      : selectedJsonData?.categories?.["best-practices"]
+                          .score >= 0.9
+                      ? "bg-green"
+                      : selectedJsonData?.categories?.["best-practices"]
+                          .score >= 0.5
+                      ? "bg-orange"
+                      : "bg-red"
+                  }`}
+                ></div>
+                <AnimateNumber
+                  number={
+                    (selectedJsonData?.categories?.["best-practices"].score ||
+                      0) * 100
+                  }
+                />
+                %
+              </div>
+            )}
           </div>
         </div>
         <div className="sidebar-test">
-          <div className="button" onClick={() => {
-            downloadJson();
-          }}>
+          <div
+            className="button"
+            onClick={() => {
+              downloadJson();
+            }}
+          >
             {/* chevron right */}
             <span className="text">Download JSON</span>
             <span>&rarr;</span>
           </div>
-          <div className="button" onClick={() => {
-            window.open("https://googlechrome.github.io/lighthouse/viewer/", "_blank");
-          }}>
+          <div
+            className="button"
+            onClick={() => {
+              window.open(
+                "https://googlechrome.github.io/lighthouse/viewer/",
+                "_blank"
+              );
+            }}
+          >
             <span className="text">Github Viewer</span>
             <span>&rarr;</span>
           </div>
@@ -277,7 +341,11 @@ export const TestManager = () => {
             </thead>
             <tbody>
               {data.map((check, index) => (
-                <tr key={index}>
+                <tr
+                  onClick={() => selectRow(check)}
+                  key={check.id}
+                  className="test-row"
+                >
                   <td>{new Date(check.created_at).toLocaleString()}</td>
                   <td>
                     <div className="d-flex justify-content-center align-items-center">
