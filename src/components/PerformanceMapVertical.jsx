@@ -624,8 +624,8 @@ const PerformanceMapVertical = () => {
                     align="center"
                     p={4}
                     borderRadius="15px"
-                    border="2.5px solid"
-                    borderColor="gray.300"
+                    // border="2.5px solid"
+                    // borderColor="gray.300"
                     mx="auto"
                     bg="transparent" // Set background to transparent
                 >
@@ -649,7 +649,7 @@ const PerformanceMapVertical = () => {
                                 placeholder="Select Company"
                                 width="200px" // Maintain original width
                                 bg="transparent" // Set background to transparent
-                                color="white" // Set text color to white
+                                // color="white" // Set text color to white
                                 borderRadius="md"
                                 border="1px solid rgba(255, 255, 255, 0.6)" // Add border
                                 size="sm"

@@ -632,9 +632,6 @@ const PerformanceMapLocal = () => {
                     maxW="1200px"
                     align="center"
                     p={4}
-                    borderRadius="15px"
-                    border="2.5px solid"
-                    borderColor="gray.300"
                     mx="auto"
                     bg="transparent" // Set background to transparent
                 >
@@ -658,10 +655,15 @@ const PerformanceMapLocal = () => {
                                 placeholder="Select Company"
                                 width="200px" // Maintain original width
                                 bg="transparent" // Set background to transparent
-                                color="white" // Set text color to white
                                 borderRadius="md"
                                 border="1px solid rgba(255, 255, 255, 0.6)" // Add border
                                 size="sm"
+                                borderColor="#cbd5e0"
+                                // color="white"
+                                _hover={{ borderColor: "gray.300" }}
+                                _focus={{ borderColor: "gray.300", boxShadow: "none" }}
+                                iconColor="white"
+                                _placeholder={{ color: "gray.300" }}
                                 _placeholder={{ color: "gray.300" }}
                             >
                                 {companyOptions}
