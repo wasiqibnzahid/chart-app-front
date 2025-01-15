@@ -46,7 +46,7 @@ const localAztecaLabel = "Local Azteca";
 const generalAzetaLabel = "General Azteca";
 const seriesColors = {
   "General Azteca": "#3357FF", // Vibrant Blue
-  "Local Azteca": "#00FF00", // Vibrant Green
+  "Local Azteca": "#009900", // Darker Green
   // Add more series colors here if needed
 };
 const LocalAverageChart = ({ data: propData }) => {
