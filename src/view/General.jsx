@@ -69,7 +69,7 @@ const METRICS = ["FCP", "TBT", "SPI", "LCP", "CLS"];
 // *** 2) Show units next to average ***
 const METRIC_UNITS = {
     FCP: "s",
-    TBT: "ms",
+    TBT: "s",
     SPI: "s",
     LCP: "s",
     CLS: ""
