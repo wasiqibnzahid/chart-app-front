@@ -147,7 +147,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
 
     const { isLoading, error, execute } = useAsyncFn(fetchData);
 
-    useEffect(() => {
+    React.useEffect(() => {
         execute().then((res) => {
             let parsedData = res.map((item) => {
                 const dateObj = parseDate(item["date"]);
@@ -196,7 +196,11 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
         const options = [];
         INDIVIDUAL_COMPANIES.forEach((company) => {
             options.push(
-                <option key={company} value={company} style={{ color: "black" }}>
+                <option
+                    key={company}
+                    value={company}
+                    style={{ color: "white" }} // <-- changed (was black before)
+                >
                     {company}
                 </option>
             );
@@ -487,7 +491,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                 return obj;
             });
         }
-    }, [filteredDataMemo, selectedCategories, selectedCompany, GROUP_NAMES, METRICS]);
+    }, [filteredDataMemo, selectedCategories, selectedCompany, GROUP_NAMES]);
 
     // Trend data
     const trendData = useMemo(() => {
@@ -511,12 +515,11 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
             ) : (
                 <Flex
                     direction="column"
-                    // **Reduced spacing & padding** for a tighter layout
                     gap={3}
                     width="100%"
                     align="center"
                     bg="linear-gradient(90deg, #000000, #7800ff)"
-                    p={3} 
+                    p={3}
                     borderRadius="15px"
                     borderColor="gray.300"
                     mx="auto"
@@ -527,7 +530,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                         justifyContent="space-between"
                         alignItems="center"
                         flexWrap="wrap"
-                        gap={2} 
+                        gap={2}
                         bg="transparent"
                     >
                         {/* Company Selector */}
@@ -584,6 +587,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                     fontSize="sm"
                                                     fontWeight="semibold"
                                                     mb={1}
+                                                    color="white" // <-- changed
                                                 >
                                                     Category:
                                                 </Text>
@@ -597,6 +601,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                             value="note"
                                                             bg="transparent"
                                                             size="sm"
+                                                            color="white" // <-- changed
                                                         >
                                                             Nota
                                                         </Checkbox>
@@ -604,6 +609,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                             value="video"
                                                             bg="transparent"
                                                             size="sm"
+                                                            color="white" // <-- changed
                                                         >
                                                             Video
                                                         </Checkbox>
@@ -617,6 +623,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                     fontSize="sm"
                                                     fontWeight="semibold"
                                                     mb={1}
+                                                    color="white" // <-- changed
                                                 >
                                                     Week:
                                                 </Text>
@@ -638,7 +645,11 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                     _hover={{ borderColor: "teal.200" }}
                                                 >
                                                     {availableWeeks.map((week) => (
-                                                        <option key={week} value={week}>
+                                                        <option
+                                                            key={week}
+                                                            value={week}
+                                                            style={{ color: "white" }} // <-- changed
+                                                        >
                                                             {week}
                                                         </option>
                                                     ))}
@@ -662,11 +673,13 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                     fontSize="sm"
                                                     fontWeight="semibold"
                                                     mb={1}
+                                                    color="white" // <-- changed
                                                 >
                                                     Comparison Mode:
                                                 </Text>
                                                 <HStack spacing={2}>
                                                     <Button
+                                                        color="white" // <-- changed
                                                         colorScheme={
                                                             comparisonMode === "Weekly"
                                                                 ? "teal"
@@ -680,6 +693,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         Weekly
                                                     </Button>
                                                     <Button
+                                                        color="white" // <-- changed
                                                         colorScheme={
                                                             comparisonMode === "Monthly"
                                                                 ? "teal"
@@ -693,6 +707,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         Monthly
                                                     </Button>
                                                     <Button
+                                                        color="white" // <-- changed
                                                         colorScheme={
                                                             comparisonMode === "Yearly"
                                                                 ? "teal"
@@ -751,7 +766,6 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                             return (
                                 <Tooltip
                                     key={metric}
-                                    // 4) Use our new RANGES_STRINGS with small definition
                                     label={RANGES_STRINGS[metric]}
                                     bg="gray.700"
                                     color="white"
@@ -761,7 +775,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                 >
                                     <Box
                                         bg="transparent"
-                                        p={3} 
+                                        p={3}
                                         border="none"
                                         borderRadius="lg"
                                         transition="box-shadow 0.2s, transform 0.2s"
@@ -815,7 +829,12 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                             </Flex>
 
                                             {/* Value & Comparison */}
-                                            <Flex direction="column" justify="center" align="center" mt={1}>
+                                            <Flex
+                                                direction="column"
+                                                justify="center"
+                                                align="center"
+                                                mt={1}
+                                            >
                                                 <Flex alignItems="center" justifyContent="center">
                                                     <Text
                                                         color="white"
@@ -824,7 +843,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         textAlign="center"
                                                     >
                                                         {formatNumber(averages[metric])}{" "}
-                                                        {METRIC_UNITS[metric]} 
+                                                        {METRIC_UNITS[metric]}
                                                     </Text>
                                                     {/* Performance Circle */}
                                                     <Box
@@ -846,7 +865,10 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                             fontWeight="bold"
                                                             mt={1}
                                                         >
-                                                            {Math.abs(percentageDifferences[metric])}%
+                                                            {Math.abs(
+                                                                percentageDifferences[metric]
+                                                            )}
+                                                            %
                                                             {percentageDifferences[metric] > 0
                                                                 ? " ↑"
                                                                 : " ↓"}
@@ -881,7 +903,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         zeroline: false,
                                                         showline: false,
                                                         ticks: "",
-                                                        tickformat: "%b", 
+                                                        tickformat: "%b",
                                                         dtick: "M1",
                                                         showticklabels: true
                                                     },
