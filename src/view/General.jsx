@@ -33,6 +33,7 @@ import {
 import Papa from "papaparse";
 import { FaFilter, FaExpand } from "react-icons/fa";
 
+// Import Plotly component
 import Plot from "react-plotly.js";
 import { Loader } from "../components/common/Loader";
 import { useAsyncFn } from "../hooks/useAsync";
@@ -46,63 +47,89 @@ const parseDate = (dateStr) => {
 // Helper function to get the Monday of the week for a given date
 const getWeekStartDate = (date) => {
     const day = date.getDay(); // Sunday - Saturday : 0 - 6
-    const diff = day === 0 ? -6 : 1 - day; // Adjust if day is Sunday
+    const diff = day === 0 ? -6 : 1 - day; // Adjust when day is Sunday
     const monday = new Date(date);
     monday.setDate(date.getDate() + diff);
-
+    // Format as "YYYY-MM-DD" with leading zeros
     const dd = String(monday.getDate()).padStart(2, "0");
     const mm = String(monday.getMonth() + 1).padStart(2, "0");
     const yyyy = monday.getFullYear();
     return `${yyyy}-${mm}-${dd}`;
 };
 
-// Format number (no decimals if integer, else 1 decimal)
+// Helper function to format numbers: display without decimals if integer, else with one decimal
 const formatNumber = (numStr) => {
     const num = parseFloat(numStr);
     if (isNaN(num)) return "N/A";
     return Number.isInteger(num) ? num.toString() : num.toFixed(1);
 };
 
-// *** 1) Renamed metrics ***
-const METRICS = ["FCP", "TBT", "SPI", "LCP", "CLS"];
+// Define the metrics to display (ensure unique names and updated order)
+const METRICS = [
+    "First Contentful Paint",
+    "Total Blocking Time",
+    "Speed Index Performance",
+    "Largest Contentful Paint",
+    "Cumulative Layout Shift"
+];
 
-// *** 2) Show units next to average ***
+// Define units for each metric
 const METRIC_UNITS = {
-    FCP: "s",
-    TBT: "s",
-    SPI: "s",
-    LCP: "s",
-    CLS: ""
+    "First Contentful Paint": "s",
+    "Speed Index Performance": "s",
+    "Total Blocking Time": "ms",
+    "Largest Contentful Paint": "s",
+    "Cumulative Layout Shift": "" // No unit
 };
 
-// *** 3) Adjust thresholds and rename for short acronyms ***
+// Thresholds for performance metrics
 const THRESHOLDS = {
-    FCP: { good: 1.8, needsImprovement: 3.0 },
-    TBT: { good: 200, needsImprovement: 600 },
-    SPI: { good: 3.4, needsImprovement: 5.8 },
-    LCP: { good: 2.5, needsImprovement: 4.0 },
-    CLS: { good: 0.1, needsImprovement: 0.25 }
+    "First Contentful Paint": {
+        good: 1.8,
+        needsImprovement: 3.0
+    },
+    "Speed Index Performance": {
+        good: 3.4,
+        needsImprovement: 5.8
+    },
+    "Largest Contentful Paint": {
+        good: 2.5,
+        needsImprovement: 4.0
+    },
+    "Total Blocking Time": {
+        good: 200,
+        needsImprovement: 600
+    },
+    "Cumulative Layout Shift": {
+        good: 0.1,
+        needsImprovement: 0.25
+    }
 };
 
-// *** 4) Tooltip text with short definitions + “What does that mean?” ***
+// Ranges strings for tooltips
 const RANGES_STRINGS = {
-    FCP: "Good: 0–1.8s, Needs Improvement: 1.8–3s, Poor: >3s\nWhat does that mean? Measures time until first content is painted.",
-    TBT: "Good: 0–200ms, Needs Improvement: 0.2–0.6s, Poor: >600ms\nWhat does that mean? Measures main-thread blocking time.",
-    SPI: "Good: 0–3.4s, Needs Improvement: 3.4–5.8s, Poor: >5.8s\nWhat does that mean? Measures how quickly content is visually displayed.",
-    LCP: "Good: 0–2.5s, Needs Improvement: 2.5–4s, Poor: >4s\nWhat does that mean? Largest element painted.",
-    CLS: "Good: 0–0.1, Needs Improvement: 0.1–0.25, Poor: >0.25\nWhat does that mean? Measures layout shift during load."
+    "First Contentful Paint":
+        "Good: 0–1.8 s, Needs Improvement: 1.8–3 s, Poor: Over 3 s",
+    "Speed Index Performance":
+        "Good: 0–3.4 s, Needs Improvement: 3.4–5.8 s, Poor: Over 5.8 s",
+    "Largest Contentful Paint":
+        "Good: 0–2.5 s, Needs Improvement: 2.5–4 s, Poor: Over 4 s",
+    "Total Blocking Time":
+        "Good: 0–200 ms, Needs Improvement: 200–600 ms, Poor: Over 600 ms",
+    "Cumulative Layout Shift":
+        "Good: 0–0.1, Needs Improvement: 0.1–0.25, Poor: Over 0.25"
 };
 
-// *** Map new acronyms to the data keys ***
+// Mapping metrics to their corresponding keys in the data
 const METRIC_KEYS = {
-    FCP: "firstContentfulPaint",
-    TBT: "totalBlockingTime",
-    SPI: "speedIndex",
-    LCP: "largestContentfulPaint",
-    CLS: "cumulativeLayoutShift"
+    "First Contentful Paint": "firstContentfulPaint",
+    "Speed Index Performance": "speedIndex",
+    "Total Blocking Time": "totalBlockingTime",
+    "Largest Contentful Paint": "largestContentfulPaint",
+    "Cumulative Layout Shift": "cumulativeLayoutShift"
 };
 
-// Helper: slope of a linear regression
+// Helper function to calculate the slope of a linear regression
 const calculateSlope = (x, y) => {
     const n = x.length;
     if (n === 0) return 0;
@@ -116,30 +143,38 @@ const calculateSlope = (x, y) => {
     const denominator = n * sum_xx - sum_x * sum_x;
 
     if (denominator === 0) return 0;
+
     return numerator / denominator;
 };
 
-const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
+const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
+    // Define the groups and their member companies
     const GROUPS = groups;
+    // Extract group names and individual companies
     const GROUP_NAMES = Object.keys(GROUPS);
     const INDIVIDUAL_COMPANIES = GROUP_NAMES.reduce(
         (acc, group) => acc.concat(GROUPS[group]),
         []
     );
-
+    // State variables
     const [data, setData] = useState([]);
+
     const [selectedCompany, setSelectedCompany] = useState(preSelectedWebsites);
-    const [selectedCategories, setSelectedCategories] = useState(["nota", "video"]);
+    const [selectedCategories, setSelectedCategories] = useState([
+        "nota",
+        "video"
+    ]);
     const [selectedWeek, setSelectedWeek] = useState("");
     const [availableWeeks, setAvailableWeeks] = useState([]);
-    const [comparisonMode, setComparisonMode] = useState("Monthly"); // Default
+    const [comparisonMode, setComparisonMode] = useState("Monthly"); // Preselect "Weekly"
 
     const toast = useToast();
 
-    // Modal (expanded graph)
+    // Modal state for expanded graph
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [modalPlotData, setModalPlotData] = useState(null);
 
+    // Function to handle expand icon click
     const handleExpand = (plotData, metric) => {
         setModalPlotData({ ...plotData, metric });
         onOpen();
@@ -149,51 +184,63 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
 
     useEffect(() => {
         execute().then((res) => {
-            let parsedData = res.map((item) => {
+            let parsedData = res.map((item, index) => {
                 const dateObj = parseDate(item["date"]);
                 const weekStart = getWeekStartDate(dateObj);
 
                 const noteValues = {
-                    date: item["date"],
-                    company: item["name"].toUpperCase(),
-                    category: "note",
-                    firstContentfulPaint: item["note_first_contentful_paint"],
-                    totalBlockingTime: item["note_total_blocking_time"],
-                    speedIndex: item["note_speed_index"],
-                    largestContentfulPaint: item["note_largest_contentful_paint"],
-                    cumulativeLayoutShift: item["note_cumulative_layout_shift"],
-                    week: weekStart
+                    date: item["date"], // Column A (YYYY-MM-DD)
+                    company: item["name"].toUpperCase(), // Column B (converted to uppercase)
+                    category: "note", // Column C
+                    firstContentfulPaint: item["note_first_contentful_paint"], // Column D
+                    totalBlockingTime: item["note_total_blocking_time"], // Column E
+                    speedIndex: item["note_speed_index"], // Column F
+                    largestContentfulPaint:
+                        item["note_largest_contentful_paint"], // Column G
+                    cumulativeLayoutShift: item["note_cumulative_layout_shift"], // Column H
+                    week: weekStart // Added week information
                 };
                 const videoValues = {
-                    date: item["date"],
-                    company: item["name"].toUpperCase(),
-                    category: "video",
-                    firstContentfulPaint: item["video_first_contentful_paint"],
-                    totalBlockingTime: item["video_total_blocking_time"],
-                    speedIndex: item["video_speed_index"],
-                    largestContentfulPaint: item["video_largest_contentful_paint"],
-                    cumulativeLayoutShift: item["video_cumulative_layout_shift"],
-                    week: weekStart
+                    date: item["date"], // Column A (YYYY-MM-DD)
+                    company: item["name"].toUpperCase(), // Column B (converted to uppercase)
+                    category: "video", // Column C
+                    firstContentfulPaint: item["video_first_contentful_paint"], // Column D
+                    totalBlockingTime: item["video_total_blocking_time"], // Column E
+                    speedIndex: item["video_speed_index"], // Column F
+                    largestContentfulPaint:
+                        item["video_largest_contentful_paint"], // Column G
+                    cumulativeLayoutShift:
+                        item["video_cumulative_layout_shift"], // Column H
+                    week: weekStart // Added week information
                 };
                 return [noteValues, videoValues];
             });
 
             parsedData = parsedData.flat();
 
+            // Extract unique weeks and sort them
             const weeks = Array.from(new Set(parsedData.map((d) => d.week)));
-            weeks.sort((a, b) => parseDate(a) - parseDate(b));
+            weeks.sort((a, b) => {
+                const dateA = parseDate(a);
+                const dateB = parseDate(b);
+                return dateA - dateB;
+            });
 
             setAvailableWeeks(weeks);
             setData(parsedData);
+
+            // Preselect the most recent week
             if (weeks.length > 0) {
                 setSelectedWeek(weeks[weeks.length - 1]);
             }
         });
     }, [execute]);
 
-    // Generate company <option> tags
+    // Generate company options including groups and individual companies
     const companyOptions = useMemo(() => {
         const options = [];
+
+        // Add individual company options
         INDIVIDUAL_COMPANIES.forEach((company) => {
             options.push(
                 <option key={company} value={company} style={{ color: "black" }}>
@@ -201,14 +248,15 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                 </option>
             );
         });
+
         return options;
     }, [INDIVIDUAL_COMPANIES]);
 
-    const parseDateStr = useCallback((d) => parseDate(d), []);
-
+    // Function to get the comparison date based on the selected date and comparison mode
     const getComparisonPeriod = useCallback((currentDateStr, mode) => {
-        const currentDate = parseDateStr(currentDateStr);
+        const currentDate = parseDate(currentDateStr);
         let comparisonDate;
+
         switch (mode) {
             case "Weekly":
                 comparisonDate = new Date(currentDate);
@@ -225,175 +273,232 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
             default:
                 return null;
         }
-        return comparisonDate;
-    }, [parseDateStr]);
 
+        return comparisonDate;
+    }, []);
+
+    // Get the comparison date based on the selected week and comparison mode
     const comparisonDate = useMemo(() => {
         if (
             comparisonMode === "Weekly" ||
             comparisonMode === "Monthly" ||
             comparisonMode === "Yearly"
         ) {
-            if (!selectedWeek) return null;
+            if (selectedWeek === "") return null;
             return getComparisonPeriod(selectedWeek, comparisonMode);
         }
         return null;
     }, [selectedWeek, comparisonMode, getComparisonPeriod]);
 
+    // Memoized function to get filtered data
     const getFilteredData = useCallback(
         (dataSet, dateFilter) => {
             return dataSet.filter((row) => {
+                // Company filtering
                 let companyMatch = false;
-                if (!selectedCompany) {
-                    companyMatch = true;
+                if (selectedCompany === "") {
+                    companyMatch = true; // No company selected
                 } else if (GROUP_NAMES.includes(selectedCompany)) {
+                    // Group selected
                     const groupCompanies = GROUPS[selectedCompany].map((c) =>
                         c.toUpperCase()
                     );
                     companyMatch = groupCompanies.includes(row.company);
                 } else {
-                    companyMatch = row.company === selectedCompany.toUpperCase();
+                    // Individual company selected
+                    companyMatch =
+                        row.company === selectedCompany.toUpperCase();
                 }
 
+                // Category filtering
                 const categoryMatch =
                     selectedCategories.length === 0 ||
                     selectedCategories.includes(row.category);
 
+                // Time filtering
                 let timeMatch = true;
                 if (dateFilter) {
-                    const rowDate = parseDateStr(row.date);
-                    const filterDate = parseDateStr(dateFilter);
+                    const rowDate = parseDate(row.date);
+                    const filterDate = parseDate(dateFilter);
 
                     if (comparisonMode === "Weekly") {
+                        // Filter by week
                         timeMatch = row.week === dateFilter;
                     } else if (comparisonMode === "Monthly") {
+                        // Filter by month
                         timeMatch =
-                            rowDate.getFullYear() === filterDate.getFullYear() &&
+                            rowDate.getFullYear() ===
+                                filterDate.getFullYear() &&
                             rowDate.getMonth() === filterDate.getMonth();
                     } else if (comparisonMode === "Yearly") {
+                        // Filter by year
                         timeMatch =
                             rowDate.getFullYear() === filterDate.getFullYear();
+                    } else {
+                        // Default to no time filter
+                        timeMatch = true;
                     }
                 }
+
                 return companyMatch && categoryMatch && timeMatch;
             });
         },
-        [selectedCompany, selectedCategories, comparisonMode, parseDateStr, GROUP_NAMES, GROUPS]
+        [selectedCompany, selectedCategories, comparisonMode, GROUP_NAMES, GROUPS]
     );
 
+    // Memoize the filtered data
     const filteredDataMemo = useMemo(() => {
         return getFilteredData(data, selectedWeek);
     }, [getFilteredData, data, selectedWeek]);
 
+    // Filtered data for comparison
     const comparisonData = useMemo(() => {
         if (!comparisonDate) return [];
+
         let comparisonDateStr = "";
         if (comparisonMode === "Weekly") {
             comparisonDateStr = getWeekStartDate(comparisonDate);
-        } else if (comparisonMode === "Monthly" || comparisonMode === "Yearly") {
+        } else if (
+            comparisonMode === "Monthly" ||
+            comparisonMode === "Yearly"
+        ) {
             const yyyy = comparisonDate.getFullYear();
             const mm = String(comparisonDate.getMonth() + 1).padStart(2, "0");
             const dd = String(comparisonDate.getDate()).padStart(2, "0");
             comparisonDateStr = `${yyyy}-${mm}-${dd}`;
         }
+
         return getFilteredData(data, comparisonDateStr);
     }, [getFilteredData, data, comparisonDate, comparisonMode]);
 
+    // Calculate averages for current data
     const averages = useMemo(() => {
         if (filteredDataMemo.length === 0) return {};
+
         const metricSums = {};
-        METRICS.forEach((m) => {
-            metricSums[m] = 0;
+        METRICS.forEach((metric) => {
+            metricSums[metric] = 0;
         });
+
         filteredDataMemo.forEach((row) => {
-            METRICS.forEach((m) => {
-                const key = METRIC_KEYS[m];
-                const val = parseFloat(row[key]);
-                if (!isNaN(val)) {
-                    metricSums[m] += val;
+            METRICS.forEach((metric) => {
+                const key = METRIC_KEYS[metric];
+                const value = parseFloat(row[key]);
+                if (!isNaN(value)) {
+                    metricSums[metric] += value;
                 }
             });
         });
+
         const metricAverages = {};
-        METRICS.forEach((m) => {
-            metricAverages[m] = (
-                metricSums[m] / filteredDataMemo.length
+        METRICS.forEach((metric) => {
+            metricAverages[metric] = (
+                metricSums[metric] / filteredDataMemo.length
             ).toFixed(2);
         });
+
         return metricAverages;
     }, [filteredDataMemo]);
 
+    // Calculate averages for comparison data
     const comparisonAverages = useMemo(() => {
         if (comparisonData.length === 0) return {};
+
         const metricSums = {};
-        METRICS.forEach((m) => {
-            metricSums[m] = 0;
+        METRICS.forEach((metric) => {
+            metricSums[metric] = 0;
         });
+
         comparisonData.forEach((row) => {
-            METRICS.forEach((m) => {
-                const key = METRIC_KEYS[m];
-                const val = parseFloat(row[key]);
-                if (!isNaN(val)) {
-                    metricSums[m] += val;
+            METRICS.forEach((metric) => {
+                const key = METRIC_KEYS[metric];
+                const value = parseFloat(row[key]);
+                if (!isNaN(value)) {
+                    metricSums[metric] += value;
                 }
             });
         });
+
         const metricAverages = {};
-        METRICS.forEach((m) => {
-            metricAverages[m] = (
-                metricSums[m] / comparisonData.length
+        METRICS.forEach((metric) => {
+            metricAverages[metric] = (
+                metricSums[metric] / comparisonData.length
             ).toFixed(2);
         });
+
         return metricAverages;
     }, [comparisonData]);
 
+    // Calculate percentage differences
     const percentageDifferences = useMemo(() => {
-        const diffs = {};
-        METRICS.forEach((m) => {
-            const current = parseFloat(+averages[m] || 0);
-            const prev = parseFloat(+comparisonAverages[m] || 0);
-            if (isNaN(current) || isNaN(prev)) {
-                diffs[m] = 0;
+        const differences = {};
+
+        METRICS.forEach((metric) => {
+            const current = parseFloat(+averages?.[metric] || 0);
+            const comparison = parseFloat(+comparisonAverages?.[metric] || 0);
+            if (isNaN(current) || isNaN(comparison)) {
+                differences[metric] = 0;
             } else {
-                const diff = ((current - prev) / (prev || current || 1)) * 100;
-                diffs[m] = Math.round(diff);
+                // Calculate percentage difference and round to whole number
+                const diff =
+                    ((current - comparison) / (comparison || current || 1)) *
+                    100;
+                differences[metric] = Math.round(diff);
             }
         });
-        return diffs;
-    }, [averages, comparisonAverages]);
 
+        return differences;
+    }, [averages, comparisonAverages, comparisonDate]);
+
+    // Determine color based on percentage difference
     const getDifferenceColor = (metric) => {
         const diff = parseFloat(percentageDifferences[metric]);
-        if (isNaN(diff)) return "gray.300";
-        // Lower is better, so positive => improvement
+        if (isNaN(diff)) return "gray.300"; // N/A
+
+        // For metrics where lower is better
         if (diff > 0) {
+            // Improvement
             return "green.400";
         } else if (diff < 0) {
+            // Deterioration
+            return "red.400";
+        } else {
+            return "gray.300"; // No change
+        }
+    };
+
+    // Function to get performance color based on thresholds
+    const getPerformanceColor = (metric, value) => {
+        if (!THRESHOLDS[metric] || isNaN(value)) {
+            return "gray.300"; // default color
+        }
+
+        const thresholds = THRESHOLDS[metric];
+
+        if (value <= thresholds.good) {
+            return "green.400";
+        } else if (value <= thresholds.needsImprovement) {
+            return "orange.400";
+        } else {
             return "red.400";
         }
-        return "gray.300";
     };
 
-    const getPerformanceColor = (metric, val) => {
-        if (!THRESHOLDS[metric] || isNaN(val)) return "gray.300";
-        const { good, needsImprovement } = THRESHOLDS[metric];
-        if (val <= good) return "green.400";
-        if (val <= needsImprovement) return "orange.400";
-        return "red.400";
-    };
-
+    // Handle company selection
     const handleCompanyChange = (e) => {
         setSelectedCompany(e.target.value);
     };
 
-    const handleCategoryChange = (vals) => {
-        if (vals !== "") {
-            setSelectedCategories(vals);
-        } else {
-            setSelectedCategories(["note", "video"]);
+    // Handle category selection
+    const handleCategoryChange = (values) => {
+        if (values !== "") {
+            setSelectedCategories(values);
+            return;
         }
+        setSelectedCategories(["note", "video"]);
     };
 
+    // Handle week selection
     const handleWeekChange = (e) => {
         setSelectedWeek(e.target.value);
         toast({
@@ -405,6 +510,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
         });
     };
 
+    // Reset week selection
     const resetWeekSelection = () => {
         setSelectedWeek("");
         toast({
@@ -416,6 +522,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
         });
     };
 
+    // Handle comparison mode selection
     const handleComparisonModeChange = (mode) => {
         setComparisonMode(mode);
         toast({
@@ -433,71 +540,82 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
         });
     };
 
-    // Plot data
+    // Prepare data for Plotly graphs based on filtered data
     const plotlyData = useMemo(() => {
-        const sorted = [...filteredDataMemo].sort(
+        // Sort data by date
+        const sortedData = [...filteredDataMemo].sort(
             (a, b) => parseDate(a.date) - parseDate(b.date)
         );
 
-        const shouldAggregate =
-            selectedCategories.length > 1 || GROUP_NAMES.includes(selectedCompany);
+        // Check if multiple categories are selected
+        const shouldAggregate = selectedCategories.length > 1 || GROUP_NAMES.includes(selectedCompany);
 
         if (shouldAggregate) {
+            // Group data by date and compute average per metric
             const dataByDate = {};
-            sorted.forEach((row) => {
+
+            sortedData.forEach((row) => {
                 if (!dataByDate[row.date]) {
                     dataByDate[row.date] = { count: 0 };
-                    METRICS.forEach((m) => {
-                        dataByDate[row.date][m] = 0;
+                    METRICS.forEach((metric) => {
+                        dataByDate[row.date][metric] = 0;
                     });
                 }
                 dataByDate[row.date].count += 1;
-                METRICS.forEach((m) => {
-                    const key = METRIC_KEYS[m];
-                    const val = parseFloat(row[key]);
-                    if (!isNaN(val)) dataByDate[row.date][m] += val;
+                METRICS.forEach((metric) => {
+                    const key = METRIC_KEYS[metric];
+                    const value = parseFloat(row[key]);
+                    if (!isNaN(value)) {
+                        dataByDate[row.date][metric] += value;
+                    }
                 });
             });
-            const averagedData = Object.keys(dataByDate)
-                .map((dt) => {
-                    const obj = { date: dt };
-                    METRICS.forEach((m) => {
-                        obj[m] = (
-                            dataByDate[dt][m] / dataByDate[dt].count
-                        ).toFixed(2);
-                    });
-                    return obj;
-                })
-                .sort((a, b) => parseDate(a.date) - parseDate(b.date));
 
-            return averagedData.map((row) => {
+            // Compute averages
+            const averaged = Object.keys(dataByDate).map((dt) => {
+                const obj = { date: dt };
+                METRICS.forEach((metric) => {
+                    obj[metric] = (
+                        dataByDate[dt][metric] / dataByDate[dt].count
+                    ).toFixed(2);
+                });
+                return obj;
+            });
+
+            const averagedSorted = averaged.sort(
+                (a, b) => parseDate(a.date) - parseDate(b.date)
+            );
+
+            // Prepare final data
+            return averagedSorted.map((row) => {
                 const obj = { date: row.date };
-                METRICS.forEach((m) => {
-                    obj[m] = parseFloat(row[m]) || 0;
+                METRICS.forEach((metric) => {
+                    obj[metric] = parseFloat(row[metric]) || 0;
                 });
                 return obj;
             });
         } else {
-            return sorted.map((r) => {
-                const obj = { date: r.date };
-                METRICS.forEach((m) => {
-                    const key = METRIC_KEYS[m];
-                    obj[m] = parseFloat(r[key]) || 0;
+            // Single category or single company
+            return sortedData.map((row) => {
+                const obj = { date: row.date };
+                METRICS.forEach((metric) => {
+                    const key = METRIC_KEYS[metric];
+                    obj[metric] = parseFloat(row[key]) || 0;
                 });
                 return obj;
             });
         }
-    }, [filteredDataMemo, selectedCategories, selectedCompany, GROUP_NAMES, METRICS]);
+    }, [filteredDataMemo, selectedCategories, selectedCompany, GROUP_NAMES]);
 
-    // Trend data
+    // Calculate trendline slopes
     const trendData = useMemo(() => {
-        const t = {};
-        METRICS.forEach((m) => {
+        const trends = {};
+        METRICS.forEach((metric) => {
             const xVals = plotlyData.map((d) => parseDate(d.date).getTime());
-            const yVals = plotlyData.map((d) => d[m]);
-            t[m] = calculateSlope(xVals, yVals);
+            const yVals = plotlyData.map((d) => d[metric]);
+            trends[metric] = calculateSlope(xVals, yVals);
         });
-        return t;
+        return trends;
     }, [plotlyData]);
 
     return (
@@ -511,26 +629,25 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
             ) : (
                 <Flex
                     direction="column"
-                    // **Reduced spacing & padding** for a tighter layout
-                    gap={3}
+                    gap={4}
                     width="100%"
                     align="center"
                     bg="linear-gradient(90deg, #000000, #7800ff)"
-                    p={3} 
+                    p={4}
                     borderRadius="15px"
                     borderColor="gray.300"
                     mx="auto"
                 >
-                    {/* Header Row */}
+                    {/* Header Section */}
                     <Flex
                         width="100%"
                         justifyContent="space-between"
                         alignItems="center"
                         flexWrap="wrap"
-                        gap={2} 
+                        gap={2}
                         bg="transparent"
                     >
-                        {/* Company Selector */}
+                        {/* Company Selector and Filter Icon */}
                         <Flex alignItems="center" gap={2}>
                             <Text color="white" fontSize="md" fontWeight="semibold">
                                 Company:
@@ -553,7 +670,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                 {companyOptions}
                             </Select>
 
-                            {/* Filter Popover */}
+                            {/* Popover Controls */}
                             <Popover>
                                 <PopoverTrigger>
                                     <IconButton
@@ -578,12 +695,13 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                     </PopoverHeader>
                                     <PopoverBody>
                                         <VStack align="start" spacing={2}>
-                                            {/* Category */}
+                                            {/* Category Selection */}
                                             <Box>
                                                 <Text
                                                     fontSize="sm"
                                                     fontWeight="semibold"
                                                     mb={1}
+                                                    color="white" // <-- changed
                                                 >
                                                     Category:
                                                 </Text>
@@ -597,6 +715,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                             value="note"
                                                             bg="transparent"
                                                             size="sm"
+                                                            color="white" // <-- changed
                                                         >
                                                             Nota
                                                         </Checkbox>
@@ -604,6 +723,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                             value="video"
                                                             bg="transparent"
                                                             size="sm"
+                                                            color="white" // <-- changed
                                                         >
                                                             Video
                                                         </Checkbox>
@@ -611,12 +731,13 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                 </CheckboxGroup>
                                             </Box>
 
-                                            {/* Week */}
+                                            {/* Week Filter */}
                                             <Box>
                                                 <Text
                                                     fontSize="sm"
                                                     fontWeight="semibold"
                                                     mb={1}
+                                                    color="white" // <-- changed
                                                 >
                                                     Week:
                                                 </Text>
@@ -662,6 +783,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                     fontSize="sm"
                                                     fontWeight="semibold"
                                                     mb={1}
+                                                    color="white" // <-- changed
                                                 >
                                                     Comparison Mode:
                                                 </Text>
@@ -714,44 +836,54 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                         </Flex>
                     </Flex>
 
-                    {/* Metrics Grid */}
+                    {/* Metrics Display */}
                     <Grid
                         templateColumns={{
-                            base: "repeat(1, 1fr)",
-                            sm: "repeat(2, 1fr)",
-                            md: "repeat(3, 1fr)",
-                            lg: "repeat(4, 1fr)",
-                            xl: "repeat(5, 1fr)"
+                            base: "repeat(1, 1fr)", // 1 column on small screens
+                            sm: "repeat(2, 1fr)", // 2 columns on small to medium screens
+                            md: "repeat(3, 1fr)", // 3 columns on medium screens
+                            lg: "repeat(4, 1fr)", // 4 columns on large screens
+                            xl: "repeat(5, 1fr)" // 5 columns for 5 metrics
                         }}
-                        gap={3}
+                        gap={4}
                         width="100%"
                         overflowX="auto"
                     >
                         {METRICS.map((metric) => {
+                            // Prepare Plotly data for individual or averaged graph
                             const plotDataPoints = plotlyData.map((d) => d.date);
                             const plotMetricValues = plotlyData.map((d) => d[metric]);
 
+                            // Calculate trendline slope
                             const xValues = plotlyData.map((d) =>
                                 parseDate(d.date).getTime()
                             );
-                            const slope = calculateSlope(xValues, plotMetricValues);
+                            const yValues = plotMetricValues;
+                            const slope = calculateSlope(xValues, yValues);
                             const lineColor = slope < 0 ? "green" : "red";
 
                             const individualPlotData = {
                                 x: plotDataPoints,
                                 y: plotMetricValues,
                                 type: "scatter",
-                                mode: "lines+markers",
-                                marker: { color: "#82ca9d", size: 6 },
-                                line: { color: lineColor, width: 2 },
+                                mode: "lines+markers", // Keeps markers for hover points
+                                marker: {
+                                    color: "#82ca9d",
+                                    size: 6 // Adjust marker size as needed
+                                },
+                                line: {
+                                    color: lineColor, // Dynamic color based on trend
+                                    width: 2
+                                },
                                 name: metric,
-                                hovertemplate: "%{x|%B %d, %Y}<br>%{y}<extra></extra>"
+                                // Updated hovertemplate to show only full date and value
+                                hovertemplate:
+                                    "%{x|%B %d, %Y}<br>%{y}<extra></extra>"
                             };
 
                             return (
                                 <Tooltip
                                     key={metric}
-                                    // 4) Use our new RANGES_STRINGS with small definition
                                     label={RANGES_STRINGS[metric]}
                                     bg="gray.700"
                                     color="white"
@@ -761,9 +893,9 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                 >
                                     <Box
                                         bg="transparent"
-                                        p={3} 
                                         border="none"
                                         borderRadius="lg"
+                                        p={4}
                                         transition="box-shadow 0.2s, transform 0.2s"
                                         _hover={{
                                             boxShadow: "lg",
@@ -771,21 +903,21 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                         }}
                                         cursor="pointer"
                                         minW="140px"
-                                        minH="220px"
+                                        minH="250px"
                                         display="flex"
                                         flexDirection="column"
                                         justifyContent="space-between"
                                         position="relative"
                                     >
                                         <Flex direction="column" align="center">
-                                            {/* Title & Expand */}
+                                            {/* Title and Expand Button */}
                                             <Flex
                                                 width="100%"
                                                 justifyContent="space-between"
                                                 alignItems="center"
                                             >
                                                 <Box
-                                                    height="40px"
+                                                    height="50px"
                                                     display="flex"
                                                     alignItems="center"
                                                     justifyContent="center"
@@ -801,6 +933,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         {metric}
                                                     </Text>
                                                 </Box>
+                                                {/* Expand Icon */}
                                                 <IconButton
                                                     aria-label="Expand Graph"
                                                     icon={<FaExpand />}
@@ -808,15 +941,21 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                     bg="transparent"
                                                     _hover={{ bg: "transparent" }}
                                                     size="sm"
-                                                    onClick={() =>
-                                                        handleExpand(individualPlotData, metric)
-                                                    }
+                                                    onClick={() => handleExpand(individualPlotData, metric)}
                                                 />
                                             </Flex>
 
-                                            {/* Value & Comparison */}
-                                            <Flex direction="column" justify="center" align="center" mt={1}>
-                                                <Flex alignItems="center" justifyContent="center">
+                                            {/* Number and Difference */}
+                                            <Flex
+                                                direction="column"
+                                                justify="center"
+                                                align="center"
+                                                mt={2}
+                                            >
+                                                <Flex
+                                                    alignItems="center"
+                                                    justifyContent="center"
+                                                >
                                                     <Text
                                                         color="white"
                                                         fontSize="2xl"
@@ -824,9 +963,9 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         textAlign="center"
                                                     >
                                                         {formatNumber(averages[metric])}{" "}
-                                                        {METRIC_UNITS[metric]} 
+                                                        {METRIC_UNITS[metric]}
                                                     </Text>
-                                                    {/* Performance Circle */}
+                                                    {/* Circle indicating performance */}
                                                     <Box
                                                         w={3}
                                                         h={3}
@@ -846,10 +985,15 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                             fontWeight="bold"
                                                             mt={1}
                                                         >
-                                                            {Math.abs(percentageDifferences[metric])}%
-                                                            {percentageDifferences[metric] > 0
-                                                                ? " ↑"
-                                                                : " ↓"}
+                                                            {percentageDifferences[metric] !== "N/A"
+                                                                ? `${Math.abs(
+                                                                      percentageDifferences[metric]
+                                                                  )}% ${
+                                                                      percentageDifferences[metric] > 0
+                                                                          ? "↑"
+                                                                          : "↓"
+                                                                  }`
+                                                                : 0}
                                                         </Text>
                                                         <Text
                                                             color="gray.300"
@@ -867,45 +1011,72 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                             </Flex>
                                         </Flex>
 
-                                        {/* Plotly mini-graph */}
-                                        <Box mt={2} width="100%" height="120px" position="relative">
-                                            <Plot
-                                                data={[individualPlotData]}
-                                                layout={{
-                                                    autosize: true,
-                                                    margin: { l: 40, r: 10, t: 10, b: 30 },
-                                                    xaxis: {
-                                                        tickfont: { size: 10, color: "white" },
-                                                        type: "date",
-                                                        showgrid: false,
-                                                        zeroline: false,
-                                                        showline: false,
-                                                        ticks: "",
-                                                        tickformat: "%b", 
-                                                        dtick: "M1",
-                                                        showticklabels: true
-                                                    },
-                                                    yaxis: {
-                                                        tickfont: { size: 10, color: "white" },
-                                                        showgrid: false,
-                                                        zeroline: false,
-                                                        showline: false,
-                                                        ticks: "",
-                                                        showticklabels: true,
-                                                        title: { text: "" }
-                                                    },
-                                                    showlegend: false,
-                                                    hovermode: "closest",
-                                                    paper_bgcolor: "transparent",
-                                                    plot_bgcolor: "transparent"
-                                                }}
-                                                config={{
-                                                    displayModeBar: false,
-                                                    responsive: true,
-                                                    hovermode: "closest"
-                                                }}
-                                                style={{ width: "100%", height: "100%" }}
-                                            />
+                                        {/* Plotly Graph */}
+                                        <Box
+                                            mt={4}
+                                            width="100%"
+                                            height="150px"
+                                            position="relative"
+                                            className="plot-container"
+                                        >
+                                            <Box
+                                                className="plot-container"
+                                                position="relative"
+                                                height="100%"
+                                                width="100%"
+                                            >
+                                                <Plot
+                                                    data={[individualPlotData]}
+                                                    layout={{
+                                                        autosize: true,
+                                                        margin: {
+                                                            l: 40,
+                                                            r: 10,
+                                                            t: 10,
+                                                            b: 30
+                                                        },
+                                                        xaxis: {
+                                                            tickfont: {
+                                                                size: 10,
+                                                                color: "white"
+                                                            },
+                                                            type: "date",
+                                                            showgrid: false,
+                                                            zeroline: false,
+                                                            showline: false,
+                                                            ticks: "",
+                                                            tickformat: "%b",
+                                                            dtick: "M1",
+                                                            showticklabels: true
+                                                        },
+                                                        yaxis: {
+                                                            tickfont: {
+                                                                size: 10,
+                                                                color: "white"
+                                                            },
+                                                            showgrid: false,
+                                                            zeroline: false,
+                                                            showline: false,
+                                                            ticks: "",
+                                                            showticklabels: true,
+                                                            title: { text: "" }
+                                                        },
+                                                        showlegend: false,
+                                                        hovermode: "closest",
+                                                        paper_bgcolor: "transparent",
+                                                        plot_bgcolor: "transparent"
+                                                    }}
+                                                    config={{
+                                                        displayModeBar: false,
+                                                        responsive: true,
+                                                        hovermode: "closest"
+                                                    }}
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%"
+                                                    }}
+                                                />
+                                            </Box>
                                         </Box>
                                     </Box>
                                 </Tooltip>
@@ -913,12 +1084,14 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                         })}
                     </Grid>
 
-                    {/* Expanded Modal */}
+                    {/* Modal for Expanded Graph */}
                     <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
                         <ModalOverlay />
                         <ModalContent bg="gray.800" color="white">
                             <ModalHeader>
-                                {modalPlotData ? modalPlotData.metric : "Expanded Graph"}
+                                {modalPlotData
+                                    ? modalPlotData.metric
+                                    : "Expanded Graph"}
                             </ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
