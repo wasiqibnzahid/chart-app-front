@@ -578,7 +578,7 @@ export const VerticalOverview = () => {
                 <BarChart
                   data={data}
                   getinsights={getInsights}
-                  titleHeading="Vertrical Overview - TVA vs. Comp. - Individual Bar Chart"
+                  titleHeading="Vertical Overview - TVA vs. Comp. - Individual Bar Chart"
                 />
               </ExpandWrapper>
             </div>
