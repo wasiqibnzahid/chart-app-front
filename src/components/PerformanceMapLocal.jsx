@@ -26,14 +26,12 @@ import Plot from "react-plotly.js";
 
 /** ========== Helpers ========== */
 
-
 // Parse YYYY-MM-DD -> Date
 const parseDate = (dateStr) => {
   if (!dateStr) return new Date(0);
   const [year, month, day] = dateStr.split("-").map(Number);
   return new Date(year, month - 1, day);
 };
-
 
 // Format "YYYY-MM-DD" range -> "MMM DD, YYYY - MMM DD, YYYY"
 const formatDateRange = (start, end) => {
@@ -44,14 +42,12 @@ const formatDateRange = (start, end) => {
   return `${sDate.toLocaleDateString(undefined, opts)} - ${eDate.toLocaleDateString(undefined, opts)}`;
 };
 
-
 // Format numeric with or without decimals
 const formatNumber = (val) => {
   const num = parseFloat(val);
   if (isNaN(num)) return "N/A";
   return Number.isInteger(num) ? num.toString() : num.toFixed(1);
 };
-
 
 // “Local” aggregator
 function getAggregatedLocalData(dataRows, metric) {
@@ -75,7 +71,6 @@ function getAggregatedLocalData(dataRows, metric) {
   return aggregated;
 }
 
-
 // Single-company data
 function getSingleCompanyData(dataRows, metric) {
   return dataRows
@@ -87,7 +82,6 @@ function getSingleCompanyData(dataRows, metric) {
     }));
 }
 
-
 // Identify the most recent date for marking with a vertical line
 function getMostRecentDate(dataArray) {
   let maxTime = 0;
@@ -98,9 +92,7 @@ function getMostRecentDate(dataArray) {
   return maxTime > 0 ? new Date(maxTime) : null;
 }
 
-
 /** ========== Constants ========== */
-
 
 // Company to URL mapping
 const COMPANY_URLS = {
@@ -121,7 +113,6 @@ const COMPANY_URLS = {
   Chihuahua: "https://www.aztecachihuahua.com",
   Laguna: "https://www.aztecalaguna.com",
 };
-
 
 // Group “Local”
 const GROUPS = {
@@ -145,14 +136,11 @@ const GROUPS = {
   ],
 };
 
-
 const GROUP_NAMES = Object.keys(GROUPS);
 const INDIVIDUAL_COMPANIES = Object.values(GROUPS).flat(); // Removed the empty string
 
-
 // 5 metrics
 const METRICS = ["LCP", "CLS", "INP", "FCP", "TTFB"];
-
 
 // Units
 const METRIC_UNITS = {
@@ -163,7 +151,6 @@ const METRIC_UNITS = {
   TTFB: "ms",
 };
 
-
 // Thresholds
 const THRESHOLDS = {
   FCP: { good: 1800, needsImprovement: 3000 },
@@ -172,7 +159,6 @@ const THRESHOLDS = {
   TTFB: { good: 800, needsImprovement: 1800 },
   LCP: { good: 2500, needsImprovement: 4000 },
 };
-
 
 // Metric Definitions
 const METRIC_DEFINITIONS = {
@@ -183,27 +169,22 @@ const METRIC_DEFINITIONS = {
   TTFB: "Time To First Byte measures the responsiveness of a web server. It marks the time from the request until the first byte is received.",
 };
 
-
 /** ========== Component ========== */
-
 
 const PerformanceMapLocal = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
   // Default selection
   const [selectedCompany, setSelectedCompany] = useState("Local");
   const [selectedWeek, setSelectedWeek] = useState("");
   const [availableWeeks, setAvailableWeeks] = useState([]);
 
-
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalPlotData, setModalPlotData] = useState(null);
   const [modalMetric, setModalMetric] = useState("");
-
 
   // Fetch data
   useEffect(() => {
@@ -227,7 +208,6 @@ const PerformanceMapLocal = () => {
                 : "N/A",
           }));
 
-
           // Filter valid
           const validData = parsed.filter((r, idx) => {
             if (!r.website) {
@@ -245,7 +225,6 @@ const PerformanceMapLocal = () => {
             return true;
           });
 
-
           // Unique weeks
           const weeks = Array.from(new Set(validData.map((d) => d.weekRange)));
           weeks.sort((a, b) => {
@@ -254,7 +233,6 @@ const PerformanceMapLocal = () => {
             return dateA - dateB;
           });
           setAvailableWeeks(weeks);
-
 
           setData(validData);
           setIsLoading(false);
@@ -271,7 +249,6 @@ const PerformanceMapLocal = () => {
       },
     });
   }, []);
-
 
   // Company select options (Groups + Individuals)
   const companyOptions = useMemo(() => {
@@ -304,7 +281,6 @@ const PerformanceMapLocal = () => {
     return opts;
   }, [selectedCompany]);
 
-
   // Filtered data by company + week
   const filteredData = useMemo(() => {
     if (!data.length) return [];
@@ -329,7 +305,6 @@ const PerformanceMapLocal = () => {
     });
   }, [data, selectedCompany, selectedWeek]);
 
-
   // Build final “series” for each metric
   const plotlySeries = useMemo(() => {
     const seriesByMetric = {};
@@ -347,7 +322,6 @@ const PerformanceMapLocal = () => {
     });
     return seriesByMetric;
   }, [filteredData, selectedCompany]);
-
 
   // Averages
   const averages = useMemo(() => {
@@ -378,7 +352,6 @@ const PerformanceMapLocal = () => {
     return result;
   }, [filteredData]);
 
-
   // Most recent date for shape
   const mostRecentDate = useMemo(() => {
     let allPoints = [];
@@ -388,7 +361,6 @@ const PerformanceMapLocal = () => {
     const dt = getMostRecentDate(allPoints);
     return dt; // May be null
   }, [plotlySeries]);
-
 
   // Current date line in Plotly
   const getCurrentDateLine = (dt) => {
@@ -428,7 +400,6 @@ const PerformanceMapLocal = () => {
     };
   };
 
-
   // Expand modal
   const handleExpand = (plotData, metric) => {
     setModalPlotData(plotData);
@@ -436,12 +407,10 @@ const PerformanceMapLocal = () => {
     onOpen();
   };
 
-
   // Handlers
   const handleCompanyChange = (e) => {
     setSelectedCompany(e.target.value);
   };
-
 
   const handleWeekChange = (e) => {
     setSelectedWeek(e.target.value);
@@ -456,12 +425,10 @@ const PerformanceMapLocal = () => {
     }
   };
 
-
   // Keeps the function, but it's no longer used anywhere:
   const showAllWeeks = () => {
     setSelectedWeek("All Weeks");
   };
-
 
   if (isLoading) {
     return (
@@ -474,7 +441,6 @@ const PerformanceMapLocal = () => {
     );
   }
 
-
   if (error) {
     return (
       <Flex justifyContent="center" alignItems="center" height="50vh" bg="transparent">
@@ -484,7 +450,6 @@ const PerformanceMapLocal = () => {
       </Flex>
     );
   }
-
 
   return (
     <>
@@ -521,6 +486,7 @@ const PerformanceMapLocal = () => {
               border="1px solid rgba(255, 255, 255, 0.6)"
               size="sm"
               _placeholder={{ color: "gray.300" }}
+              color="white" // <-- Added
             >
               {companyOptions}
             </Select>
@@ -541,9 +507,8 @@ const PerformanceMapLocal = () => {
               border="1px solid rgba(255, 255, 255, 0.6)"
               size="sm"
               _placeholder={{ color: "gray.300" }}
+              color="white" // <-- Added
             >
-              {/* “All Weeks” is also an option in the dropdown.
-                  (We still provide it here in case you want to choose it) */}
               <option
                 value="All Weeks"
                 style={
@@ -562,7 +527,6 @@ const PerformanceMapLocal = () => {
                 </option>
               ))}
             </Select>
-            {/* REMOVED: All Weeks button */}
           </Flex>
         </Flex>
 
