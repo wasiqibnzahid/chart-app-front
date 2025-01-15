@@ -683,7 +683,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         colorScheme={
                                                             comparisonMode === "Weekly"
                                                                 ? "teal"
-                                                                : "gray"
+                                                                : "gray.500"
                                                         }
                                                         onClick={() =>
                                                             handleComparisonModeChange("Weekly")
@@ -697,7 +697,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         colorScheme={
                                                             comparisonMode === "Monthly"
                                                                 ? "teal"
-                                                                : "gray"
+                                                                : "gray.600"
                                                         }
                                                         onClick={() =>
                                                             handleComparisonModeChange("Monthly")
@@ -711,7 +711,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         colorScheme={
                                                             comparisonMode === "Yearly"
                                                                 ? "teal"
-                                                                : "gray"
+                                                                : "gray.600"
                                                         }
                                                         onClick={() =>
                                                             handleComparisonModeChange("Yearly")
