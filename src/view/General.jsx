@@ -69,7 +69,7 @@ const METRICS = ["FCP", "TBT", "SPI", "LCP", "CLS"];
 // *** 2) Show units next to average ***
 const METRIC_UNITS = {
     FCP: "s",
-    TBT: "ms",
+    TBT: "s",
     SPI: "s",
     LCP: "s",
     CLS: ""
@@ -78,7 +78,7 @@ const METRIC_UNITS = {
 // *** 3) Adjust thresholds and rename for short acronyms ***
 const THRESHOLDS = {
     FCP: { good: 1.8, needsImprovement: 3.0 },
-    TBT: { good: 200, needsImprovement: 600 },
+    TBT: { good: 0.2, needsImprovement: 0.6 },
     SPI: { good: 3.4, needsImprovement: 5.8 },
     LCP: { good: 2.5, needsImprovement: 4.0 },
     CLS: { good: 0.1, needsImprovement: 0.25 }
@@ -87,7 +87,7 @@ const THRESHOLDS = {
 // *** 4) Tooltip text with short definitions + “What does that mean?” ***
 const RANGES_STRINGS = {
     FCP: "Good: 0–1.8s, Needs Improvement: 1.8–3s, Poor: >3s\nWhat does that mean? Measures time until first content is painted.",
-    TBT: "Good: 0–200ms, Needs Improvement: 200–600ms, Poor: >600ms\nWhat does that mean? Measures main-thread blocking time.",
+    TBT: "Good: 0–0.2s, Needs Improvement: 0.2–0.6s, Poor: >0.6s\nWhat does that mean? Measures main-thread blocking time.",
     SPI: "Good: 0–3.4s, Needs Improvement: 3.4–5.8s, Poor: >5.8s\nWhat does that mean? Measures how quickly content is visually displayed.",
     LCP: "Good: 0–2.5s, Needs Improvement: 2.5–4s, Poor: >4s\nWhat does that mean? Largest element painted.",
     CLS: "Good: 0–0.1, Needs Improvement: 0.1–0.25, Poor: >0.25\nWhat does that mean? Measures layout shift during load."
