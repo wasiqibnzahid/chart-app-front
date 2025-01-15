@@ -55,7 +55,7 @@ const months = [
 const seriesColors: { [key: string]: string } = {
   "TV Azteca": "#3357FF",
   Competition: "#FF5733",
-  AMP: "DAA520",
+  AMP: "#DAA520",
 };
 const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   // States
