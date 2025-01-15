@@ -33,7 +33,6 @@ import {
 import Papa from "papaparse";
 import { FaFilter, FaExpand } from "react-icons/fa";
 
-// Import Plotly component
 import Plot from "react-plotly.js";
 import { Loader } from "../components/common/Loader";
 import { useAsyncFn } from "../hooks/useAsync";
@@ -47,89 +46,63 @@ const parseDate = (dateStr) => {
 // Helper function to get the Monday of the week for a given date
 const getWeekStartDate = (date) => {
     const day = date.getDay(); // Sunday - Saturday : 0 - 6
-    const diff = day === 0 ? -6 : 1 - day; // Adjust when day is Sunday
+    const diff = day === 0 ? -6 : 1 - day; // Adjust if day is Sunday
     const monday = new Date(date);
     monday.setDate(date.getDate() + diff);
-    // Format as "YYYY-MM-DD" with leading zeros
+
     const dd = String(monday.getDate()).padStart(2, "0");
     const mm = String(monday.getMonth() + 1).padStart(2, "0");
     const yyyy = monday.getFullYear();
     return `${yyyy}-${mm}-${dd}`;
 };
 
-// Helper function to format numbers: display without decimals if integer, else with one decimal
+// Format number (no decimals if integer, else 1 decimal)
 const formatNumber = (numStr) => {
     const num = parseFloat(numStr);
     if (isNaN(num)) return "N/A";
     return Number.isInteger(num) ? num.toString() : num.toFixed(1);
 };
 
-// Define the metrics to display (ensure unique names and updated order)
-const METRICS = [
-    "First Contentful Paint",
-    "Total Blocking Time",
-    "Speed Index Performance",
-    "Largest Contentful Paint",
-    "Cumulative Layout Shift"
-];
+// *** 1) Renamed metrics ***
+const METRICS = ["FCP", "TBT", "SPI", "LCP", "CLS"];
 
-// Define units for each metric
+// *** 2) Show units next to average ***
 const METRIC_UNITS = {
-    "First Contentful Paint": "s",
-    "Speed Index Performance": "s",
-    "Total Blocking Time": "ms",
-    "Largest Contentful Paint": "s",
-    "Cumulative Layout Shift": "" // No unit
+    FCP: "s",
+    TBT: "ms",
+    SPI: "s",
+    LCP: "s",
+    CLS: ""
 };
 
-// Thresholds for performance metrics
+// *** 3) Adjust thresholds and rename for short acronyms ***
 const THRESHOLDS = {
-    "First Contentful Paint": {
-        good: 1.8,
-        needsImprovement: 3.0
-    },
-    "Speed Index Performance": {
-        good: 3.4,
-        needsImprovement: 5.8
-    },
-    "Largest Contentful Paint": {
-        good: 2.5,
-        needsImprovement: 4.0
-    },
-    "Total Blocking Time": {
-        good: 200,
-        needsImprovement: 600
-    },
-    "Cumulative Layout Shift": {
-        good: 0.1,
-        needsImprovement: 0.25
-    }
+    FCP: { good: 1.8, needsImprovement: 3.0 },
+    TBT: { good: 200, needsImprovement: 600 },
+    SPI: { good: 3.4, needsImprovement: 5.8 },
+    LCP: { good: 2.5, needsImprovement: 4.0 },
+    CLS: { good: 0.1, needsImprovement: 0.25 }
 };
 
-// Ranges strings for tooltips
+// *** 4) Tooltip text with short definitions + “What does that mean?” ***
 const RANGES_STRINGS = {
-    "First Contentful Paint":
-        "Good: 0–1.8 s, Needs Improvement: 1.8–3 s, Poor: Over 3 s",
-    "Speed Index Performance":
-        "Good: 0–3.4 s, Needs Improvement: 3.4–5.8 s, Poor: Over 5.8 s",
-    "Largest Contentful Paint":
-        "Good: 0–2.5 s, Needs Improvement: 2.5–4 s, Poor: Over 4 s",
-    "Total Blocking Time":
-        "Good: 0–200 ms, Needs Improvement: 200–600 ms, Poor: Over 600 ms",
-    "Cumulative Layout Shift":
-        "Good: 0–0.1, Needs Improvement: 0.1–0.25, Poor: Over 0.25"
+    FCP: "Good: 0–1.8s, Needs Improvement: 1.8–3s, Poor: >3s\nWhat does that mean? Measures time until first content is painted.",
+    TBT: "Good: 0–200ms, Needs Improvement: 200–600ms, Poor: >600ms\nWhat does that mean? Measures main-thread blocking time.",
+    SPI: "Good: 0–3.4s, Needs Improvement: 3.4–5.8s, Poor: >5.8s\nWhat does that mean? Measures how quickly content is visually displayed.",
+    LCP: "Good: 0–2.5s, Needs Improvement: 2.5–4s, Poor: >4s\nWhat does that mean? Largest element painted.",
+    CLS: "Good: 0–0.1, Needs Improvement: 0.1–0.25, Poor: >0.25\nWhat does that mean? Measures layout shift during load."
 };
 
-// Mapping metrics to their corresponding keys in the data
+// *** Map new acronyms to the data keys ***
 const METRIC_KEYS = {
-    "First Contentful Paint": "firstContentfulPaint",
-    "Speed Index Performance": "speedIndex",
-    "Total Blocking Time": "totalBlockingTime",
-    "Largest Contentful Paint": "largestContentfulPaint",
-    "Cumulative Layout Shift": "cumulativeLayoutShift"
+    FCP: "firstContentfulPaint",
+    TBT: "totalBlockingTime",
+    SPI: "speedIndex",
+    LCP: "largestContentfulPaint",
+    CLS: "cumulativeLayoutShift"
 };
 
-// Helper function to calculate the slope of a linear regression
+// Helper: slope of a linear regression
 const calculateSlope = (x, y) => {
     const n = x.length;
     if (n === 0) return 0;
@@ -143,39 +116,30 @@ const calculateSlope = (x, y) => {
     const denominator = n * sum_xx - sum_x * sum_x;
 
     if (denominator === 0) return 0;
-
     return numerator / denominator;
 };
 
-const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
-    // Define the groups and their member companies
-
+const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
     const GROUPS = groups;
-    // Extract group names and individual companies
     const GROUP_NAMES = Object.keys(GROUPS);
     const INDIVIDUAL_COMPANIES = GROUP_NAMES.reduce(
         (acc, group) => acc.concat(GROUPS[group]),
         []
     );
-    // State variables
-    const [data, setData] = useState([]);
 
+    const [data, setData] = useState([]);
     const [selectedCompany, setSelectedCompany] = useState(preSelectedWebsites);
-    const [selectedCategories, setSelectedCategories] = useState([
-        "nota",
-        "video"
-    ]);
+    const [selectedCategories, setSelectedCategories] = useState(["nota", "video"]);
     const [selectedWeek, setSelectedWeek] = useState("");
     const [availableWeeks, setAvailableWeeks] = useState([]);
-    const [comparisonMode, setComparisonMode] = useState("Monthly"); // Preselect "Weekly"
+    const [comparisonMode, setComparisonMode] = useState("Monthly"); // Default
 
     const toast = useToast();
 
-    // Modal state for expanded graph
+    // Modal (expanded graph)
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [modalPlotData, setModalPlotData] = useState(null);
 
-    // Function to handle expand icon click
     const handleExpand = (plotData, metric) => {
         setModalPlotData({ ...plotData, metric });
         onOpen();
@@ -185,63 +149,51 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
 
     useEffect(() => {
         execute().then((res) => {
-            let parsedData = res.map((item, index) => {
+            let parsedData = res.map((item) => {
                 const dateObj = parseDate(item["date"]);
                 const weekStart = getWeekStartDate(dateObj);
 
                 const noteValues = {
-                    date: item["date"], // Column A (YYYY-MM-DD)
-                    company: item["name"].toUpperCase(), // Column B (converted to uppercase)
-                    category: "note", // Column C
-                    firstContentfulPaint: item["note_first_contentful_paint"], // Column D
-                    totalBlockingTime: item["note_total_blocking_time"], // Column E
-                    speedIndex: item["note_speed_index"], // Column F
-                    largestContentfulPaint:
-                        item["note_largest_contentful_paint"], // Column G
-                    cumulativeLayoutShift: item["note_cumulative_layout_shift"], // Column H
-                    week: weekStart // Added week information
+                    date: item["date"],
+                    company: item["name"].toUpperCase(),
+                    category: "note",
+                    firstContentfulPaint: item["note_first_contentful_paint"],
+                    totalBlockingTime: item["note_total_blocking_time"],
+                    speedIndex: item["note_speed_index"],
+                    largestContentfulPaint: item["note_largest_contentful_paint"],
+                    cumulativeLayoutShift: item["note_cumulative_layout_shift"],
+                    week: weekStart
                 };
                 const videoValues = {
-                    date: item["date"], // Column A (YYYY-MM-DD)
-                    company: item["name"].toUpperCase(), // Column B (converted to uppercase)
-                    category: "video", // Column C
-                    firstContentfulPaint: item["video_first_contentful_paint"], // Column D
-                    totalBlockingTime: item["video_total_blocking_time"], // Column E
-                    speedIndex: item["video_speed_index"], // Column F
-                    largestContentfulPaint:
-                        item["video_largest_contentful_paint"], // Column G
-                    cumulativeLayoutShift:
-                        item["video_cumulative_layout_shift"], // Column H
-                    week: weekStart // Added week information
+                    date: item["date"],
+                    company: item["name"].toUpperCase(),
+                    category: "video",
+                    firstContentfulPaint: item["video_first_contentful_paint"],
+                    totalBlockingTime: item["video_total_blocking_time"],
+                    speedIndex: item["video_speed_index"],
+                    largestContentfulPaint: item["video_largest_contentful_paint"],
+                    cumulativeLayoutShift: item["video_cumulative_layout_shift"],
+                    week: weekStart
                 };
                 return [noteValues, videoValues];
             });
 
             parsedData = parsedData.flat();
 
-            // Extract unique weeks and sort them
             const weeks = Array.from(new Set(parsedData.map((d) => d.week)));
-            weeks.sort((a, b) => {
-                const dateA = parseDate(a);
-                const dateB = parseDate(b);
-                return dateA - dateB;
-            });
+            weeks.sort((a, b) => parseDate(a) - parseDate(b));
 
             setAvailableWeeks(weeks);
             setData(parsedData);
-
-            // Preselect the most recent week
             if (weeks.length > 0) {
                 setSelectedWeek(weeks[weeks.length - 1]);
             }
         });
-    }, []);
+    }, [execute]);
 
-    // Generate company options including groups and individual companies
+    // Generate company <option> tags
     const companyOptions = useMemo(() => {
         const options = [];
-
-        // Add individual company options
         INDIVIDUAL_COMPANIES.forEach((company) => {
             options.push(
                 <option key={company} value={company} style={{ color: "black" }}>
@@ -249,15 +201,14 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                 </option>
             );
         });
-
         return options;
-    }, []);
+    }, [INDIVIDUAL_COMPANIES]);
 
-    // Function to get the comparison date based on the selected date and comparison mode
+    const parseDateStr = useCallback((d) => parseDate(d), []);
+
     const getComparisonPeriod = useCallback((currentDateStr, mode) => {
-        const currentDate = parseDate(currentDateStr);
+        const currentDate = parseDateStr(currentDateStr);
         let comparisonDate;
-
         switch (mode) {
             case "Weekly":
                 comparisonDate = new Date(currentDate);
@@ -274,236 +225,175 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
             default:
                 return null;
         }
-
         return comparisonDate;
-    }, []);
+    }, [parseDateStr]);
 
-    // Get the comparison date based on the selected week and comparison mode
     const comparisonDate = useMemo(() => {
         if (
             comparisonMode === "Weekly" ||
             comparisonMode === "Monthly" ||
             comparisonMode === "Yearly"
         ) {
-            if (selectedWeek === "") return null;
+            if (!selectedWeek) return null;
             return getComparisonPeriod(selectedWeek, comparisonMode);
         }
         return null;
     }, [selectedWeek, comparisonMode, getComparisonPeriod]);
 
-    // Memoized function to get filtered data
     const getFilteredData = useCallback(
         (dataSet, dateFilter) => {
             return dataSet.filter((row) => {
-                // Company filtering
                 let companyMatch = false;
-                if (selectedCompany === "") {
-                    companyMatch = true; // No company selected
+                if (!selectedCompany) {
+                    companyMatch = true;
                 } else if (GROUP_NAMES.includes(selectedCompany)) {
-                    // Group selected
                     const groupCompanies = GROUPS[selectedCompany].map((c) =>
                         c.toUpperCase()
                     );
                     companyMatch = groupCompanies.includes(row.company);
                 } else {
-                    // Individual company selected
-                    companyMatch =
-                        row.company === selectedCompany.toUpperCase();
+                    companyMatch = row.company === selectedCompany.toUpperCase();
                 }
 
-                // Category filtering
                 const categoryMatch =
                     selectedCategories.length === 0 ||
                     selectedCategories.includes(row.category);
 
-                // Time filtering
                 let timeMatch = true;
                 if (dateFilter) {
-                    const rowDate = parseDate(row.date);
-                    const filterDate = parseDate(dateFilter);
+                    const rowDate = parseDateStr(row.date);
+                    const filterDate = parseDateStr(dateFilter);
 
                     if (comparisonMode === "Weekly") {
-                        // Filter by week
                         timeMatch = row.week === dateFilter;
                     } else if (comparisonMode === "Monthly") {
-                        // Filter by month
                         timeMatch =
-                            rowDate.getFullYear() ===
-                                filterDate.getFullYear() &&
+                            rowDate.getFullYear() === filterDate.getFullYear() &&
                             rowDate.getMonth() === filterDate.getMonth();
                     } else if (comparisonMode === "Yearly") {
-                        // Filter by year
                         timeMatch =
                             rowDate.getFullYear() === filterDate.getFullYear();
-                    } else {
-                        // Default to no time filter
-                        timeMatch = true;
                     }
                 }
-
                 return companyMatch && categoryMatch && timeMatch;
             });
         },
-        [selectedCompany, selectedCategories, comparisonMode]
+        [selectedCompany, selectedCategories, comparisonMode, parseDateStr, GROUP_NAMES, GROUPS]
     );
 
-    // Memoize the filtered data
     const filteredDataMemo = useMemo(() => {
         return getFilteredData(data, selectedWeek);
     }, [getFilteredData, data, selectedWeek]);
 
-    // Filtered data for comparison
     const comparisonData = useMemo(() => {
         if (!comparisonDate) return [];
-
         let comparisonDateStr = "";
         if (comparisonMode === "Weekly") {
             comparisonDateStr = getWeekStartDate(comparisonDate);
-        } else if (
-            comparisonMode === "Monthly" ||
-            comparisonMode === "Yearly"
-        ) {
+        } else if (comparisonMode === "Monthly" || comparisonMode === "Yearly") {
             const yyyy = comparisonDate.getFullYear();
             const mm = String(comparisonDate.getMonth() + 1).padStart(2, "0");
             const dd = String(comparisonDate.getDate()).padStart(2, "0");
             comparisonDateStr = `${yyyy}-${mm}-${dd}`;
         }
-
         return getFilteredData(data, comparisonDateStr);
     }, [getFilteredData, data, comparisonDate, comparisonMode]);
 
-    // Calculate averages for current data
     const averages = useMemo(() => {
         if (filteredDataMemo.length === 0) return {};
-
         const metricSums = {};
-        METRICS.forEach((metric) => {
-            metricSums[metric] = 0;
+        METRICS.forEach((m) => {
+            metricSums[m] = 0;
         });
-
         filteredDataMemo.forEach((row) => {
-            METRICS.forEach((metric) => {
-                const key = METRIC_KEYS[metric];
-                const value = parseFloat(row[key]);
-                if (!isNaN(value)) {
-                    metricSums[metric] += value;
+            METRICS.forEach((m) => {
+                const key = METRIC_KEYS[m];
+                const val = parseFloat(row[key]);
+                if (!isNaN(val)) {
+                    metricSums[m] += val;
                 }
             });
         });
-
         const metricAverages = {};
-        METRICS.forEach((metric) => {
-            metricAverages[metric] = (
-                metricSums[metric] / filteredDataMemo.length
+        METRICS.forEach((m) => {
+            metricAverages[m] = (
+                metricSums[m] / filteredDataMemo.length
             ).toFixed(2);
         });
-
         return metricAverages;
     }, [filteredDataMemo]);
 
-    // Calculate averages for comparison data
     const comparisonAverages = useMemo(() => {
         if (comparisonData.length === 0) return {};
-
         const metricSums = {};
-        METRICS.forEach((metric) => {
-            metricSums[metric] = 0;
+        METRICS.forEach((m) => {
+            metricSums[m] = 0;
         });
-
         comparisonData.forEach((row) => {
-            METRICS.forEach((metric) => {
-                const key = METRIC_KEYS[metric];
-                const value = parseFloat(row[key]);
-                if (!isNaN(value)) {
-                    metricSums[metric] += value;
+            METRICS.forEach((m) => {
+                const key = METRIC_KEYS[m];
+                const val = parseFloat(row[key]);
+                if (!isNaN(val)) {
+                    metricSums[m] += val;
                 }
             });
         });
-
         const metricAverages = {};
-        METRICS.forEach((metric) => {
-            metricAverages[metric] = (
-                metricSums[metric] / comparisonData.length
+        METRICS.forEach((m) => {
+            metricAverages[m] = (
+                metricSums[m] / comparisonData.length
             ).toFixed(2);
         });
-
         return metricAverages;
     }, [comparisonData]);
 
-    // Calculate percentage differences
     const percentageDifferences = useMemo(() => {
-        // if (!comparisonDate) return {};
-
-        const differences = {};
-
-        METRICS.forEach((metric) => {
-            const current = parseFloat(+averages?.[metric] || 0);
-            const comparison = parseFloat(+comparisonAverages?.[metric] || 0);
-            if (isNaN(current) || isNaN(comparison)) {
-                differences[metric] = 0;
+        const diffs = {};
+        METRICS.forEach((m) => {
+            const current = parseFloat(+averages[m] || 0);
+            const prev = parseFloat(+comparisonAverages[m] || 0);
+            if (isNaN(current) || isNaN(prev)) {
+                diffs[m] = 0;
             } else {
-                // Calculate percentage difference and round to whole number
-                const diff =
-                    ((current - comparison) / (comparison || current || 1)) *
-                    100;
-                differences[metric] = Math.round(diff);
+                const diff = ((current - prev) / (prev || current || 1)) * 100;
+                diffs[m] = Math.round(diff);
             }
         });
+        return diffs;
+    }, [averages, comparisonAverages]);
 
-        return differences;
-    }, [averages, comparisonAverages, comparisonDate]);
-
-    // Determine color based on percentage difference
     const getDifferenceColor = (metric) => {
         const diff = parseFloat(percentageDifferences[metric]);
-        if (isNaN(diff)) return "gray.300"; // N/A
-
-        // For metrics where lower is better
+        if (isNaN(diff)) return "gray.300";
+        // Lower is better, so positive => improvement
         if (diff > 0) {
-            // Improvement
             return "green.400";
         } else if (diff < 0) {
-            // Deterioration
-            return "red.400";
-        } else {
-            return "gray.300"; // No change
-        }
-    };
-
-    // Function to get performance color based on thresholds
-    const getPerformanceColor = (metric, value) => {
-        if (!THRESHOLDS[metric] || isNaN(value)) {
-            return "gray.300"; // default color
-        }
-
-        const thresholds = THRESHOLDS[metric];
-
-        if (value <= thresholds.good) {
-            return "green.400";
-        } else if (value <= thresholds.needsImprovement) {
-            return "orange.400";
-        } else {
             return "red.400";
         }
+        return "gray.300";
     };
 
-    // Handle company selection
+    const getPerformanceColor = (metric, val) => {
+        if (!THRESHOLDS[metric] || isNaN(val)) return "gray.300";
+        const { good, needsImprovement } = THRESHOLDS[metric];
+        if (val <= good) return "green.400";
+        if (val <= needsImprovement) return "orange.400";
+        return "red.400";
+    };
+
     const handleCompanyChange = (e) => {
         setSelectedCompany(e.target.value);
-        // Removed setSelectedWeek to persist week selection
     };
 
-    // Handle category selection
-    const handleCategoryChange = (values) => {
-        if (values !== "") {
-            setSelectedCategories(values);
-            return;
+    const handleCategoryChange = (vals) => {
+        if (vals !== "") {
+            setSelectedCategories(vals);
+        } else {
+            setSelectedCategories(["note", "video"]);
         }
-        setSelectedCategories(["note", "video"]);
-        // Removed setSelectedWeek to persist week selection
     };
 
-    // Handle week selection
     const handleWeekChange = (e) => {
         setSelectedWeek(e.target.value);
         toast({
@@ -515,7 +405,6 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
         });
     };
 
-    // Reset week selection
     const resetWeekSelection = () => {
         setSelectedWeek("");
         toast({
@@ -527,7 +416,6 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
         });
     };
 
-    // Handle comparison mode selection
     const handleComparisonModeChange = (mode) => {
         setComparisonMode(mode);
         toast({
@@ -545,97 +433,71 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
         });
     };
 
-    // **Prepare data for Plotly graphs based on filtered data**
+    // Plot data
     const plotlyData = useMemo(() => {
-        // Sort data by date
-        const sortedData = [...filteredDataMemo].sort(
+        const sorted = [...filteredDataMemo].sort(
             (a, b) => parseDate(a.date) - parseDate(b.date)
         );
 
-        // Check if multiple categories are selected
-        const shouldAggregate = selectedCategories.length > 1;
+        const shouldAggregate =
+            selectedCategories.length > 1 || GROUP_NAMES.includes(selectedCompany);
 
-        if (shouldAggregate || GROUP_NAMES.includes(selectedCompany)) {
-            // Group data by date and compute average per metric
+        if (shouldAggregate) {
             const dataByDate = {};
-
-            sortedData.forEach((row) => {
+            sorted.forEach((row) => {
                 if (!dataByDate[row.date]) {
                     dataByDate[row.date] = { count: 0 };
-                    METRICS.forEach((metric) => {
-                        dataByDate[row.date][metric] = 0;
+                    METRICS.forEach((m) => {
+                        dataByDate[row.date][m] = 0;
                     });
                 }
                 dataByDate[row.date].count += 1;
-                METRICS.forEach((metric) => {
-                    const key = METRIC_KEYS[metric];
-                    const value = parseFloat(row[key]);
-                    if (!isNaN(value)) {
-                        dataByDate[row.date][metric] += value;
-                    }
+                METRICS.forEach((m) => {
+                    const key = METRIC_KEYS[m];
+                    const val = parseFloat(row[key]);
+                    if (!isNaN(val)) dataByDate[row.date][m] += val;
                 });
             });
-
-            // Compute averages
             const averagedData = Object.keys(dataByDate)
-                .map((date) => {
-                    const obj = { date };
-                    METRICS.forEach((metric) => {
-                        obj[metric] =
-                            (
-                                dataByDate[date][metric] /
-                                dataByDate[date].count
-                            ).toFixed(2) || 0;
+                .map((dt) => {
+                    const obj = { date: dt };
+                    METRICS.forEach((m) => {
+                        obj[m] = (
+                            dataByDate[dt][m] / dataByDate[dt].count
+                        ).toFixed(2);
                     });
                     return obj;
                 })
                 .sort((a, b) => parseDate(a.date) - parseDate(b.date));
 
-            // Prepare plotly data
             return averagedData.map((row) => {
                 const obj = { date: row.date };
-                METRICS.forEach((metric) => {
-                    obj[metric] = parseFloat(row[metric]) || 0;
+                METRICS.forEach((m) => {
+                    obj[m] = parseFloat(row[m]) || 0;
                 });
                 return obj;
             });
         } else {
-            // Individual company or single category selected, use existing data
-            return sortedData.map((row) => {
-                const obj = { date: row.date };
-                METRICS.forEach((metric) => {
-                    const key = METRIC_KEYS[metric];
-                    obj[metric] = parseFloat(row[key]) || 0;
+            return sorted.map((r) => {
+                const obj = { date: r.date };
+                METRICS.forEach((m) => {
+                    const key = METRIC_KEYS[m];
+                    obj[m] = parseFloat(r[key]) || 0;
                 });
                 return obj;
             });
         }
-    }, [filteredDataMemo, selectedCategories, selectedCompany]);
+    }, [filteredDataMemo, selectedCategories, selectedCompany, GROUP_NAMES, METRICS]);
 
-    // **Determine the full date range for the filtered data**
-    const dateRange = useMemo(() => {
-        if (plotlyData.length === 0) return { min: null, max: null };
-        const dates = plotlyData.map((d) => parseDate(d.date));
-        const minDate = new Date(Math.min(...dates));
-        const maxDate = new Date(Math.max(...dates));
-        return { min: minDate, max: maxDate };
-    }, [plotlyData]);
-
-    // **Calculate trendline and determine color for each metric**
+    // Trend data
     const trendData = useMemo(() => {
-        const trends = {};
-
-        METRICS.forEach((metric) => {
-            const plotDataPoints = plotlyData.map((d) =>
-                parseDate(d.date).getTime()
-            );
-            const plotMetricValues = plotlyData.map((d) => d[metric]);
-
-            const slope = calculateSlope(plotDataPoints, plotMetricValues);
-            trends[metric] = slope;
+        const t = {};
+        METRICS.forEach((m) => {
+            const xVals = plotlyData.map((d) => parseDate(d.date).getTime());
+            const yVals = plotlyData.map((d) => d[m]);
+            t[m] = calculateSlope(xVals, yVals);
         });
-
-        return trends;
+        return t;
     }, [plotlyData]);
 
     return (
@@ -649,31 +511,28 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
             ) : (
                 <Flex
                     direction="column"
-                    gap={4} // Reduced gap to minimize empty space
+                    // **Reduced spacing & padding** for a tighter layout
+                    gap={3}
                     width="100%"
                     align="center"
-                    bg="linear-gradient(90deg, #000000, #7800ff)" // Consistent background
-                    p={4} // Reduced padding to minimize empty space
+                    bg="linear-gradient(90deg, #000000, #7800ff)"
+                    p={3} 
                     borderRadius="15px"
-                    borderColor="gray.300" // Same border as panels
+                    borderColor="gray.300"
                     mx="auto"
                 >
-                    {/* Header Section */}
+                    {/* Header Row */}
                     <Flex
                         width="100%"
                         justifyContent="space-between"
                         alignItems="center"
                         flexWrap="wrap"
-                        gap={2} // Reduced gap
-                        bg="transparent" // Removed background
+                        gap={2} 
+                        bg="transparent"
                     >
-                        {/* Company Selector and Filter Icon */}
+                        {/* Company Selector */}
                         <Flex alignItems="center" gap={2}>
-                            <Text
-                                color="white"
-                                fontSize="md"
-                                fontWeight="semibold"
-                            >
+                            <Text color="white" fontSize="md" fontWeight="semibold">
                                 Company:
                             </Text>
                             <Select
@@ -694,16 +553,16 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                 {companyOptions}
                             </Select>
 
-                            {/* Filter Icon with Popover */}
+                            {/* Filter Popover */}
                             <Popover>
                                 <PopoverTrigger>
                                     <IconButton
                                         aria-label="Filter Controls"
                                         icon={<FaFilter />}
-                                        color="white" // Make the icon white
+                                        color="white"
                                         bg="transparent"
                                         _hover={{ bg: "gray.700" }}
-                                        size="sm" // Smaller size to reduce padding
+                                        size="sm"
                                     />
                                 </PopoverTrigger>
                                 <PopoverContent
@@ -714,15 +573,12 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                 >
                                     <PopoverArrow bg="gray.800" />
                                     <PopoverCloseButton color="white" />
-                                    <PopoverHeader
-                                        color="white"
-                                        fontWeight="bold"
-                                    >
+                                    <PopoverHeader color="white" fontWeight="bold">
                                         Controls
                                     </PopoverHeader>
                                     <PopoverBody>
                                         <VStack align="start" spacing={2}>
-                                            {/* Category Selection */}
+                                            {/* Category */}
                                             <Box>
                                                 <Text
                                                     fontSize="sm"
@@ -734,34 +590,20 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                                 <CheckboxGroup
                                                     colorScheme="teal"
                                                     value={selectedCategories}
-                                                    onChange={
-                                                        handleCategoryChange
-                                                    }
+                                                    onChange={handleCategoryChange}
                                                 >
                                                     <HStack spacing={2}>
                                                         <Checkbox
                                                             value="note"
                                                             bg="transparent"
-                                                            _checked={{
-                                                                bg: "transparent",
-                                                                color: "teal.300",
-                                                                borderColor:
-                                                                    "teal.300"
-                                                            }}
-                                                            size="sm" // Smaller size
+                                                            size="sm"
                                                         >
                                                             Nota
                                                         </Checkbox>
                                                         <Checkbox
                                                             value="video"
                                                             bg="transparent"
-                                                            _checked={{
-                                                                bg: "transparent",
-                                                                color: "teal.300",
-                                                                borderColor:
-                                                                    "teal.300"
-                                                            }}
-                                                            size="sm" // Smaller size
+                                                            size="sm"
                                                         >
                                                             Video
                                                         </Checkbox>
@@ -769,7 +611,7 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                                 </CheckboxGroup>
                                             </Box>
 
-                                            {/* Week Filter */}
+                                            {/* Week */}
                                             <Box>
                                                 <Text
                                                     fontSize="sm"
@@ -782,50 +624,39 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                                     value={selectedWeek}
                                                     onChange={handleWeekChange}
                                                     placeholder="Select Week"
-                                                    bg="transparent" // Changed from "white" to "transparent"
-                                                    color="white" // Changed text color to white
+                                                    bg="transparent"
+                                                    color="white"
                                                     borderRadius="md"
-                                                    size="sm" // Smaller size
+                                                    size="sm"
                                                     width="100%"
-                                                    border="1px solid rgba(255, 255, 255, 0.6)" // Added semi-transparent white border
-                                                    _placeholder={{
-                                                        color: "gray.300"
-                                                    }} // Placeholder color
+                                                    border="1px solid rgba(255, 255, 255, 0.6)"
+                                                    _placeholder={{ color: "gray.300" }}
                                                     _focus={{
                                                         borderColor: "teal.300",
                                                         boxShadow: "none"
-                                                    }} // Focus state
-                                                    _hover={{
-                                                        borderColor: "teal.200"
-                                                    }} // Hover state
+                                                    }}
+                                                    _hover={{ borderColor: "teal.200" }}
                                                 >
-                                                    {availableWeeks.map(
-                                                        (week) => (
-                                                            <option
-                                                                key={week}
-                                                                value={week}
-                                                            >
-                                                                {week}
-                                                            </option>
-                                                        )
-                                                    )}
+                                                    {availableWeeks.map((week) => (
+                                                        <option key={week} value={week}>
+                                                            {week}
+                                                        </option>
+                                                    ))}
                                                 </Select>
                                                 {selectedWeek && (
                                                     <Button
                                                         colorScheme="red"
                                                         variant="outline"
-                                                        size="xs" // Extra small size
-                                                        onClick={
-                                                            resetWeekSelection
-                                                        }
-                                                        mt={1} // Reduced top margin
+                                                        size="xs"
+                                                        onClick={resetWeekSelection}
+                                                        mt={1}
                                                     >
                                                         Clear
                                                     </Button>
                                                 )}
                                             </Box>
 
-                                            {/* Comparison Mode Selection */}
+                                            {/* Comparison Mode */}
                                             <Box>
                                                 <Text
                                                     fontSize="sm"
@@ -837,49 +668,40 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                                 <HStack spacing={2}>
                                                     <Button
                                                         colorScheme={
-                                                            comparisonMode ===
-                                                            "Weekly"
+                                                            comparisonMode === "Weekly"
                                                                 ? "teal"
                                                                 : "gray"
                                                         }
                                                         onClick={() =>
-                                                            handleComparisonModeChange(
-                                                                "Weekly"
-                                                            )
+                                                            handleComparisonModeChange("Weekly")
                                                         }
-                                                        size="xs" // Extra small size
+                                                        size="xs"
                                                     >
                                                         Weekly
                                                     </Button>
                                                     <Button
                                                         colorScheme={
-                                                            comparisonMode ===
-                                                            "Monthly"
+                                                            comparisonMode === "Monthly"
                                                                 ? "teal"
                                                                 : "gray"
                                                         }
                                                         onClick={() =>
-                                                            handleComparisonModeChange(
-                                                                "Monthly"
-                                                            )
+                                                            handleComparisonModeChange("Monthly")
                                                         }
-                                                        size="xs" // Extra small size
+                                                        size="xs"
                                                     >
                                                         Monthly
                                                     </Button>
                                                     <Button
                                                         colorScheme={
-                                                            comparisonMode ===
-                                                            "Yearly"
+                                                            comparisonMode === "Yearly"
                                                                 ? "teal"
                                                                 : "gray"
                                                         }
                                                         onClick={() =>
-                                                            handleComparisonModeChange(
-                                                                "Yearly"
-                                                            )
+                                                            handleComparisonModeChange("Yearly")
                                                         }
-                                                        size="xs" // Extra small size
+                                                        size="xs"
                                                     >
                                                         Yearly
                                                     </Button>
@@ -892,58 +714,44 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                         </Flex>
                     </Flex>
 
-                    {/* Metrics Display */}
+                    {/* Metrics Grid */}
                     <Grid
                         templateColumns={{
-                            base: "repeat(1, 1fr)", // 1 column on small screens
-                            sm: "repeat(2, 1fr)", // 2 columns on small to medium screens
-                            md: "repeat(3, 1fr)", // 3 columns on medium screens
-                            lg: "repeat(4, 1fr)", // 4 columns on large screens
-                            xl: "repeat(5, 1fr)" // 5 columns for 5 metrics
+                            base: "repeat(1, 1fr)",
+                            sm: "repeat(2, 1fr)",
+                            md: "repeat(3, 1fr)",
+                            lg: "repeat(4, 1fr)",
+                            xl: "repeat(5, 1fr)"
                         }}
-                        gap={4} // Reduced gap for closer spacing
+                        gap={3}
                         width="100%"
-                        overflowX="auto" // Allow horizontal scrolling on smaller screens
+                        overflowX="auto"
                     >
                         {METRICS.map((metric) => {
-                            // Prepare Plotly data for individual or averaged graph
-                            const plotDataPoints = plotlyData.map(
-                                (d) => d.date
-                            );
-                            const plotMetricValues = plotlyData.map(
-                                (d) => d[metric]
-                            );
+                            const plotDataPoints = plotlyData.map((d) => d.date);
+                            const plotMetricValues = plotlyData.map((d) => d[metric]);
 
-                            // Calculate trendline slope
                             const xValues = plotlyData.map((d) =>
                                 parseDate(d.date).getTime()
                             );
-                            const yValues = plotMetricValues;
-                            const slope = calculateSlope(xValues, yValues);
+                            const slope = calculateSlope(xValues, plotMetricValues);
                             const lineColor = slope < 0 ? "green" : "red";
 
                             const individualPlotData = {
                                 x: plotDataPoints,
                                 y: plotMetricValues,
                                 type: "scatter",
-                                mode: "lines+markers", // Keeps markers for hover points
-                                marker: {
-                                    color: "#82ca9d",
-                                    size: 6 // Adjust marker size as needed
-                                },
-                                line: {
-                                    color: lineColor, // Dynamic color based on trend
-                                    width: 2 // Reduced line width for less boldness
-                                },
+                                mode: "lines+markers",
+                                marker: { color: "#82ca9d", size: 6 },
+                                line: { color: lineColor, width: 2 },
                                 name: metric,
-                                // **Updated hovertemplate to show only full date and value**
-                                hovertemplate:
-                                    "%{x|%B %d, %Y}<br>%{y}<extra></extra>"
+                                hovertemplate: "%{x|%B %d, %Y}<br>%{y}<extra></extra>"
                             };
 
                             return (
                                 <Tooltip
                                     key={metric}
+                                    // 4) Use our new RANGES_STRINGS with small definition
                                     label={RANGES_STRINGS[metric]}
                                     bg="gray.700"
                                     color="white"
@@ -953,9 +761,9 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                 >
                                     <Box
                                         bg="transparent"
+                                        p={3} 
                                         border="none"
                                         borderRadius="lg"
-                                        p={4}
                                         transition="box-shadow 0.2s, transform 0.2s"
                                         _hover={{
                                             boxShadow: "lg",
@@ -963,21 +771,21 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                         }}
                                         cursor="pointer"
                                         minW="140px"
-                                        minH="250px" // Increased height to accommodate y-axis
+                                        minH="220px"
                                         display="flex"
                                         flexDirection="column"
                                         justifyContent="space-between"
-                                        position="relative" // To position the expand icon
+                                        position="relative"
                                     >
                                         <Flex direction="column" align="center">
-                                            {/* Title and Expand Button Section */}
+                                            {/* Title & Expand */}
                                             <Flex
                                                 width="100%"
                                                 justifyContent="space-between"
                                                 alignItems="center"
                                             >
                                                 <Box
-                                                    height="50px"
+                                                    height="40px"
                                                     display="flex"
                                                     alignItems="center"
                                                     justifyContent="center"
@@ -993,183 +801,111 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                                         {metric}
                                                     </Text>
                                                 </Box>
-                                                {/* Move Expand Button Here */}
                                                 <IconButton
                                                     aria-label="Expand Graph"
                                                     icon={<FaExpand />}
                                                     color="white"
                                                     bg="transparent"
-                                                    _hover={{
-                                                        bg: "transparent"
-                                                    }}
+                                                    _hover={{ bg: "transparent" }}
                                                     size="sm"
                                                     onClick={() =>
-                                                        handleExpand(
-                                                            individualPlotData,
-                                                            metric
-                                                        )
+                                                        handleExpand(individualPlotData, metric)
                                                     }
                                                 />
                                             </Flex>
 
-                                            {/* Number and Difference Section */}
-                                            <Flex
-                                                direction="column"
-                                                justify="center"
-                                                align="center"
-                                                mt={2}
-                                            >
-                                                <Flex
-                                                    alignItems="center"
-                                                    justify="center"
-                                                >
+                                            {/* Value & Comparison */}
+                                            <Flex direction="column" justify="center" align="center" mt={1}>
+                                                <Flex alignItems="center" justifyContent="center">
                                                     <Text
                                                         color="white"
                                                         fontSize="2xl"
                                                         fontWeight="bold"
                                                         textAlign="center"
                                                     >
-                                                        {formatNumber(
-                                                            averages[metric]
-                                                        ) || "N/A"}{" "}
-                                                        {/* Removed unit labels */}
+                                                        {formatNumber(averages[metric])}{" "}
+                                                        {METRIC_UNITS[metric]} 
                                                     </Text>
-                                                    {/* Add circle indicating performance */}
+                                                    {/* Performance Circle */}
                                                     <Box
                                                         w={3}
                                                         h={3}
                                                         bg={getPerformanceColor(
                                                             metric,
-                                                            parseFloat(
-                                                                +averages[
-                                                                    metric
-                                                                ]
-                                                            )
+                                                            parseFloat(+averages[metric])
                                                         )}
                                                         borderRadius="50%"
                                                         ml={2}
                                                     />
                                                 </Flex>
-                                                {comparisonMode !==
-                                                    "Current" && (
+                                                {comparisonMode !== "Current" && (
                                                     <>
                                                         <Text
-                                                            color={getDifferenceColor(
-                                                                metric
-                                                            )}
+                                                            color={getDifferenceColor(metric)}
                                                             fontSize="sm"
                                                             fontWeight="bold"
                                                             mt={1}
                                                         >
-                                                            {percentageDifferences[
-                                                                metric
-                                                            ] !== "N/A"
-                                                                ? `${Math.abs(
-                                                                      percentageDifferences[
-                                                                          metric
-                                                                      ]
-                                                                  )}% ${
-                                                                      percentageDifferences[
-                                                                          metric
-                                                                      ] > 0
-                                                                          ? "↑"
-                                                                          : "↓"
-                                                                  }`
-                                                                : 0}
+                                                            {Math.abs(percentageDifferences[metric])}%
+                                                            {percentageDifferences[metric] > 0
+                                                                ? " ↑"
+                                                                : " ↓"}
                                                         </Text>
-                                                        {percentageDifferences[
-                                                            metric
-                                                        ] !== "N/A" && (
-                                                            <Text
-                                                                color="gray.300"
-                                                                fontSize="sm"
-                                                                mt={0.5}
-                                                            >
-                                                                {comparisonMode ===
-                                                                "Weekly"
-                                                                    ? "vs Last Week"
-                                                                    : comparisonMode ===
-                                                                      "Monthly"
-                                                                    ? "vs Last Month"
-                                                                    : "vs Last Year"}
-                                                            </Text>
-                                                        )}
+                                                        <Text
+                                                            color="gray.300"
+                                                            fontSize="sm"
+                                                            mt={0.5}
+                                                        >
+                                                            {comparisonMode === "Weekly"
+                                                                ? "vs Last Week"
+                                                                : comparisonMode === "Monthly"
+                                                                ? "vs Last Month"
+                                                                : "vs Last Year"}
+                                                        </Text>
                                                     </>
                                                 )}
                                             </Flex>
                                         </Flex>
 
-                                        {/* Graph Section */}
-                                        <Box
-                                            mt={4} // Increased margin-top for more space between labels and graph
-                                            width="100%"
-                                            height="150px" // Reduced height to allow more space below
-                                            position="relative"
-                                            className="plot-container"
-                                        >
-                                            <Box
-                                                className="plot-container"
-                                                position="relative"
-                                                height="100%"
-                                                width="100%"
-                                            >
-                                                <Plot
-                                                    data={[individualPlotData]}
-                                                    layout={{
-                                                        autosize: true,
-                                                        margin: {
-                                                            l: 40,
-                                                            r: 10,
-                                                            t: 10,
-                                                            b: 30
-                                                        }, // Adjusted margins
-                                                        xaxis: {
-                                                            tickfont: {
-                                                                size: 10,
-                                                                color: "white"
-                                                            }, // Set x-axis numbers to white
-                                                            type: "date",
-                                                            showgrid: false,
-                                                            zeroline: false,
-                                                            showline: false,
-                                                            ticks: "",
-                                                            tickformat: "%b", // Display abbreviated month names
-                                                            dtick: "M1", // Tick every month
-                                                            showticklabels: true
-                                                        },
-                                                        yaxis: {
-                                                            tickfont: {
-                                                                size: 10,
-                                                                color: "white"
-                                                            }, // Set y-axis numbers to white
-                                                            showgrid: false,
-                                                            zeroline: false,
-                                                            showline: false,
-                                                            ticks: "",
-                                                            showticklabels: true,
-                                                            // Removed y-axis title
-                                                            title: {
-                                                                text: "" // No title
-                                                            }
-                                                        },
-                                                        showlegend: false,
-                                                        hovermode: "closest", // Ensures hover on closest point
-                                                        paper_bgcolor:
-                                                            "transparent",
-                                                        plot_bgcolor:
-                                                            "transparent"
-                                                    }}
-                                                    config={{
-                                                        displayModeBar: false,
-                                                        responsive: true,
-                                                        hovermode: "closest" // Ensures hover on closest point
-                                                    }}
-                                                    style={{
-                                                        width: "100%",
-                                                        height: "100%"
-                                                    }}
-                                                />
-                                            </Box>
+                                        {/* Plotly mini-graph */}
+                                        <Box mt={2} width="100%" height="120px" position="relative">
+                                            <Plot
+                                                data={[individualPlotData]}
+                                                layout={{
+                                                    autosize: true,
+                                                    margin: { l: 40, r: 10, t: 10, b: 30 },
+                                                    xaxis: {
+                                                        tickfont: { size: 10, color: "white" },
+                                                        type: "date",
+                                                        showgrid: false,
+                                                        zeroline: false,
+                                                        showline: false,
+                                                        ticks: "",
+                                                        tickformat: "%b", 
+                                                        dtick: "M1",
+                                                        showticklabels: true
+                                                    },
+                                                    yaxis: {
+                                                        tickfont: { size: 10, color: "white" },
+                                                        showgrid: false,
+                                                        zeroline: false,
+                                                        showline: false,
+                                                        ticks: "",
+                                                        showticklabels: true,
+                                                        title: { text: "" }
+                                                    },
+                                                    showlegend: false,
+                                                    hovermode: "closest",
+                                                    paper_bgcolor: "transparent",
+                                                    plot_bgcolor: "transparent"
+                                                }}
+                                                config={{
+                                                    displayModeBar: false,
+                                                    responsive: true,
+                                                    hovermode: "closest"
+                                                }}
+                                                style={{ width: "100%", height: "100%" }}
+                                            />
                                         </Box>
                                     </Box>
                                 </Tooltip>
@@ -1177,19 +913,12 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                         })}
                     </Grid>
 
-                    {/* Modal for Expanded Graph */}
-                    <Modal
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        size="xl"
-                        isCentered
-                    >
+                    {/* Expanded Modal */}
+                    <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
                         <ModalOverlay />
                         <ModalContent bg="gray.800" color="white">
                             <ModalHeader>
-                                {modalPlotData
-                                    ? modalPlotData.metric
-                                    : "Expanded Graph"}
+                                {modalPlotData ? modalPlotData.metric : "Expanded Graph"}
                             </ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
@@ -1198,64 +927,36 @@ const General = ({ fetchData, groups, preSelectedWebsites="ADN40" }) => {
                                         data={[modalPlotData]}
                                         layout={{
                                             autosize: true,
-                                            margin: {
-                                                l: 50,
-                                                r: 50,
-                                                t: 50,
-                                                b: 50
-                                            },
+                                            margin: { l: 50, r: 50, t: 50, b: 50 },
                                             xaxis: {
-                                                tickfont: {
-                                                    size: 12,
-                                                    color: "white"
-                                                }, // Set x-axis numbers to white
+                                                tickfont: { size: 12, color: "white" },
                                                 type: "date",
                                                 title: "Date",
-                                                titlefont: {
-                                                    size: 14,
-                                                    color: "white"
-                                                },
-                                                // **Updated tickformat to full date format**
-                                                tickformat: "%B %d, %Y", // Displays as "October 5, 2024"
-                                                dtick: "M1", // Tick every month
+                                                titlefont: { size: 14, color: "white" },
+                                                tickformat: "%B %d, %Y",
+                                                dtick: "M1",
                                                 showticklabels: true
                                             },
                                             yaxis: {
-                                                tickfont: {
-                                                    size: 12,
-                                                    color: "white"
-                                                }, // Set y-axis numbers to white
-                                                showgrid: true, // Optionally show grid in modal
+                                                tickfont: { size: 12, color: "white" },
+                                                showgrid: true,
                                                 zeroline: false,
                                                 showline: false,
                                                 ticks: "",
                                                 showticklabels: true,
-                                                title: {
-                                                    text: "" // No title
-                                                }
+                                                title: { text: "" }
                                             },
                                             showlegend: false,
-                                            hovermode: "closest", // Ensures hover on closest point
+                                            hovermode: "closest",
                                             paper_bgcolor: "transparent",
                                             plot_bgcolor: "transparent"
                                         }}
                                         config={{
-                                            displayModeBar: true, // Enable mode bar in modal
+                                            displayModeBar: true,
                                             responsive: true,
-                                            hovermode: "closest" // Ensures hover on closest point
+                                            hovermode: "closest"
                                         }}
-                                        // **Updated hovertemplate to show only full date and value**
-                                        data={[
-                                            {
-                                                ...modalPlotData,
-                                                hovertemplate:
-                                                    "%{x|%B %d, %Y}<br>%{y}<extra></extra>"
-                                            }
-                                        ]}
-                                        style={{
-                                            width: "100%",
-                                            height: "100%"
-                                        }}
+                                        style={{ width: "100%", height: "100%" }}
                                     />
                                 )}
                             </ModalBody>
