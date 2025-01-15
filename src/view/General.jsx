@@ -84,7 +84,7 @@ const METRIC_UNITS = {
 
 // Thresholds for performance metrics
 const THRESHOLDS = {
-    "First Contentful Paint": {
+    "First Contentful": {
         good: 1.8,
         needsImprovement: 3.0
     },
