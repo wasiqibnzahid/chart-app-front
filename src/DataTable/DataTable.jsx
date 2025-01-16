@@ -533,7 +533,7 @@ const DataTable = () => {
   if (loading) {
     return (
       <Box
-        p={5}
+        p={2.5}
         minH="100vh"
         color="white"
         display="flex"
@@ -551,7 +551,7 @@ const DataTable = () => {
   if (error) {
     return (
       <Box
-        p={5}
+        p={2.5}
         minH="100vh"
         color="white"
         display="flex"
