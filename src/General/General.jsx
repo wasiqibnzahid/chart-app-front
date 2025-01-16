@@ -613,8 +613,7 @@ const General = () => {
             <Box
               bg="linear-gradient(90deg, #000000, #7800ff)" // Linear gradient background
               borderRadius="20px" // Rounded corners
-              border="5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
-              boxShadow="0px 0px 15px rgba(200, 200, 200, 0.5)" // Shiny glow effect
+              border="2.5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
               p={6}
               flex="1"
             >
@@ -688,8 +687,7 @@ const General = () => {
             <Box
               bg="linear-gradient(90deg, #000000, #7800ff)" // Linear gradient background
               borderRadius="20px" // Rounded corners
-              border="5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
-              boxShadow="0px 0px 15px rgba(200, 200, 200, 0.5)" // Shiny glow effect
+              border="2.5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
               p={6}
               flex="1"
             >
@@ -761,8 +759,7 @@ const General = () => {
           <Box
             bg="linear-gradient(90deg, #000000, #7800ff)" // Linear gradient background
             borderRadius="20px" // Rounded corners
-            border="5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
-            boxShadow="0px 0px 15px rgba(200, 200, 200, 0.5)" // Shiny glow effect
+            border="2.5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
             p={6}
             width="100%"
             maxW="800px"
