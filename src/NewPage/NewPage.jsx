@@ -1394,8 +1394,7 @@ const NewPage = () => {
             bg="linear-gradient(90deg, #000000, #7800ff)"
             borderRadius="20px"
             p={[4, 6]}
-            border="5px solid rgba(255, 255, 255, 0.8)"
-            boxShadow="0px 0px 15px rgba(200, 200, 200, 0.5)"
+            border="2.5px solid rgba(255, 255, 255, 0.8)"
             mb={6}
           >
             <Text
