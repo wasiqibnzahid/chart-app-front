@@ -65,7 +65,7 @@ const DataTable = () => {
   // State to manage the selected row for detailed graph
   const [selectedRow, setSelectedRow] = useState(null);
 
-  // State for day of week selection
+  // State for day-of-week selection
   const [selectedDay, setSelectedDay] = useState("");
 
   // State for comparison mode
@@ -231,8 +231,11 @@ const DataTable = () => {
     // Take top 50
     const top50 = processedData.slice(0, 50);
 
-    // Calculate total requests for percentage
-    const totalRequests = top50.reduce((sum, row) => sum + row.requestCount, 0);
+    // Calculate total requests
+    const totalRequests = top50.reduce(
+      (sum, row) => sum + row.requestCount,
+      0
+    );
 
     // Map to tableData format with percentage and amount
     const formattedData = top50.map((row) => ({
@@ -268,7 +271,6 @@ const DataTable = () => {
 
     // Map to desired format
     const mappedData = filtered.map((row) => {
-      // Accurate Date Parsing
       const dateParts = row.Date.split("-");
       if (dateParts.length !== 3) {
         console.error(`Invalid date format for row: ${row.Date}`);
@@ -314,7 +316,7 @@ const DataTable = () => {
     // Remove any entries with invalid dates
     const validMappedData = mappedData.filter((d) => d.dayOfWeek !== null);
 
-    // Sort by date ascending for the graph (oldest first)
+    // Sort by date ascending (oldest first)
     validMappedData.sort((a, b) => new Date(a.x) - new Date(b.x));
 
     return validMappedData;
@@ -366,7 +368,6 @@ const DataTable = () => {
     };
 
     let primary = historicData;
-
     if (selectedDay !== "") {
       const dayNumber = daysMap[selectedDay];
       primary = primary.filter((d) => d.dayOfWeek === dayNumber);
@@ -378,7 +379,7 @@ const DataTable = () => {
       comparison = historicData.filter((d) => d.dayOfWeek === compareDayNumber);
     }
 
-    return { primary: primary, comparison: comparison };
+    return { primary, comparison };
   };
 
   const filteredData = getFilteredData();
@@ -475,7 +476,6 @@ const DataTable = () => {
   // 4.1. Adjusted lastSevenDates Calculation
   // ============================
 
-  // Generate the last seven dates starting from currentDate -1
   const lastSevenDates = useMemo(() => {
     if (!currentDate) return [];
     const dates = [];
@@ -510,7 +510,7 @@ const DataTable = () => {
   const formattedCurrentDate = useMemo(() => {
     if (!currentDate) return "";
     const d = new Date(currentDate);
-    d.setDate(d.getDate() + 1); // **Add one day to the currentDate**
+    d.setDate(d.getDate() + 1);
     return d.toLocaleDateString(undefined, {
       month: "short",
       day: "numeric",
@@ -533,7 +533,7 @@ const DataTable = () => {
   if (loading) {
     return (
       <Box
-        p={2.5}
+        p={0} // Removed top padding here
         minH="100vh"
         color="white"
         display="flex"
@@ -551,7 +551,7 @@ const DataTable = () => {
   if (error) {
     return (
       <Box
-        p={2.5}
+        p={0} // Removed top padding here
         minH="100vh"
         color="white"
         display="flex"
@@ -569,7 +569,6 @@ const DataTable = () => {
   // 6. Helper Function
   // ============================
 
-  // Helper function to get data for the past 7 days for a specific object
   const getPastSevenDaysData = (object) => {
     if (!lastSevenDates.length) return [];
     return lastSevenDates.map((date) => {
@@ -587,7 +586,7 @@ const DataTable = () => {
 
   return (
     <Box
-      p={5}
+      p={0} // Removed top padding here
       minH="100vh"
       color="white"
       display="flex"
@@ -602,11 +601,7 @@ const DataTable = () => {
         maxW="1200px"
       >
         {/* Table and Detailed Graph Section */}
-        <Flex
-          direction={flexDirection}
-          width="100%"
-          overflow="hidden"
-        >
+        <Flex direction={flexDirection} width="100%" overflow="hidden">
           {/* Table Section */}
           <Box
             bg="linear-gradient(90deg, #000000, #7800ff)"
@@ -632,7 +627,6 @@ const DataTable = () => {
               <Text fontSize="md" mr={2}>
                 Viewing Data for:
               </Text>
-              {/* Calendar Input for Date Selection */}
               <Flex alignItems="center">
                 <Input
                   type="date"
@@ -666,14 +660,13 @@ const DataTable = () => {
               </Button>
             </Flex>
 
-            {/* Updated TableContainer with Hidden Scrollbar and Uniform Font Size */}
             <TableContainer
               overflowY="auto"
               maxH="600px"
               overflowX="auto"
               sx={{
-                scrollbarWidth: "none", // Firefox
-                msOverflowStyle: "none", // IE 10+
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
                 "&::-webkit-scrollbar": {
                   display: "none",
                 },
@@ -695,9 +688,7 @@ const DataTable = () => {
                         Percentage
                       </Th>
                     )}
-                    <Th isNumeric color="white">
-                      {formattedCurrentDate}
-                    </Th>
+                    <Th isNumeric color="white">{formattedCurrentDate}</Th>
                     {isExpanded &&
                       displayLastSevenDates.map((date, i) => (
                         <Th key={i} isNumeric color="white" fontSize="sm" p={2}>
@@ -924,7 +915,7 @@ const DataTable = () => {
                     scrollZoom: true,
                     doubleClick: "reset",
                   }}
-                  useResizeHandler={true}
+                  useResizeHandler
                   style={{ width: "100%", height: "100%" }}
                 />
               </Box>
