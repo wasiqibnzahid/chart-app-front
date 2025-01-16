@@ -165,7 +165,7 @@ const DataTable = () => {
             0
           );
 
-          // Map to tableData format with percentage and amount
+          // Map to tableData format
           const formattedData = top50.map((row) => ({
             object: row.object,
             percentage: `${(
@@ -214,10 +214,7 @@ const DataTable = () => {
 
     // Filter data for the currentDate
     const recentData = allData.filter((row) => row.Date === currentDate);
-
-    if (recentData.length === 0) {
-      return [];
-    }
+    if (recentData.length === 0) return [];
 
     // Convert Request Count to integer
     const processedData = recentData.map((row) => ({
@@ -232,12 +229,9 @@ const DataTable = () => {
     const top50 = processedData.slice(0, 50);
 
     // Calculate total requests
-    const totalRequests = top50.reduce(
-      (sum, row) => sum + row.requestCount,
-      0
-    );
+    const totalRequests = top50.reduce((sum, row) => sum + row.requestCount, 0);
 
-    // Map to tableData format with percentage and amount
+    // Map to tableData format
     const formattedData = top50.map((row) => ({
       object: row.object,
       percentage: `${((row.requestCount / totalRequests) * 100).toFixed(1)}%`,
@@ -260,7 +254,7 @@ const DataTable = () => {
     return "md";
   }, [maxObjectLength]);
 
-  // Memoized historic data for the selected row to optimize performance
+  // Memoized historic data for the selected row
   const historicData = useMemo(() => {
     if (!selectedRow) return [];
 
@@ -301,7 +295,7 @@ const DataTable = () => {
         };
       }
 
-      // Create a UTC date to avoid timezone issues
+      // Create a UTC date
       const dateObj = new Date(Date.UTC(year, month - 1, day));
 
       return {
@@ -313,10 +307,10 @@ const DataTable = () => {
       };
     });
 
-    // Remove any entries with invalid dates
+    // Remove invalid dates
     const validMappedData = mappedData.filter((d) => d.dayOfWeek !== null);
 
-    // Sort by date ascending (oldest first)
+    // Sort by date ascending
     validMappedData.sort((a, b) => new Date(a.x) - new Date(b.x));
 
     return validMappedData;
@@ -346,7 +340,7 @@ const DataTable = () => {
         startDate = new Date(historicData[0]?.x || currentDate);
         break;
       default:
-        startDate.setMonth(startDate.getMonth() - 1); // Default to 1 Month
+        startDate.setMonth(startDate.getMonth() - 1);
     }
 
     return {
@@ -368,6 +362,7 @@ const DataTable = () => {
     };
 
     let primary = historicData;
+
     if (selectedDay !== "") {
       const dayNumber = daysMap[selectedDay];
       primary = primary.filter((d) => d.dayOfWeek === dayNumber);
@@ -472,10 +467,7 @@ const DataTable = () => {
     return `${year}-${month}-${day}`;
   };
 
-  // ============================
-  // 4.1. Adjusted lastSevenDates Calculation
-  // ============================
-
+  // Generate the last seven dates starting from currentDate -1
   const lastSevenDates = useMemo(() => {
     if (!currentDate) return [];
     const dates = [];
@@ -488,14 +480,11 @@ const DataTable = () => {
     return dates;
   }, [currentDate]);
 
-  // ============================
-  // 4.2. Updated Display Last Seven Dates (Shift Labels by One Day Earlier)
-  // ============================
-
+  // Format last 7 days for table headers, shift label by +1 day
   const displayLastSevenDates = useMemo(() => {
     return lastSevenDates.map((dateStr) => {
       const d = new Date(dateStr);
-      d.setDate(d.getDate() + 1); // Shift label by one day earlier
+      d.setDate(d.getDate() + 1);
       return d.toLocaleDateString(undefined, {
         month: "short",
         day: "numeric",
@@ -503,10 +492,7 @@ const DataTable = () => {
     });
   }, [lastSevenDates]);
 
-  // ============================
-  // 4.3. Update formattedCurrentDate
-  // ============================
-
+  // Format currentDate +1 day for table’s main column
   const formattedCurrentDate = useMemo(() => {
     if (!currentDate) return "";
     const d = new Date(currentDate);
@@ -517,14 +503,17 @@ const DataTable = () => {
     });
   }, [currentDate]);
 
-  // ============================
-  // 4.4. Determine Flex direction based on isExpanded
-  // ============================
-
-  const flexDirection = useMemo(() => {
-    if (isExpanded) return "column";
-    return { base: "column", md: "row" };
-  }, [isExpanded]);
+  // Helper to get data for the past 7 days for a specific object
+  const getPastSevenDaysData = (object) => {
+    if (!lastSevenDates.length) return [];
+    return lastSevenDates.map((date) => {
+      const row = allData.find((r) => r.Date === date && r.Object === object);
+      if (!row) return "-";
+      const requestCount = parseInt(row["Request Count"], 10);
+      if (isNaN(requestCount) || requestCount === 0) return "-";
+      return requestCount.toLocaleString();
+    });
+  };
 
   // ============================
   // 5. Early Returns for Loading and Error
@@ -533,7 +522,7 @@ const DataTable = () => {
   if (loading) {
     return (
       <Box
-        p={3} // Removed top padding here
+        p={0}
         minH="100vh"
         color="white"
         display="flex"
@@ -551,7 +540,7 @@ const DataTable = () => {
   if (error) {
     return (
       <Box
-        p={3} // Removed top padding here
+        p={0}
         minH="100vh"
         color="white"
         display="flex"
@@ -566,27 +555,12 @@ const DataTable = () => {
   }
 
   // ============================
-  // 6. Helper Function
-  // ============================
-
-  const getPastSevenDaysData = (object) => {
-    if (!lastSevenDates.length) return [];
-    return lastSevenDates.map((date) => {
-      const row = allData.find((r) => r.Date === date && r.Object === object);
-      if (!row) return "-";
-      const requestCount = parseInt(row["Request Count"], 10);
-      if (isNaN(requestCount) || requestCount === 0) return "-";
-      return requestCount.toLocaleString();
-    });
-  };
-
-  // ============================
-  // 7. Render Component
+  // 6. Render Component
   // ============================
 
   return (
     <Box
-      p={0} // Removed top padding here
+      p={0} // Removed top padding
       minH="100vh"
       color="white"
       display="flex"
@@ -594,14 +568,16 @@ const DataTable = () => {
       alignItems="center"
       overflow="hidden"
     >
-      {/* Main Wrapper Flex with updated width and maxW */}
-      <Flex
-        direction="column"
-        width={{ base: "100%", md: "90%" }}
-        maxW="1200px"
-      >
-        {/* Table and Detailed Graph Section */}
-        <Flex direction={flexDirection} width="100%" overflow="hidden">
+      <Flex direction="column" width="100%" maxW="1200px">
+        {/* 
+            NOTE: We no longer change to "column" on small screens.
+            We only switch to column if the user clicks "Expand" 
+        */}
+        <Flex
+          direction={isExpanded ? "column" : "row"}
+          width="100%"
+          overflow="hidden"
+        >
           {/* Table Section */}
           <Box
             bg="linear-gradient(90deg, #000000, #7800ff)"
@@ -611,8 +587,8 @@ const DataTable = () => {
             p={6}
             boxShadow="lg"
             flex="1"
-            mr={{ base: 0, md: isExpanded ? 0 : 8 }}
-            mb={{ base: 8, md: isExpanded ? 4 : 0 }}
+            mr={isExpanded ? 0 : 8} // Only add margin if not expanded
+            mb={isExpanded ? 4 : 0} // Only add margin if expanded (stacked)
             overflow="hidden"
           >
             {/* Navigation Arrows and Date Selection */}
@@ -660,6 +636,7 @@ const DataTable = () => {
               </Button>
             </Flex>
 
+            {/* TableContainer */}
             <TableContainer
               overflowY="auto"
               maxH="600px"
@@ -667,9 +644,7 @@ const DataTable = () => {
               sx={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
-                "&::-webkit-scrollbar": {
-                  display: "none",
-                },
+                "&::-webkit-scrollbar": { display: "none" },
               }}
             >
               <Table variant="simple" size="sm" sx={{ tableLayout: "auto" }}>
@@ -688,7 +663,9 @@ const DataTable = () => {
                         Percentage
                       </Th>
                     )}
-                    <Th isNumeric color="white">{formattedCurrentDate}</Th>
+                    <Th isNumeric color="white">
+                      {formattedCurrentDate}
+                    </Th>
                     {isExpanded &&
                       displayLastSevenDates.map((date, i) => (
                         <Th key={i} isNumeric color="white" fontSize="sm" p={2}>
@@ -701,9 +678,7 @@ const DataTable = () => {
                   {displayedData.map((row, index) => (
                     <Tr
                       key={index}
-                      _hover={{
-                        cursor: "pointer",
-                      }}
+                      _hover={{ cursor: "pointer" }}
                       onClick={() => handleRowClick(row)}
                       bg={
                         selectedRow && selectedRow.object === row.object
@@ -722,7 +697,9 @@ const DataTable = () => {
                           </Text>
                         </Tooltip>
                       </Td>
-                      {!isExpanded && <Td isNumeric>{row.percentage}</Td>}
+                      {!isExpanded && (
+                        <Td isNumeric>{row.percentage}</Td>
+                      )}
                       <Td isNumeric>{row.amount}</Td>
                       {isExpanded &&
                         getPastSevenDaysData(row.object).map((count, i) => (
@@ -746,6 +723,8 @@ const DataTable = () => {
             p={6}
             boxShadow="lg"
             flex="1"
+            // If expanded => stack below the table (margin-top).
+            // If not => side by side with the table (no top margin).
             mt={isExpanded ? 8 : 0}
             overflow="hidden"
           >
@@ -759,41 +738,52 @@ const DataTable = () => {
                   <ButtonGroup mb={4} size="sm" isAttached variant="outline">
                     <Button
                       onClick={() => handleDateRangeChange("1W")}
-                      colorScheme={selectedDateRange === "1W" ? "teal" : "gray"}
+                      colorScheme={
+                        selectedDateRange === "1W" ? "teal" : "gray"
+                      }
                       color="white"
                     >
                       1W
                     </Button>
                     <Button
                       onClick={() => handleDateRangeChange("1M")}
-                      colorScheme={selectedDateRange === "1M" ? "teal" : "gray"}
+                      colorScheme={
+                        selectedDateRange === "1M" ? "teal" : "gray"
+                      }
                       color="white"
                     >
                       1M
                     </Button>
                     <Button
                       onClick={() => handleDateRangeChange("6M")}
-                      colorScheme={selectedDateRange === "6M" ? "teal" : "gray"}
+                      colorScheme={
+                        selectedDateRange === "6M" ? "teal" : "gray"
+                      }
                       color="white"
                     >
                       6M
                     </Button>
                     <Button
                       onClick={() => handleDateRangeChange("1Y")}
-                      colorScheme={selectedDateRange === "1Y" ? "teal" : "gray"}
+                      colorScheme={
+                        selectedDateRange === "1Y" ? "teal" : "gray"
+                      }
                       color="white"
                     >
                       1Y
                     </Button>
                     <Button
                       onClick={() => handleDateRangeChange("All")}
-                      colorScheme={selectedDateRange === "All" ? "teal" : "gray"}
+                      colorScheme={
+                        selectedDateRange === "All" ? "teal" : "gray"
+                      }
                       color="white"
                     >
                       All
                     </Button>
                   </ButtonGroup>
 
+                  {/* Day-of-Week & Comparison */}
                   <Flex
                     direction={{ base: "column", md: "row" }}
                     gap={4}
@@ -801,7 +791,6 @@ const DataTable = () => {
                     width="100%"
                     maxW="600px"
                   >
-                    {/* Day-of-Week Dropdown */}
                     <FormControl>
                       <FormLabel>Select Day of Week</FormLabel>
                       <Select
@@ -821,7 +810,6 @@ const DataTable = () => {
                       </Select>
                     </FormControl>
 
-                    {/* Compare Button */}
                     <FormControl>
                       <FormLabel>Comparison</FormLabel>
                       <Flex alignItems="center">
@@ -862,6 +850,7 @@ const DataTable = () => {
                 </>
               )}
             </Flex>
+
             {selectedRow ? (
               <Box overflow="auto">
                 <Plot
@@ -894,9 +883,7 @@ const DataTable = () => {
                       tickfont: { color: "white" },
                       autorange: true,
                     },
-                    font: {
-                      color: "white",
-                    },
+                    font: { color: "white" },
                     legend: {
                       orientation: "h",
                       y: -0.2,
