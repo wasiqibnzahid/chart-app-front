@@ -114,7 +114,6 @@ const DataTable = () => {
   // 3. Data Fetching and Processing
   // ============================
 
-  // Fetch and process CSV data on component mount
   useEffect(() => {
     const csvUrl =
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVHwv5X6-u3M7f8HJNih14hSnVpBlNKFUe_O76bTUJ2PaaOAfrqIrwjWsyc9DNFKxcYoEsWutl1_K6/pub?output=csv";
@@ -233,17 +232,12 @@ const DataTable = () => {
     const top50 = processedData.slice(0, 50);
 
     // Calculate total requests for percentage
-    const totalRequests = top50.reduce(
-      (sum, row) => sum + row.requestCount,
-      0
-    );
+    const totalRequests = top50.reduce((sum, row) => sum + row.requestCount, 0);
 
     // Map to tableData format with percentage and amount
     const formattedData = top50.map((row) => ({
       object: row.object,
-      percentage: `${((row.requestCount / totalRequests) * 100).toFixed(
-        1
-      )}%`,
+      percentage: `${((row.requestCount / totalRequests) * 100).toFixed(1)}%`,
       amount: row.requestCount.toLocaleString(),
     }));
 
@@ -381,9 +375,7 @@ const DataTable = () => {
     let comparison = [];
     if (isComparing && compareDay !== "") {
       const compareDayNumber = daysMap[compareDay];
-      comparison = historicData.filter(
-        (d) => d.dayOfWeek === compareDayNumber
-      );
+      comparison = historicData.filter((d) => d.dayOfWeek === compareDayNumber);
     }
 
     return { primary: primary, comparison: comparison };
@@ -488,7 +480,7 @@ const DataTable = () => {
     if (!currentDate) return [];
     const dates = [];
     const current = new Date(currentDate);
-    for (let i = 1; i <= 7; i++) { // Start from 1 to exclude currentDate
+    for (let i = 1; i <= 7; i++) {
       const d = new Date(current);
       d.setDate(current.getDate() - i);
       dates.push(formatDate(d));
@@ -500,7 +492,6 @@ const DataTable = () => {
   // 4.2. Updated Display Last Seven Dates (Shift Labels by One Day Earlier)
   // ============================
 
-  // Format dates for better display in headers and shift labels by one day earlier
   const displayLastSevenDates = useMemo(() => {
     return lastSevenDates.map((dateStr) => {
       const d = new Date(dateStr);
@@ -516,7 +507,6 @@ const DataTable = () => {
   // 4.3. Update formattedCurrentDate
   // ============================
 
-  // Define a formatted date for table headers (e.g., "Nov 15")
   const formattedCurrentDate = useMemo(() => {
     if (!currentDate) return "";
     const d = new Date(currentDate);
@@ -540,11 +530,10 @@ const DataTable = () => {
   // 5. Early Returns for Loading and Error
   // ============================
 
-  // Loading State
   if (loading) {
     return (
       <Box
-        p={5}
+        p={0}
         minH="100vh"
         color="white"
         display="flex"
@@ -559,11 +548,10 @@ const DataTable = () => {
     );
   }
 
-  // Error State
   if (error) {
     return (
       <Box
-        p={5}
+        p={0}
         minH="100vh"
         color="white"
         display="flex"
@@ -585,9 +573,7 @@ const DataTable = () => {
   const getPastSevenDaysData = (object) => {
     if (!lastSevenDates.length) return [];
     return lastSevenDates.map((date) => {
-      const row = allData.find(
-        (r) => r.Date === date && r.Object === object
-      );
+      const row = allData.find((r) => r.Date === date && r.Object === object);
       if (!row) return "-";
       const requestCount = parseInt(row["Request Count"], 10);
       if (isNaN(requestCount) || requestCount === 0) return "-";
@@ -609,257 +595,228 @@ const DataTable = () => {
       alignItems="center"
       overflow="hidden"
     >
-      {/* Table and Detailed Graph Section */}
+      {/* Main Wrapper Flex with updated width and maxW */}
       <Flex
-        direction={flexDirection}
-        width={{ base: "100%", md: "87%" }}
-        overflow="hidden"
+        direction="column"
+        width={{ base: "100%", md: "90%" }}
+        maxW="1200px"
       >
-        {/* Table Section */}
-        <Box
-          bg="linear-gradient(90deg, #000000, #7800ff)"
-          border="5px solid"
-          borderColor="rgba(255, 255, 255, 0.8)"
-          borderRadius="20px"
-          p={6}
-          boxShadow="lg"
-          flex="1"
-          mr={{ base: 0, md: isExpanded ? 0 : 8 }}
-          mb={{ base: 8, md: isExpanded ? 4 : 0 }}
+        {/* Table and Detailed Graph Section */}
+        <Flex
+          direction={flexDirection}
+          width="100%"
           overflow="hidden"
         >
-          {/* Navigation Arrows and Date Selection */}
-          <Flex alignItems="center" mb={4}>
-            <IconButton
-              icon={<ChevronLeftIcon />}
-              onClick={goToPreviousDate}
-              isDisabled={currentIndex >= sortedDates.length - 1}
-              aria-label="Previous Date"
-              mr={2}
-            />
-            <Text fontSize="md" mr={2}>
-              Viewing Data for:
-            </Text>
-            {/* Calendar Input for Date Selection */}
-            <Flex alignItems="center">
-              <Input
-                type="date"
-                value={currentDate || ""}
-                onChange={handleDateChange}
-                max={mostRecentDate}
-                bg="white"
-                color="black"
-                size="sm"
+          {/* Table Section */}
+          <Box
+            bg="linear-gradient(90deg, #000000, #7800ff)"
+            border="5px solid"
+            borderColor="rgba(255, 255, 255, 0.8)"
+            borderRadius="20px"
+            p={6}
+            boxShadow="lg"
+            flex="1"
+            mr={{ base: 0, md: isExpanded ? 0 : 8 }}
+            mb={{ base: 8, md: isExpanded ? 4 : 0 }}
+            overflow="hidden"
+          >
+            {/* Navigation Arrows and Date Selection */}
+            <Flex alignItems="center" mb={4}>
+              <IconButton
+                icon={<ChevronLeftIcon />}
+                onClick={goToPreviousDate}
+                isDisabled={currentIndex >= sortedDates.length - 1}
+                aria-label="Previous Date"
                 mr={2}
               />
+              <Text fontSize="md" mr={2}>
+                Viewing Data for:
+              </Text>
+              {/* Calendar Input for Date Selection */}
+              <Flex alignItems="center">
+                <Input
+                  type="date"
+                  value={currentDate || ""}
+                  onChange={handleDateChange}
+                  max={mostRecentDate}
+                  bg="white"
+                  color="black"
+                  size="sm"
+                  mr={2}
+                />
+              </Flex>
+              <IconButton
+                icon={<ChevronRightIcon />}
+                onClick={goToNextDate}
+                isDisabled={currentIndex <= 0}
+                aria-label="Next Date"
+                ml={2}
+              />
             </Flex>
-            <IconButton
-              icon={<ChevronRightIcon />}
-              onClick={goToNextDate}
-              isDisabled={currentIndex <= 0}
-              aria-label="Next Date"
-              ml={2}
-            />
-          </Flex>
 
-          {/* Expand/Collapse Button */}
-          <Flex justifyContent="flex-end" mb={2}>
-            <Button
-              onClick={() => setIsExpanded(!isExpanded)}
-              leftIcon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-              size="sm"
-              colorScheme="none"
+            {/* Expand/Collapse Button */}
+            <Flex justifyContent="flex-end" mb={2}>
+              <Button
+                onClick={() => setIsExpanded(!isExpanded)}
+                leftIcon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                size="sm"
+                colorScheme="none"
+              >
+                {isExpanded ? "Collapse" : "Expand"}
+              </Button>
+            </Flex>
+
+            {/* Updated TableContainer with Hidden Scrollbar and Uniform Font Size */}
+            <TableContainer
+              overflowY="auto"
+              maxH="600px"
+              overflowX="auto"
+              sx={{
+                scrollbarWidth: "none", // Firefox
+                msOverflowStyle: "none", // IE 10+
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+              }}
             >
-              {isExpanded ? "Collapse" : "Expand"}
-            </Button>
-          </Flex>
-
-          {/* Updated TableContainer with Hidden Scrollbar and Uniform Font Size */}
-          <TableContainer
-            overflowY="auto"
-            maxH="600px"
-            overflowX="auto"
-            sx={{
-              scrollbarWidth: "none", // Firefox
-              msOverflowStyle: "none", // IE 10+
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-            }}
-          >
-            <Table variant="simple" size="sm" sx={{ tableLayout: "auto" }}>
-              <Thead>
-                <Tr>
-                  <Th
-                    maxW="200px"
-                    whiteSpace="normal"
-                    wordBreak="break-word"
-                    color="white"
-                  >
-                    Object
-                  </Th>
-                  {/* Conditionally hide Percentage column when expanded */}
-                  {!isExpanded && (
-                    <Th isNumeric color="white">
-                      Percentage
+              <Table variant="simple" size="sm" sx={{ tableLayout: "auto" }}>
+                <Thead>
+                  <Tr>
+                    <Th
+                      maxW="200px"
+                      whiteSpace="normal"
+                      wordBreak="break-word"
+                      color="white"
+                    >
+                      Object
                     </Th>
-                  )}
-                  <Th isNumeric color="white">
-                    {formattedCurrentDate} {/* Updated to currentDate + 1 day */}
-                  </Th>
-                  {/* Conditionally render past 7 days headers in descending order */}
-                  {isExpanded &&
-                    displayLastSevenDates.map((date, i) => (
-                      <Th
-                        key={i}
-                        isNumeric
-                        color="white"
-                        fontSize="sm"
-                        p={2}
-                      >
-                        {date} {/* Labels shifted by one day earlier */}
+                    {!isExpanded && (
+                      <Th isNumeric color="white">
+                        Percentage
                       </Th>
-                    ))}
-                </Tr>
-              </Thead>
-              <Tbody>
-                {displayedData.map((row, index) => (
-                  <Tr
-                    key={index}
-                    _hover={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleRowClick(row)}
-                    bg={
-                      selectedRow && selectedRow.object === row.object
-                        ? "rgba(255, 255, 255, 0.3)"
-                        : "transparent"
-                    }
-                  >
-                    <Td>
-                      <Tooltip label={row.object} hasArrow>
-                        <Text
-                          whiteSpace="normal"
-                          wordBreak="break-word"
-                          fontSize={objectFontSize}
-                        >
-                          {row.object}
-                        </Text>
-                      </Tooltip>
-                    </Td>
-                    {/* Conditionally hide Percentage cell when expanded */}
-                    {!isExpanded && <Td isNumeric>{row.percentage}</Td>}
-                    <Td isNumeric>{row.amount}</Td>
-                    {/* Conditionally render past 7 days data */}
+                    )}
+                    <Th isNumeric color="white">
+                      {formattedCurrentDate}
+                    </Th>
                     {isExpanded &&
-                      getPastSevenDaysData(row.object).map((count, i) => (
-                        <Td key={i} isNumeric fontSize="sm" p={2}>
-                          {count}
-                        </Td>
+                      displayLastSevenDates.map((date, i) => (
+                        <Th key={i} isNumeric color="white" fontSize="sm" p={2}>
+                          {date}
+                        </Th>
                       ))}
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </Box>
-
-        {/* Detailed Graph Section */}
-        <Box
-          bg="linear-gradient(90deg, #000000, #7800ff)"
-          border="5px solid"
-          borderColor="rgba(255, 255, 255, 0.8)"
-          borderRadius="20px"
-          p={6}
-          boxShadow="lg"
-          flex="1"
-          mt={isExpanded ? 8 : 0}
-          overflow="hidden"
-        >
-          <Flex direction="column" alignItems="center" mb={4}>
-            <Text fontSize="2xl" mb={4} textAlign="center">
-              {getGraphTitle()}
-            </Text>
-            {selectedRow && (
-              <>
-                {/* Date Range Buttons */}
-                <ButtonGroup mb={4} size="sm" isAttached variant="outline">
-                  {/* "1W" Button */}
-                  <Button
-                    onClick={() => handleDateRangeChange("1W")}
-                    colorScheme={selectedDateRange === "1W" ? "teal" : "gray"}
-                    color="white"
-                  >
-                    1W
-                  </Button>
-                  {/* Existing Date Range Buttons */}
-                  <Button
-                    onClick={() => handleDateRangeChange("1M")}
-                    colorScheme={selectedDateRange === "1M" ? "teal" : "gray"}
-                    color="white"
-                  >
-                    1M
-                  </Button>
-                  <Button
-                    onClick={() => handleDateRangeChange("6M")}
-                    colorScheme={selectedDateRange === "6M" ? "teal" : "gray"}
-                    color="white"
-                  >
-                    6M
-                  </Button>
-                  <Button
-                    onClick={() => handleDateRangeChange("1Y")}
-                    colorScheme={selectedDateRange === "1Y" ? "teal" : "gray"}
-                    color="white"
-                  >
-                    1Y
-                  </Button>
-                  <Button
-                    onClick={() => handleDateRangeChange("All")}
-                    colorScheme={selectedDateRange === "All" ? "teal" : "gray"}
-                    color="white"
-                  >
-                    All
-                  </Button>
-                </ButtonGroup>
-
-                <Flex
-                  direction={{ base: "column", md: "row" }}
-                  gap={4}
-                  mb={4}
-                  width="100%"
-                  maxW="600px"
-                >
-                  {/* Day-of-Week Dropdown */}
-                  <FormControl>
-                    <FormLabel>Select Day of Week</FormLabel>
-                    <Select
-                      value={selectedDay}
-                      onChange={(e) => setSelectedDay(e.target.value)}
-                      placeholder="Select Day"
-                      bg="white"
-                      color="black"
+                </Thead>
+                <Tbody>
+                  {displayedData.map((row, index) => (
+                    <Tr
+                      key={index}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleRowClick(row)}
+                      bg={
+                        selectedRow && selectedRow.object === row.object
+                          ? "rgba(255, 255, 255, 0.3)"
+                          : "transparent"
+                      }
                     >
-                      <option value="Monday">Monday</option>
-                      <option value="Tuesday">Tuesday</option>
-                      <option value="Wednesday">Wednesday</option>
-                      <option value="Thursday">Thursday</option>
-                      <option value="Friday">Friday</option>
-                      <option value="Saturday">Saturday</option>
-                      <option value="Sunday">Sunday</option>
-                    </Select>
-                  </FormControl>
+                      <Td>
+                        <Tooltip label={row.object} hasArrow>
+                          <Text
+                            whiteSpace="normal"
+                            wordBreak="break-word"
+                            fontSize={objectFontSize}
+                          >
+                            {row.object}
+                          </Text>
+                        </Tooltip>
+                      </Td>
+                      {!isExpanded && <Td isNumeric>{row.percentage}</Td>}
+                      <Td isNumeric>{row.amount}</Td>
+                      {isExpanded &&
+                        getPastSevenDaysData(row.object).map((count, i) => (
+                          <Td key={i} isNumeric fontSize="sm" p={2}>
+                            {count}
+                          </Td>
+                        ))}
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </Box>
 
-                  {/* Compare Button */}
-                  <FormControl>
-                    <FormLabel>Comparison</FormLabel>
-                    <Flex alignItems="center">
+          {/* Detailed Graph Section */}
+          <Box
+            bg="linear-gradient(90deg, #000000, #7800ff)"
+            border="5px solid"
+            borderColor="rgba(255, 255, 255, 0.8)"
+            borderRadius="20px"
+            p={6}
+            boxShadow="lg"
+            flex="1"
+            mt={isExpanded ? 8 : 0}
+            overflow="hidden"
+          >
+            <Flex direction="column" alignItems="center" mb={4}>
+              <Text fontSize="2xl" mb={4} textAlign="center">
+                {getGraphTitle()}
+              </Text>
+              {selectedRow && (
+                <>
+                  {/* Date Range Buttons */}
+                  <ButtonGroup mb={4} size="sm" isAttached variant="outline">
+                    <Button
+                      onClick={() => handleDateRangeChange("1W")}
+                      colorScheme={selectedDateRange === "1W" ? "teal" : "gray"}
+                      color="white"
+                    >
+                      1W
+                    </Button>
+                    <Button
+                      onClick={() => handleDateRangeChange("1M")}
+                      colorScheme={selectedDateRange === "1M" ? "teal" : "gray"}
+                      color="white"
+                    >
+                      1M
+                    </Button>
+                    <Button
+                      onClick={() => handleDateRangeChange("6M")}
+                      colorScheme={selectedDateRange === "6M" ? "teal" : "gray"}
+                      color="white"
+                    >
+                      6M
+                    </Button>
+                    <Button
+                      onClick={() => handleDateRangeChange("1Y")}
+                      colorScheme={selectedDateRange === "1Y" ? "teal" : "gray"}
+                      color="white"
+                    >
+                      1Y
+                    </Button>
+                    <Button
+                      onClick={() => handleDateRangeChange("All")}
+                      colorScheme={selectedDateRange === "All" ? "teal" : "gray"}
+                      color="white"
+                    >
+                      All
+                    </Button>
+                  </ButtonGroup>
+
+                  <Flex
+                    direction={{ base: "column", md: "row" }}
+                    gap={4}
+                    mb={4}
+                    width="100%"
+                    maxW="600px"
+                  >
+                    {/* Day-of-Week Dropdown */}
+                    <FormControl>
+                      <FormLabel>Select Day of Week</FormLabel>
                       <Select
-                        value={compareDay}
-                        onChange={(e) => setCompareDay(e.target.value)}
+                        value={selectedDay}
+                        onChange={(e) => setSelectedDay(e.target.value)}
                         placeholder="Select Day"
-                        isDisabled={!isComparing}
-                        maxW="200px"
                         bg="white"
                         color="black"
                       >
@@ -871,90 +828,113 @@ const DataTable = () => {
                         <option value="Saturday">Saturday</option>
                         <option value="Sunday">Sunday</option>
                       </Select>
-                      <Box ml={2}>
-                        <Button
-                          onClick={() => setIsComparing(!isComparing)}
-                          colorScheme={isComparing ? "teal" : "blue"}
-                          variant={isComparing ? "solid" : "outline"}
-                          bg={isComparing ? "teal.400" : "blue.200"}
-                          _hover={{
-                            bg: isComparing ? "teal.500" : "blue.300",
-                          }}
-                          size="sm"
+                    </FormControl>
+
+                    {/* Compare Button */}
+                    <FormControl>
+                      <FormLabel>Comparison</FormLabel>
+                      <Flex alignItems="center">
+                        <Select
+                          value={compareDay}
+                          onChange={(e) => setCompareDay(e.target.value)}
+                          placeholder="Select Day"
+                          isDisabled={!isComparing}
+                          maxW="200px"
+                          bg="white"
+                          color="black"
                         >
-                          {isComparing ? "Cancel Compare" : "Compare"}
-                        </Button>
-                      </Box>
-                    </Flex>
-                  </FormControl>
-                </Flex>
-              </>
-            )}
-          </Flex>
-          {selectedRow ? (
-            <Box overflow="auto">
-              <Plot
-                data={traces}
-                layout={{
-                  autosize: true,
-                  height: 500,
-                  margin: { l: 50, r: 50, t: 50, b: 100 },
-                  paper_bgcolor: "rgba(0,0,0,0)",
-                  plot_bgcolor: "rgba(0,0,0,0)",
-                  dragmode: "zoom",
-                  xaxis: {
-                    title: "Date",
-                    type: "date",
-                    showgrid: true,
-                    gridcolor: "#444",
-                    tickfont: { color: "white" },
-                    tickangle: -45,
-                    automargin: true,
-                    tickformat: "%b %d, %Y",
-                    // Set initial range based on selectedDateRange and currentDate
-                    range: [
-                      formatDate(dateRange.start),
-                      formatDate(dateRange.end),
+                          <option value="Monday">Monday</option>
+                          <option value="Tuesday">Tuesday</option>
+                          <option value="Wednesday">Wednesday</option>
+                          <option value="Thursday">Thursday</option>
+                          <option value="Friday">Friday</option>
+                          <option value="Saturday">Saturday</option>
+                          <option value="Sunday">Sunday</option>
+                        </Select>
+                        <Box ml={2}>
+                          <Button
+                            onClick={() => setIsComparing(!isComparing)}
+                            colorScheme={isComparing ? "teal" : "blue"}
+                            variant={isComparing ? "solid" : "outline"}
+                            bg={isComparing ? "teal.400" : "blue.200"}
+                            _hover={{
+                              bg: isComparing ? "teal.500" : "blue.300",
+                            }}
+                            size="sm"
+                          >
+                            {isComparing ? "Cancel Compare" : "Compare"}
+                          </Button>
+                        </Box>
+                      </Flex>
+                    </FormControl>
+                  </Flex>
+                </>
+              )}
+            </Flex>
+            {selectedRow ? (
+              <Box overflow="auto">
+                <Plot
+                  data={traces}
+                  layout={{
+                    autosize: true,
+                    height: 500,
+                    margin: { l: 50, r: 50, t: 50, b: 100 },
+                    paper_bgcolor: "rgba(0,0,0,0)",
+                    plot_bgcolor: "rgba(0,0,0,0)",
+                    dragmode: "zoom",
+                    xaxis: {
+                      title: "Date",
+                      type: "date",
+                      showgrid: true,
+                      gridcolor: "#444",
+                      tickfont: { color: "white" },
+                      tickangle: -45,
+                      automargin: true,
+                      tickformat: "%b %d, %Y",
+                      range: [
+                        formatDate(dateRange.start),
+                        formatDate(dateRange.end),
+                      ],
+                    },
+                    yaxis: {
+                      title: "Amount",
+                      showgrid: true,
+                      gridcolor: "#444",
+                      tickfont: { color: "white" },
+                      autorange: true,
+                    },
+                    font: {
+                      color: "white",
+                    },
+                    legend: {
+                      orientation: "h",
+                      y: -0.2,
+                      x: 0.5,
+                      xanchor: "center",
+                      yanchor: "top",
+                    },
+                  }}
+                  config={{
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: [
+                      "hoverClosestCartesian",
+                      "hoverCompareCartesian",
                     ],
-                  },
-                  yaxis: {
-                    title: "Amount",
-                    showgrid: true,
-                    gridcolor: "#444",
-                    tickfont: { color: "white" },
-                    autorange: true, // Ensure y-axis adjusts automatically
-                  },
-                  font: {
-                    color: "white",
-                  },
-                  legend: {
-                    orientation: "h",
-                    y: -0.2,
-                    x: 0.5,
-                    xanchor: "center",
-                    yanchor: "top",
-                  },
-                }}
-                config={{
-                  displayModeBar: true,
-                  displaylogo: false,
-                  modeBarButtonsToRemove: [
-                    "hoverClosestCartesian",
-                    "hoverCompareCartesian",
-                  ],
-                  scrollZoom: true,
-                  doubleClick: "reset", // Ensures double-click resets the zoom
-                }}
-                useResizeHandler={true}
-                style={{ width: "100%", height: "100%" }}
-              />
-            </Box>
-          ) : (
-            <Text textAlign="center" color="gray.300">
-              Click on a row to view the historic graph.
-            </Text>
-          )}
-        </Box>
+                    scrollZoom: true,
+                    doubleClick: "reset",
+                  }}
+                  useResizeHandler={true}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </Box>
+            ) : (
+              <Text textAlign="center" color="gray.300">
+                Click on a row to view the historic graph.
+              </Text>
+            )}
+          </Box>
+        </Flex>
       </Flex>
     </Box>
   );
