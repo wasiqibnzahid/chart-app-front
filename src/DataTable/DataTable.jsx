@@ -581,11 +581,10 @@ const DataTable = () => {
           {/* Table Section */}
           <Box
             bg="linear-gradient(90deg, #000000, #7800ff)"
-            border="5px solid"
+            border="2.5px solid"
             borderColor="rgba(255, 255, 255, 0.8)"
             borderRadius="20px"
             p={6}
-            boxShadow="lg"
             flex="1"
             mr={isExpanded ? 0 : 8} // Only add margin if not expanded
             mb={isExpanded ? 4 : 0} // Only add margin if expanded (stacked)
@@ -717,11 +716,10 @@ const DataTable = () => {
           {/* Detailed Graph Section */}
           <Box
             bg="linear-gradient(90deg, #000000, #7800ff)"
-            border="5px solid"
+            border="2.5px solid"
             borderColor="rgba(255, 255, 255, 0.8)"
             borderRadius="20px"
             p={6}
-            boxShadow="lg"
             flex="1"
             // If expanded => stack below the table (margin-top).
             // If not => side by side with the table (no top margin).
