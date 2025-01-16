@@ -496,12 +496,11 @@ const RequestCountGraph = () => {
           bg="linear-gradient(90deg, #000000, #7800ff)" // Changed to linear gradient
           borderRadius="20px" // Adjust border-radius as desired
           p={4} // **Preserved original padding**
-          boxShadow="0px 0px 15px rgba(200, 200, 200, 0.5)" // Optional: adds a shiny glow effect
           width="100%"
           display="flex"
           flexDirection="column"
           gap={6} // **Space between controls and chart**
-          border="5px solid" // Adjust border thickness as needed
+          border="2.5px solid" // Adjust border thickness as needed
           borderColor="rgba(255, 255, 255, 0.8)" // White with slight transparency for a shiny effect
         >
           {/* Controls */}
