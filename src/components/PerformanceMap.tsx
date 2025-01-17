@@ -1,16 +1,8 @@
-// PerformanceMap.jsx
-
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Box } from "@chakra-ui/react";
 
-// Replace with your actual Mapbox token (or read from an .env variable)
-const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZGZlZWZlZmVmZWYiLCJhIjoiY202MTA1amFtMGswZjJxb3V4czNmd2hwZSJ9.DxBpdqtliDHOD1WLZN3mOQ";
-
-// -------------------------------------------------------
-// City data
-// -------------------------------------------------------
 const citiesData = [
   {
     name: "Laguna",
@@ -110,11 +102,9 @@ const citiesData = [
   },
 ];
 
-// -------------------------------------------------------
-// The main component
-// -------------------------------------------------------
+// Weekly and monthly general TV Azteca performance data
+
 const PerformanceMap = (data) => {
-  // "generalAztecaPerformance" is a quick reference to the arrays
   const generalAztecaPerformance = {
     week: data.week,
     month: data.month,
@@ -122,71 +112,58 @@ const PerformanceMap = (data) => {
     allTime: data.allTime,
   };
 
-  const [view, setView] = useState("week"); // "week", "month", "year", "allTime"
+  const [view, setView] = useState("week"); // State to toggle between week and month
   const [cities, setCities] = useState(
     citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
-  );
+  ); // Initialize performances
 
-  // We track changes to "cities" but currently do nothing here
   useEffect(() => {}, [cities]);
 
-  // -------------------------------------------------------
-  // Process data on mount (or whenever props "data" changes)
-  // -------------------------------------------------------
   useEffect(() => {
     const updatedCities = [...cities];
 
-    // data.data.comparison.total is expected in your fetched or parent-provided "data"
-    data.data.comparison.total.forEach(({ name, data: cityData }) => {
-      // "cityData" is an array of objects { x: number, y: number }
-      const lastFourData = cityData?.slice(-4);
+    // Process video data
+    data.data.comparison.total.forEach(({ name, data }) => {
+      const lastFourData = data?.slice(-4);
       const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
       const average = sum / lastFourData?.length;
 
-      const lastYearData = cityData?.slice(-52);
+      const lastYearData = data?.slice(-52);
       const yearSum = lastYearData?.reduce((acc, point) => acc + point.y, 0);
       const yearAverage = yearSum / lastYearData?.length;
 
-      const allTimeData = cityData;
+      const allTimeData = data;
       const allTimeSum = allTimeData?.reduce((acc, point) => acc + point.y, 0);
       const allTimeAverage = allTimeSum / allTimeData?.length;
 
-      // Update the matching city
-      const city = updatedCities.find((c) => c.name === name);
+      // Update city performance
+      const city = updatedCities.find((city) => city.name === name);
       if (city) {
         city.performances = {
-          week: cityData[cityData.length - 1]?.y?.toFixed(0) || 0,
-          month: average?.toFixed(0) || 0,
-          year: yearAverage?.toFixed(0) || 0,
-          allTime: allTimeAverage?.toFixed(0) || 0,
+          week: data[data.length - 1].y.toFixed(0) || 0, // Use last week's value or 0 if undefined
+          month: average.toFixed(0) || 0, // Use average or 0 if undefined
+          year: yearAverage.toFixed(0) || 0,
+          allTime: allTimeAverage.toFixed(0) || 0,
         };
       }
     });
 
     setCities(updatedCities);
-  }, [data, cities]);
+    // toggleView();
+  }, [data]);
 
-  // -------------------------------------------------------
-  // Get the performance number for the selected "view"
-  // e.g., if view = "week", then we look at generalAztecaPerformance.week
-  // and pull the last item from that array.
-  // -------------------------------------------------------
+  // Get the current performance data based on the selected view
   const currentPerformance =
     generalAztecaPerformance[view][generalAztecaPerformance[view].length - 1];
 
-  // -------------------------------------------------------
-  // Color logic
-  // -------------------------------------------------------
-  const getColor = (performance, general) => {
-    const lowerThreshold = general * 0.85; // 15% below general => "red"
-    if (performance < lowerThreshold) return "red";
-    if (performance >= lowerThreshold && performance < general) return "yellow";
-    return "green";
+  // Function to get the color based on updated logic
+  const getColor = (performance: number, general: number) => {
+    const lowerThreshold = general * 0.85; // 15% below the general value
+    if (performance < lowerThreshold) return "red";   // More than 15% below general
+    if (performance >= lowerThreshold && performance < general) return "yellow"; // Less than general but within 15%
+    return "green"; // Meets or exceeds general performance
   };
 
-  // -------------------------------------------------------
-  // Cycle through "week" -> "month" -> "year" -> "allTime" -> "week"...
-  // -------------------------------------------------------
   const toggleView = () => {
     let newView = "";
     switch (view) {
@@ -210,7 +187,6 @@ const PerformanceMap = (data) => {
 
   return (
     <Box p={0} mb={0} borderRadius="lg" position="relative" height="530px">
-      {/* Toggle button */}
       <button
         onClick={toggleView}
         style={{
@@ -248,25 +224,12 @@ const PerformanceMap = (data) => {
         }}
         attributionControl={false}
       >
-        {/* 
-          We replace OSM tiles with Mapbox Satellite. Note that the style 
-          "mapbox/standard-satellite" might differ depending on your actual 
-          Mapbox style ID. Make sure to confirm your style is correct!
-        */}
+        {/* ONLY THE FOLLOWING TILE LAYER IS CHANGED */}
         <TileLayer
-          url={`https://api.mapbox.com/styles/v1/mapbox/standard-satellite/tiles/{z}/{x}/{y}?access_token=${MAPBOX_ACCESS_TOKEN}`}
-          attribution='
-            Map data &copy;
-            <a href="https://www.openstreetmap.org/">OpenStreetMap</a>
-            contributors,
-            &copy; 
-            <a href="https://www.mapbox.com/">Mapbox</a>
-          '
-          tileSize={512}
-          zoomOffset={-1}
+          url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          attribution="&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community"
         />
 
-        {/* Plot circles for each city */}
         {cities.map((city, idx) => {
           return (
             <CircleMarker
@@ -274,10 +237,7 @@ const PerformanceMap = (data) => {
               center={[city.lat, city.lng]}
               color="black" // Border color
               radius={10}
-              fillColor={getColor(
-                Number(city.performances[view]) || 0,
-                Number(currentPerformance) || 0
-              )}
+              fillColor={getColor(city?.performances[view], currentPerformance)} // Use correct view performance
               fillOpacity={0.8}
             >
               <Tooltip direction="top" offset={[0, -10]} opacity={1}>
