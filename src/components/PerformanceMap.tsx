@@ -159,8 +159,8 @@ const PerformanceMap = (data) => {
   // Function to get the color based on updated logic
   const getColor = (performance: number, general: number) => {
     const lowerThreshold = general * 0.85; // 15% below the general value
-    if (performance < lowerThreshold) return "red"; // More than 15% below general
-    if (performance >= lowerThreshold && performance < general) return "yellow"; // Less than general but within the 15% range
+    if (performance < lowerThreshold) return "red";   // More than 15% below general
+    if (performance >= lowerThreshold && performance < general) return "yellow"; // Less than general but within 15%
     return "green"; // Meets or exceeds general performance
   };
 
@@ -226,9 +226,8 @@ const PerformanceMap = (data) => {
       >
         {/* ONLY THE FOLLOWING TILE LAYER IS CHANGED */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
-                      &copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          attribution="&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community"
         />
 
         {cities.map((city, idx) => {
