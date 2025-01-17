@@ -224,47 +224,49 @@ const PerformanceMap = (data) => {
         }}
         attributionControl={false}
       >
-        {/* ONLY THIS TILELAYER CHANGED => NASA VIIRS Black Marble NIGHT LIGHTS */}
+        {/* ONLY THE FOLLOWING TILE LAYER IS CHANGED */}
         <TileLayer
-          url="https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2020-01-01/{z}/{y}/{x}.png"
-          attribution="Imagery provided by NASA VIIRS Black Marble"
+          url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          attribution="&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community"
         />
 
-        {cities.map((city, idx) => (
-          <CircleMarker
-            key={`${idx}-${view}`} // Force re-render on view change
-            center={[city.lat, city.lng]}
-            color="black" // Border color
-            radius={10}
-            fillColor={getColor(city?.performances[view], currentPerformance)}
-            fillOpacity={0.8}
-          >
-            <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-              <span>
-                <strong>{city.name}</strong>
-                <br />
-                {view === "week"
-                  ? "Week"
-                  : view === "month"
-                  ? "Month"
-                  : view === "year"
-                  ? "Year"
-                  : "AllTime"}{" "}
-                Performance: {city.performances[view]}
-                <br />
-                General TV Azteca{" "}
-                {view === "week"
-                  ? "Week"
-                  : view === "month"
-                  ? "Month"
-                  : view === "year"
-                  ? "Year"
-                  : "AllTime"}
-                : {currentPerformance}
-              </span>
-            </Tooltip>
-          </CircleMarker>
-        ))}
+        {cities.map((city, idx) => {
+          return (
+            <CircleMarker
+              key={`${idx}-${view}`} // Force re-render on view change
+              center={[city.lat, city.lng]}
+              color="black" // Border color
+              radius={10}
+              fillColor={getColor(city?.performances[view], currentPerformance)} // Use correct view performance
+              fillOpacity={0.8}
+            >
+              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+                <span>
+                  <strong>{city.name}</strong>
+                  <br />
+                  {view === "week"
+                    ? "Week"
+                    : view === "month"
+                    ? "Month"
+                    : view === "year"
+                    ? "Year"
+                    : "AllTime"}{" "}
+                  Performance: {city.performances[view]}
+                  <br />
+                  General TV Azteca{" "}
+                  {view === "week"
+                    ? "Week"
+                    : view === "month"
+                    ? "Month"
+                    : view === "year"
+                    ? "Year"
+                    : "AllTime"}
+                  : {currentPerformance}
+                </span>
+              </Tooltip>
+            </CircleMarker>
+          );
+        })}
       </MapContainer>
     </Box>
   );
