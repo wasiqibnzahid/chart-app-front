@@ -112,10 +112,10 @@ const PerformanceMap = (data) => {
     allTime: data.allTime,
   };
 
-  const [view, setView] = useState("week");
+  const [view, setView] = useState("week"); // State to toggle between week and month
   const [cities, setCities] = useState(
     citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
-  );
+  ); // Initialize performances
 
   useEffect(() => {}, [cities]);
 
@@ -140,8 +140,8 @@ const PerformanceMap = (data) => {
       const city = updatedCities.find((city) => city.name === name);
       if (city) {
         city.performances = {
-          week: data[data.length - 1].y.toFixed(0) || 0,
-          month: average.toFixed(0) || 0,
+          week: data[data.length - 1].y.toFixed(0) || 0, // Use last week's value or 0 if undefined
+          month: average.toFixed(0) || 0, // Use average or 0 if undefined
           year: yearAverage.toFixed(0) || 0,
           allTime: allTimeAverage.toFixed(0) || 0,
         };
@@ -158,10 +158,10 @@ const PerformanceMap = (data) => {
 
   // Function to get the color based on updated logic
   const getColor = (performance: number, general: number) => {
-    const lowerThreshold = general * 0.85; // 15% below the general
-    if (performance < lowerThreshold) return "red";
-    if (performance >= lowerThreshold && performance < general) return "yellow";
-    return "green";
+    const lowerThreshold = general * 0.85; // 15% below the general value
+    if (performance < lowerThreshold) return "red";   // More than 15% below general
+    if (performance >= lowerThreshold && performance < general) return "yellow"; // Less than general but within 15%
+    return "green"; // Meets or exceeds general performance
   };
 
   const toggleView = () => {
@@ -212,6 +212,7 @@ const PerformanceMap = (data) => {
           : "AllTime"}
       </button>
 
+      {/* Map container */}
       <MapContainer
         center={[23.634501, -102.552784]}
         zoom={4.35}
@@ -223,47 +224,49 @@ const PerformanceMap = (data) => {
         }}
         attributionControl={false}
       >
-        {/* NASA’s Black Marble from 2017-07-01. Might require zooming out. */}
+        {/* ONLY THE FOLLOWING TILE LAYER IS CHANGED */}
         <TileLayer
-          url="https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2017-07-01/{z}/{y}/{x}.png"
-          attribution="Imagery provided by NASA VIIRS Black Marble"
+          url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          attribution="&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community"
         />
 
-        {cities.map((city, idx) => (
-          <CircleMarker
-            key={`${idx}-${view}`}
-            center={[city.lat, city.lng]}
-            color="black"
-            radius={10}
-            fillColor={getColor(city?.performances[view], currentPerformance)}
-            fillOpacity={0.8}
-          >
-            <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-              <span>
-                <strong>{city.name}</strong>
-                <br />
-                {view === "week"
-                  ? "Week"
-                  : view === "month"
-                  ? "Month"
-                  : view === "year"
-                  ? "Year"
-                  : "AllTime"}{" "}
-                Performance: {city.performances[view]}
-                <br />
-                General TV Azteca{" "}
-                {view === "week"
-                  ? "Week"
-                  : view === "month"
-                  ? "Month"
-                  : view === "year"
-                  ? "Year"
-                  : "AllTime"}
-                : {currentPerformance}
-              </span>
-            </Tooltip>
-          </CircleMarker>
-        ))}
+        {cities.map((city, idx) => {
+          return (
+            <CircleMarker
+              key={`${idx}-${view}`} // Force re-render on view change
+              center={[city.lat, city.lng]}
+              color="black" // Border color
+              radius={10}
+              fillColor={getColor(city?.performances[view], currentPerformance)} // Use correct view performance
+              fillOpacity={0.8}
+            >
+              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+                <span>
+                  <strong>{city.name}</strong>
+                  <br />
+                  {view === "week"
+                    ? "Week"
+                    : view === "month"
+                    ? "Month"
+                    : view === "year"
+                    ? "Year"
+                    : "AllTime"}{" "}
+                  Performance: {city.performances[view]}
+                  <br />
+                  General TV Azteca{" "}
+                  {view === "week"
+                    ? "Week"
+                    : view === "month"
+                    ? "Month"
+                    : view === "year"
+                    ? "Year"
+                    : "AllTime"}
+                  : {currentPerformance}
+                </span>
+              </Tooltip>
+            </CircleMarker>
+          );
+        })}
       </MapContainer>
     </Box>
   );
