@@ -105,7 +105,6 @@ const citiesData = [
 // Weekly and monthly general TV Azteca performance data
 
 const PerformanceMap = (data) => {
-  // This object holds the "general Azteca" performance arrays
   const generalAztecaPerformance = {
     week: data.week,
     month: data.month,
@@ -113,36 +112,41 @@ const PerformanceMap = (data) => {
     allTime: data.allTime,
   };
 
-  const [view, setView] = useState("week"); // "week" | "month" | "year" | "allTime"
+  const [view, setView] = useState("week"); // State to toggle between week, month, year, and allTime
   const [cities, setCities] = useState(
-    citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
-  ); // Each city has "performances" for each time period
+    citiesData.map((city) => ({
+      ...city,
+      performances: { week: 0, month: 0, year: 0, allTime: 0 },
+    }))
+  ); // Initialize performances
 
-  useEffect(() => {}, [cities]);
+  useEffect(() => {
+    // eslint-disable-next-line
+  }, [cities]);
 
   useEffect(() => {
     const updatedCities = [...cities];
 
-    // data.data.comparison.total is an array of city info: [{ name, data }, ...]
-    data.data.comparison.total.forEach(({ name, data: cityData }) => {
-      const lastFourData = cityData?.slice(-4);
+    // Process video data
+    data.data.comparison.total.forEach(({ name, data }) => {
+      const lastFourData = data?.slice(-4);
       const sum = lastFourData?.reduce((acc, point) => acc + point.y, 0);
       const average = sum / lastFourData?.length;
 
-      const lastYearData = cityData?.slice(-52);
+      const lastYearData = data?.slice(-52);
       const yearSum = lastYearData?.reduce((acc, point) => acc + point.y, 0);
       const yearAverage = yearSum / lastYearData?.length;
 
-      const allTimeData = cityData;
+      const allTimeData = data;
       const allTimeSum = allTimeData?.reduce((acc, point) => acc + point.y, 0);
       const allTimeAverage = allTimeSum / allTimeData?.length;
 
-      // Find the matching city in our list and update it
-      const city = updatedCities.find((c) => c.name === name);
+      // Update city performance
+      const city = updatedCities.find((city) => city.name === name);
       if (city) {
         city.performances = {
-          week: cityData[cityData.length - 1].y.toFixed(0) || 0,
-          month: average.toFixed(0) || 0,
+          week: data[data.length - 1].y.toFixed(0) || 0, // Use last week’s value or 0 if undefined
+          month: average.toFixed(0) || 0, // Use average or 0 if undefined
           year: yearAverage.toFixed(0) || 0,
           allTime: allTimeAverage.toFixed(0) || 0,
         };
@@ -150,21 +154,25 @@ const PerformanceMap = (data) => {
     });
 
     setCities(updatedCities);
+    // toggleView();
   }, [data]);
 
-  // "currentPerformance" is the last element in whichever array (week, month, year, etc.) was selected
+  // Get the current performance data based on the selected view
   const currentPerformance =
-    generalAztecaPerformance[view][generalAztecaPerformance[view].length - 1];
+    generalAztecaPerformance[view] &&
+    generalAztecaPerformance[view][
+      generalAztecaPerformance[view].length - 1
+    ];
 
-  // Return a color based on how city performance compares to the "general" performance
+  // Function to get the color based on updated logic
   const getColor = (performance, general) => {
-    const lowerThreshold = general * 0.85; // 15% below => red
-    if (performance < lowerThreshold) return "red";
-    if (performance >= lowerThreshold && performance < general) return "yellow";
-    return "green";
+    const lowerThreshold = general * 0.85; // 15% below the general value
+    if (performance < lowerThreshold) return "red"; // More than 15% below general
+    if (performance >= lowerThreshold && performance < general)
+      return "yellow"; // Within the 15% range but below general
+    return "green"; // Meets or exceeds general performance
   };
 
-  // Cycle through the time periods
   const toggleView = () => {
     let newView = "";
     switch (view) {
@@ -188,7 +196,6 @@ const PerformanceMap = (data) => {
 
   return (
     <Box p={0} mb={0} borderRadius="lg" position="relative" height="530px">
-      {/* Button to switch between week / month / year / allTime */}
       <button
         onClick={toggleView}
         style={{
@@ -214,7 +221,7 @@ const PerformanceMap = (data) => {
           : "AllTime"}
       </button>
 
-      {/* Map Container (Leaflet) */}
+      {/* Map container */}
       <MapContainer
         center={[23.634501, -102.552784]}
         zoom={4.35}
@@ -226,43 +233,49 @@ const PerformanceMap = (data) => {
         }}
         attributionControl={false}
       >
-        {/* 
-          Using free Esri satellite imagery. 
-          If you’d rather use a different source, swap out the url and attribution below.
-        */}
         <TileLayer
-          url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-          attribution="&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community"
+          // Updated to the dark-themed CartoDB Dark Matter tile layer for a night/space view.
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
-
-        {/* Place a CircleMarker on each city */}
-        {cities.map((city, idx) => {
-          return (
-            <CircleMarker
-              key={`${idx}-${view}`}
-              center={[city.lat, city.lng]}
-              color="black" // circle border
-              radius={10}
-              fillColor={getColor(
-                Number(city.performances[view]) || 0,
-                Number(currentPerformance) || 0
-              )}
-              fillOpacity={0.8}
-            >
-              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-                <span>
-                  <strong>{city.name}</strong>
-                  <br />
-                  {view.charAt(0).toUpperCase() + view.slice(1)} Performance:{" "}
-                  {city.performances[view]}
-                  <br />
-                  General TV Azteca {view.charAt(0).toUpperCase() + view.slice(1)}
-                  : {currentPerformance}
-                </span>
-              </Tooltip>
-            </CircleMarker>
-          );
-        })}
+        {cities.map((city, idx) => (
+          <CircleMarker
+            key={`${idx}-${view}`} // Force re-render on view change
+            center={[city.lat, city.lng]}
+            color="black" // Marker border color
+            radius={10}
+            fillColor={getColor(
+              city.performances[view],
+              currentPerformance || 1
+            )} // Use correct view performance; avoid division by zero if currentPerformance is falsy.
+            fillOpacity={0.8}
+          >
+            <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+              <span>
+                <strong>{city.name}</strong>
+                <br />
+                {view === "week"
+                  ? "Week"
+                  : view === "month"
+                  ? "Month"
+                  : view === "year"
+                  ? "Year"
+                  : "AllTime"}{" "}
+                Performance: {city.performances[view]}
+                <br />
+                General TV Azteca{" "}
+                {view === "week"
+                  ? "Week"
+                  : view === "month"
+                  ? "Month"
+                  : view === "year"
+                  ? "Year"
+                  : "AllTime"}
+                : {currentPerformance}
+              </span>
+            </Tooltip>
+          </CircleMarker>
+        ))}
       </MapContainer>
     </Box>
   );
