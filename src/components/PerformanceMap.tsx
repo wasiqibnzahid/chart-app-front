@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Box } from "@chakra-ui/react";
+
 const citiesData = [
   {
     name: "Laguna",
-    lat: 25.544430,
+    lat: 25.54443,
     lng: -103.406786,
     performances: {},
   },
@@ -108,14 +109,16 @@ const PerformanceMap = (data) => {
     week: data.week,
     month: data.month,
     year: data.year,
-    allTime: data.allTime
+    allTime: data.allTime,
   };
 
   const [view, setView] = useState("week"); // State to toggle between week and month
   const [cities, setCities] = useState(
     citiesData.map((city) => ({ ...city, performances: { week: 0, month: 0 } }))
   ); // Initialize performances
+
   useEffect(() => {}, [cities]);
+
   useEffect(() => {
     const updatedCities = [...cities];
 
@@ -139,7 +142,7 @@ const PerformanceMap = (data) => {
         city.performances = {
           week: data[data.length - 1].y.toFixed(0) || 0, // Use last week's value or 0 if undefined
           month: average.toFixed(0) || 0, // Use average or 0 if undefined
-          year: yearAverage.toFixed(0) || 0, 
+          year: yearAverage.toFixed(0) || 0,
           allTime: allTimeAverage.toFixed(0) || 0,
         };
       }
@@ -163,22 +166,21 @@ const PerformanceMap = (data) => {
 
   const toggleView = () => {
     let newView = "";
-    switch(view){
+    switch (view) {
       case "week":
-        newView = "month"
+        newView = "month";
         break;
       case "month":
-        newView = "year"
+        newView = "year";
         break;
       case "year":
-        newView = "allTime"
+        newView = "allTime";
         break;
       case "allTime":
-        newView = "week"
+        newView = "week";
         break;
       default:
-          newView = "month"
-
+        newView = "month";
     }
     setView(newView);
   };
@@ -201,7 +203,13 @@ const PerformanceMap = (data) => {
           overflow: "hidden",
         }}
       >
-        {view === "week" ? "Week" : view === "month"? "Month": view === "year"? "Year": "AllTime"}
+        {view === "week"
+          ? "Week"
+          : view === "month"
+          ? "Month"
+          : view === "year"
+          ? "Year"
+          : "AllTime"}
       </button>
 
       {/* Map container */}
@@ -216,10 +224,12 @@ const PerformanceMap = (data) => {
         }}
         attributionControl={false}
       >
+        {/* ONLY THE FOLLOWING TILE LAYER IS CHANGED */}
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
+          url="https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2024-01-01/{z}/{y}/{x}.jpg"
+          attribution="Imagery by NASA GIBS, OpenStreetMap contributors"
         />
+
         {cities.map((city, idx) => {
           return (
             <CircleMarker
@@ -234,10 +244,24 @@ const PerformanceMap = (data) => {
                 <span>
                   <strong>{city.name}</strong>
                   <br />
-                  {view === "week" ? "Week" : view === "month"? "Month": view === "year"? "Year": "AllTime"} Performance:{" "}
-                  {city.performances[view]}
+                  {view === "week"
+                    ? "Week"
+                    : view === "month"
+                    ? "Month"
+                    : view === "year"
+                    ? "Year"
+                    : "AllTime"}{" "}
+                  Performance: {city.performances[view]}
                   <br />
-                  General TV Azteca {view === "week" ? "Week" : view === "month"? "Month": view === "year"? "Year": "AllTime"}: {currentPerformance}
+                  General TV Azteca{" "}
+                  {view === "week"
+                    ? "Week"
+                    : view === "month"
+                    ? "Month"
+                    : view === "year"
+                    ? "Year"
+                    : "AllTime"}
+                  : {currentPerformance}
                 </span>
               </Tooltip>
             </CircleMarker>
