@@ -303,7 +303,7 @@ const General = () => {
   const currentTotalRequest = useMemo(() => {
     if (selectedDate) {
       const data = totalData.find((d) => d.date === selectedDate);
-      return data ? data.totalRequests : null; // Corrected: 'data' instead of 'd'
+      return data ? data.totalRequests : null;
     }
     if (totalData.length === 0) return null;
     return totalData[totalData.length - 1].totalRequests;
@@ -323,7 +323,7 @@ const General = () => {
     return change.toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }); // No decimals
+    });
   }, [currentTotalRequest, previousTotalRequest]);
 
   const totalPercentageChange = useMemo(() => {
@@ -356,16 +356,13 @@ const General = () => {
     return change.toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }); // No decimals
+    });
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
   const envivoPercentageChange = useMemo(() => {
     if (previousEnvivoRequest === null || currentEnvivoRequest === null)
       return "N/A";
-    return calculatePercentageChange(
-      currentEnvivoRequest,
-      previousEnvivoRequest
-    );
+    return calculatePercentageChange(currentEnvivoRequest, previousEnvivoRequest);
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
   // Toggle comparison mode
@@ -398,10 +395,7 @@ const General = () => {
       month: "long",
       day: "numeric",
     };
-    return `Viewing data for ${latestDate.toLocaleDateString(
-      undefined,
-      options
-    )}`;
+    return `Viewing data for ${latestDate.toLocaleDateString(undefined, options)}`;
   }, [selectedDate, totalData]);
 
   // **Handle Date Selection**
@@ -518,9 +512,9 @@ const General = () => {
 
               {/* Date Label */}
               <Text
-                fontSize="lg" // Uniform font size
-                fontWeight="bold" // Bold font
-                color="white" // White color
+                fontSize="lg"
+                fontWeight="bold"
+                color="white"
               >
                 {latestDateLabel}
               </Text>
@@ -576,11 +570,11 @@ const General = () => {
                     }
                     min={totalData.length > 0 ? totalData[0].date : undefined}
                     value={selectedDate || ""}
-                    bg="transparent" // Transparent background
-                    borderColor="gray.300" // Light border color
-                    _hover={{ borderColor: "gray.400" }} // Slight border color on hover
-                    _focus={{ borderColor: "teal.500", boxShadow: "none" }} // Focus styles
-                    color="black" // Set font color to black for visibility
+                    bg="transparent"
+                    borderColor="gray.300"
+                    _hover={{ borderColor: "gray.400" }}
+                    _focus={{ borderColor: "teal.500", boxShadow: "none" }}
+                    color="black"
                   />
                   {selectedDate && (
                     <Button
@@ -590,7 +584,7 @@ const General = () => {
                       onClick={resetSelectedDate}
                       width="100%"
                       variant="outline"
-                      _hover={{ background: "transparent" }} // No hover background
+                      _hover={{ background: "transparent" }}
                     >
                       Clear Selection
                     </Button>
@@ -611,17 +605,17 @@ const General = () => {
           >
             {/* Daily Request Count Box */}
             <Box
-              bg="linear-gradient(90deg, #000000, #7800ff)" // Linear gradient background
-              borderRadius="20px" // Rounded corners
-              border="2.5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
+              bg="linear-gradient(90deg, #000000, #7800ff)"
+              borderRadius="20px"
+              border="2.5px solid rgba(255, 255, 255, 0.8)"
               p={6}
               flex="1"
             >
               <Flex justifyContent="space-between" alignItems="center" mb={4}>
                 <Text
-                  fontSize="lg" // Uniform font size
-                  fontWeight="bold" // Bold font
-                  color="white" // White color
+                  fontSize="lg"
+                  fontWeight="bold"
+                  color="white"
                   className="text-white"
                 >
                   Daily Request Count
@@ -685,17 +679,17 @@ const General = () => {
 
             {/* Daily Envivo Query Count Box */}
             <Box
-              bg="linear-gradient(90deg, #000000, #7800ff)" // Linear gradient background
-              borderRadius="20px" // Rounded corners
-              border="2.5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
+              bg="linear-gradient(90deg, #000000, #7800ff)"
+              borderRadius="20px"
+              border="2.5px solid rgba(255, 255, 255, 0.8)"
               p={6}
               flex="1"
             >
               <Flex justifyContent="space-between" alignItems="center" mb={4}>
                 <Text
-                  fontSize="lg" // Uniform font size
-                  fontWeight="bold" // Bold font
-                  color="white" // White color
+                  fontSize="lg"
+                  fontWeight="bold"
+                  color="white"
                   className="text-white"
                 >
                   Daily Envivo Query Count
@@ -704,7 +698,6 @@ const General = () => {
                   onClick={toggleComparisonMode}
                   colorScheme="teal"
                   size="sm"
-                  
                 >
                   Show {comparisonMode === "percentage" ? "Raw" : "Percentage"}
                 </Button>
@@ -732,7 +725,9 @@ const General = () => {
                           ? "N/A"
                           : `${envivoPercentageChange}%`}
                       </Text>
-                      <Text fontSize="md" className="text-white">compared to last week</Text>
+                      <Text fontSize="md" className="text-white">
+                        compared to last week
+                      </Text>
                     </>
                   ) : (
                     <>
@@ -747,7 +742,9 @@ const General = () => {
                               envivoRequestChange >= 0 ? "+" : ""
                             }${envivoRequestChange}`}
                       </Text>
-                      <Text fontSize="md" className="text-white">compared to last week</Text>
+                      <Text fontSize="md" className="text-white">
+                        compared to last week
+                      </Text>
                     </>
                   )}
                 </Flex>
@@ -757,22 +754,23 @@ const General = () => {
 
           {/* Averages Display */}
           <Box
-            bg="linear-gradient(90deg, #000000, #7800ff)" // Linear gradient background
-            borderRadius="20px" // Rounded corners
-            border="2.5px solid rgba(255, 255, 255, 0.8)" // White border with transparency
+            bg="linear-gradient(90deg, #000000, #7800ff)"
+            borderRadius="20px"
+            border="2.5px solid rgba(255, 255, 255, 0.8)"
             p={6}
             width="100%"
             maxW="800px"
-            mb={10} // Added margin-bottom for additional padding after this section
+            mb={10}
           >
             <Flex justifyContent="space-between" alignItems="center" mb={4}>
               <Text
-                fontSize="lg" // Uniform font size
-                fontWeight="bold" // Bold font
-                color="white" // White color
+                fontSize="lg"
+                fontWeight="bold"
+                color="white"
               >
                 Averages for {selectedPeriod}
               </Text>
+
               {/* Select Time Period Dropdown */}
               <Select
                 value={selectedPeriod}
@@ -781,23 +779,39 @@ const General = () => {
                   setSelectedDate(null); // Reset selected date when period changes
                 }}
                 placeholder="Select"
-                size="sm" // Smaller size
-                width="150px" // Fixed small width
-                aria-label="Select Time Period" // Accessibility
+                size="sm"
+                width="150px"
+                aria-label="Select Time Period"
+                /* ---------------------------- */
+                /* The important styling changes */
+                /* ---------------------------- */
+                bgColor="transparent"     // Transparent background
+                color="white"            // Make text white
+                borderColor="white"      // Border white
+                _focus={{ boxShadow: "none", borderColor: "white" }}
+                _hover={{ borderColor: "white" }}
               >
                 {Object.values(PERIODS).map((period) => (
-                  <option key={period} value={period}>
+                  <option
+                    key={period}
+                    value={period}
+                    style={{
+                      backgroundColor: "#000", // Dark background for dropdown items
+                      color: "#fff",           // White text in dropdown items
+                    }}
+                  >
                     {period}
                   </option>
                 ))}
               </Select>
             </Flex>
+
             <Grid templateColumns="repeat(2, 1fr)" gap={6}>
               <Box textAlign="center">
                 <Text
-                  fontSize="md" // Uniform font size
-                  fontWeight="bold" // Bold font
-                  color="white" // White color
+                  fontSize="md"
+                  fontWeight="bold"
+                  color="white"
                 >
                   Request Count
                 </Text>
@@ -809,9 +823,9 @@ const General = () => {
               </Box>
               <Box textAlign="center">
                 <Text
-                  fontSize="md" // Uniform font size
-                  fontWeight="bold" // Bold font
-                  color="white" // White color
+                  fontSize="md"
+                  fontWeight="bold"
+                  color="white"
                 >
                   Envivo Query Count
                 </Text>
