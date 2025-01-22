@@ -9,6 +9,8 @@ import Vertical from "../assets/Vertical.svg";
 import Local from "../assets/Local.svg";
 import ampIcon from '../assets/amp-svgrepo-com.svg';
 import testIcon from '../assets/test-svgrepo-com.svg';
+import ImageIcon from '../assets/gallery-svgrepo-com.svg';
+
 import General from "../assets/General.svg";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -22,7 +24,7 @@ import ImageData from "./ImageData";
 
 
 const GeneralApp: React.FC = () => {
-    const [activeTab, setActiveTab] = useState(5);
+    const [activeTab, setActiveTab] = useState(0);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
    
@@ -111,6 +113,20 @@ const GeneralApp: React.FC = () => {
               }}
             />{" "}
             Test Manager
+          </button>
+          <button
+            className={`tab-button ${activeTab === 5 ? "active" : ""}`}
+            onClick={() => setActiveTab(5)}
+          >
+            <img
+              src={ImageIcon}
+              height={10}
+              width={20}
+              style={{
+                marginRight: "10px",
+              }}
+            />{" "}
+            Gallery
           </button>
         </div>
   
