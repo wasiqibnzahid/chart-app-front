@@ -119,7 +119,7 @@ const calculateSlope = (x, y) => {
     return numerator / denominator;
 };
 
-const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
+const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_category = false }) => {
     const GROUPS = groups;
     const GROUP_NAMES = Object.keys(GROUPS);
     const INDIVIDUAL_COMPANIES = GROUP_NAMES.reduce(
@@ -582,7 +582,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                     <PopoverBody>
                                         <VStack align="start" spacing={2}>
                                             {/* Category */}
-                                            <Box>
+                                        {!hide_category &&    <Box>
                                                 <Text
                                                     fontSize="sm"
                                                     fontWeight="semibold"
@@ -615,7 +615,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40" }) => {
                                                         </Checkbox>
                                                     </HStack>
                                                 </CheckboxGroup>
-                                            </Box>
+                                            </Box>}
 
                                             {/* Week */}
                                             <Box>

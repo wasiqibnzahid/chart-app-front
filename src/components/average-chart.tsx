@@ -36,6 +36,7 @@ export interface AverageChartProps {
     comparison: ComparisonData;
     quarterData: QuarterData[];
   };
+  is_image?: boolean;
 }
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
@@ -55,9 +56,13 @@ const months = [
 const seriesColors: { [key: string]: string } = {
   "TV Azteca": "#3357FF", // Vibrant Blue
   Competition: "#FF5733", // Vibrant Red
+  "General Azteca": "#3357FF",
   // Add more series colors here if needed
 };
-const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
+const AverageChart: React.FC<AverageChartProps> = ({
+  data: propData,
+  is_image = false,
+}) => {
   // States
   const [showZoomIn, setShowZoomIn] = useState(false);
   const [showControls, setShowControls] = useState(false);
@@ -112,23 +117,27 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
 
   const dataToUse = useMemo(() => {
     let mainDataUse = [...data.weekly.data];
-
-    mainDataUse = mainDataUse
-      .filter((item) => {
+    if (!is_image) {
+        mainDataUse = mainDataUse.filter((item) => {
         if (selectedDropdown === "Video") {
           return item.name.includes("Video");
         } else if (selectedDropdown === "Note") {
           return item.name.includes("Note");
         } else
           return !item.name.includes("Note") && !item.name.includes("Video");
-      })
-      .map((data) => ({
-        ...data,
-        name: data.name
-          .replace(" Avg", "")
-          .replace(" Video", "")
-          .replace(" Note", ""),
-      }));
+      });
+    }
+    mainDataUse = mainDataUse.map((data) => ({
+      ...data,
+      data: data.data.map((item) => ({
+        ...item,
+        y: Number(Number(item.y).toFixed(2))
+      })),
+      name: data.name
+        .replace(" Avg", "")
+        .replace(" Video", "")
+        .replace(" Note", ""),
+    }));
     if (!showAllData) {
       mainDataUse = mainDataUse.map((item) => ({
         ...item,
@@ -344,10 +353,10 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       {/* Header Text */}
       <div className="justify-content-between align-items-center mb-4">
         <div>
-          <h5>General Azteca vs Competition Overview</h5>
+          <h5>{is_image ? "Gallery Overview" : "General Azteca vs Competition Overview"}</h5>
         </div>
 
-        <section className="VerticalBarChart__legend">
+       {!is_image &&  <section className="VerticalBarChart__legend">
           {/* control SVG Start */}
           <div>
             <button
@@ -483,7 +492,7 @@ const AverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
               </Select>
             </Box>
           </div>
-        </section>
+        </section>}
         {/*         
         <div style={{ width: "300px" }}>
           <Select

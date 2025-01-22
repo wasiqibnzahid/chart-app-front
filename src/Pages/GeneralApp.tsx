@@ -18,10 +18,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import AmpOverview from "./AmpOverview";
 import { TestManager } from "./TestManager";
+import ImageData from "./ImageData";
 
 
 const GeneralApp: React.FC = () => {
-    const [activeTab, setActiveTab] = useState(0);
+    const [activeTab, setActiveTab] = useState(5);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
    
@@ -150,6 +151,7 @@ const GeneralApp: React.FC = () => {
             {activeTab === 2 && <LocalOverview />}
             {activeTab === 3 && <AmpOverview />}
             {activeTab === 4 && <TestManager />}
+            {activeTab === 5 && <ImageData />}
           </section>
         </div>
       </div>

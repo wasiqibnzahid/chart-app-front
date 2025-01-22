@@ -14,4 +14,7 @@ export const endPoints = {
   ampInsights: baseURL + "amp/insights",
   addTestWebsite: baseURL + "api/website-checks/add/",
   getTestWebsite: baseURL + "api/website-checks/",
+  getImageData: baseURL + "image-data/",
+  getImageQuarters: baseURL + "image-data/quarter/",
+  getImagePerformance: baseURL + "image-data/records/",
 };
