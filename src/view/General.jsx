@@ -660,7 +660,7 @@ const General = ({
                             <option
                               key={week}
                               value={week}
-                              style={{ color: "white" }} // <-- changed
+                              style={{ color: "black" }} // <-- changed
                             >
                               {week}
                             </option>

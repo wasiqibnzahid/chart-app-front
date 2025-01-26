@@ -250,14 +250,14 @@ const PerformanceMapVertical = () => {
         const options = [];
         GROUP_NAMES.forEach((group) => {
             options.push(
-                <option key={group} value={group}>
+                <option style={{ color: "black" }} key={group} value={group}>
                     {group}
                 </option>
             );
         });
         INDIVIDUAL_COMPANIES.forEach((company) => {
             options.push(
-                <option key={company} value={company}>
+                <option style={{ color: "black" }} key={company} value={company}>
                     {company}
                 </option>
             );
@@ -448,7 +448,7 @@ const PerformanceMapVertical = () => {
                     <Select
                         value={selectedCompany}
                         onChange={(e) => setSelectedCompany(e.target.value)}
-                        placeholder="Select Company"
+                        // placeholder="Select Company"
                         width="200px"
                         bg="transparent"
                         borderRadius="md"
@@ -470,7 +470,7 @@ const PerformanceMapVertical = () => {
                     <Select
                         value={selectedWeekRange}
                         onChange={(e) => setSelectedWeekRange(e.target.value)}
-                        placeholder="All Weeks"
+                        // placeholder="All Weeks"
                         width="200px"
                         bg="transparent"
                         borderRadius="md"
@@ -480,7 +480,7 @@ const PerformanceMapVertical = () => {
                         color="white" // ← added
                     >
                         {weekOptions.map((week) => (
-                            <option key={week} value={week}>
+                            <option style={{ color: "black" }} key={week} value={week}>
                                 {week}
                             </option>
                         ))}
@@ -500,8 +500,8 @@ const PerformanceMapVertical = () => {
                         size="sm"
                         color="white" // ← added
                     >
-                        <option value="phone">Mobile</option>
-                        <option value="desktop">Desktop</option>
+                        <option style={{ color: "black" }} value="phone">Mobile</option>
+                        <option style={{ color: "black" }} value="desktop">Desktop</option>
                     </Select>
                 </Flex>
             </Flex>

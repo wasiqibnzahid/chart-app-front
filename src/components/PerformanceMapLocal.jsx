@@ -259,7 +259,7 @@ const PerformanceMapLocal = () => {
         key="Local"
         value="Local"
         style={
-          selectedCompany === "Local" ? { color: "white", fontWeight: "bold" } : {}
+          selectedCompany === "Local" ? { color: "black", fontWeight: "bold" } : { color: "black" }
         }
       >
         Local
@@ -272,7 +272,7 @@ const PerformanceMapLocal = () => {
         <option
           key={co}
           value={co}
-          style={selectedCompany === co ? { color: "white", fontWeight: "bold" } : {}}
+          style={selectedCompany === co ? { color: "black", fontWeight: "bold" } : { color: "black" }}
         >
           {co}
         </option>
@@ -512,7 +512,7 @@ const PerformanceMapLocal = () => {
               <option
                 value="All Weeks"
                 style={
-                  selectedWeek === "All Weeks" ? { color: "white", fontWeight: "bold" } : {}
+                  selectedWeek === "All Weeks" ? { color: "black", fontWeight: "bold" } : { color: "black" }
                 }
               >
                 All Weeks
@@ -521,7 +521,7 @@ const PerformanceMapLocal = () => {
                 <option
                   key={wk}
                   value={wk}
-                  style={selectedWeek === wk ? { color: "white", fontWeight: "bold" } : {}}
+                  style={selectedWeek === wk ? { color: "black", fontWeight: "bold" } : { color: "black" }}
                 >
                   {wk}
                 </option>
