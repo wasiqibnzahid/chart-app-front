@@ -107,7 +107,7 @@ export const ImageData = () => {
             data: [
               ...changeLabel(
                 averageData.weekly.data,
-                "Image Pages Avg",
+                "Note Avg",
                 "General Azteca"
               ),
               ...changeLabel(
@@ -119,12 +119,12 @@ export const ImageData = () => {
             changes: [
               ...changeLabel(
                 averageData.weekly.changes,
-                "Image Pages Avg",
+                "Note Avg",
                 "General Azteca"
               ),
               ...changeLabel(
                 localAverageData.weekly.changes,
-                "Image Pages Avg",
+                "Note Avg",
                 "Local Azteca"
               ),
             ],
@@ -224,7 +224,7 @@ export const ImageData = () => {
             </div>
           </div>
           <div className="d-flex justify-content-center align-items-center percentage">
-            <AnimateNumber number={currentQuarter?.["Image Pages Avg"]} />%
+            <AnimateNumber number={currentQuarter?.["Note Avg"]} />%
           </div>
           <div
             style={
