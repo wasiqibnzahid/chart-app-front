@@ -1,4 +1,5 @@
-/* src/NewPage/NewPage.js */
+// src/NewPage/NewPage.js
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Box,
@@ -20,11 +21,15 @@ import {
   TagCloseButton,
   Collapse,
   useBreakpointValue,
+  VStack,
+  Input,
 } from "@chakra-ui/react";
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import Papa from "papaparse";
 import Plot from "react-plotly.js";
+import { useNavigate } from "react-router-dom";
 
+// Helper functions
 const parseDateString = (dateStr) => {
   if (!dateStr) return null;
   const d = new Date(dateStr);
@@ -46,6 +51,45 @@ const formatNumber = (val) => {
 };
 
 const NewPage = () => {
+  // =======================
+  // PIN Authentication States
+  // =======================
+  const [pinInput, setPinInput] = useState('');
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const navigate = useNavigate();
+  const toastAuth = useToast();
+  const pinInputRef = useRef(null);
+
+  const handlePinSubmit = (e) => {
+    e.preventDefault();
+    if (pinInput.trim() === '13456') { // Replace '13456' with your desired PIN
+      setIsAuthorized(true);
+      // Optionally, store authorization state in localStorage for session persistence
+      // localStorage.setItem('isAuthorized', 'true');
+    } else {
+      toastAuth({
+        title: "Incorrect PIN",
+        description: "The PIN you entered is incorrect. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      navigate('/landing', { replace: true }); // Redirect to landing page on incorrect PIN
+    }
+  };
+
+  // Optionally, check for existing authorization state (e.g., from localStorage)
+  // useEffect(() => {
+  //   const auth = localStorage.getItem('isAuthorized');
+  //   if (auth === 'true') {
+  //     setIsAuthorized(true);
+  //   }
+  // }, []);
+
+  // =======================
+  // Existing NewPage Component States and Logic
+  // =======================
+
   const [eventData, setEventData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -115,7 +159,7 @@ const NewPage = () => {
         combined.sort((a, b) => new Date(b.eventDate) - new Date(a.eventDate));
         setEventData(combined);
 
-        // unique categories
+        // Unique categories
         const uniqueCats = Array.from(new Set(combined.map((d) => d.category))).sort();
         setCategories(uniqueCats);
       } catch (err) {
@@ -140,7 +184,7 @@ const NewPage = () => {
     dataRows.forEach((row, i) => {
       try {
         const cat = row[3]?.trim();
-        if (!cat) return; // skip empty
+        if (!cat) return; // Skip empty
         const dateStr = row[5]?.trim();
         const eDate = parseDateString(dateStr);
         const yearVal = eDate ? eDate.getFullYear().toString() : defaultYear;
@@ -158,7 +202,7 @@ const NewPage = () => {
         const parsedSite = siteUsers ? parseFloat(siteUsers.replace(/,/g, "")) || 0 : 0;
         const parsedApps = appsUsers ? parseFloat(appsUsers.replace(/,/g, "")) || 0 : 0;
 
-        let subVal = subtotal && subtotal !== "-" 
+        let subVal = subtotal && subtotal !== "-"
           ? parseFloat(subtotal.replace(/,/g, "")) || (parsedSite + parsedApps)
           : parsedSite + parsedApps;
 
@@ -199,7 +243,7 @@ const NewPage = () => {
     return eventData.filter((d) => d.year === yearFilter);
   }, [eventData, yearFilter]);
 
-  // subcategories for distribution
+  // Subcategories for distribution
   const subcategories = useMemo(() => {
     if (selectedCategory === "All") {
       return Array.from(new Set(eventData.map((d) => d.subcategory))).sort();
@@ -213,7 +257,7 @@ const NewPage = () => {
     ).sort();
   }, [eventData, selectedCategory]);
 
-  // category colors
+  // Category colors
   const categoryColors = useMemo(() => {
     const palette = [
       "blue.600",
@@ -235,7 +279,7 @@ const NewPage = () => {
     return map;
   }, [categories]);
 
-  // distribution filter
+  // Distribution filter
   const distributionFilteredData = useMemo(() => {
     let data = [...yearFilteredData];
     if (selectedCategory !== "All") {
@@ -257,7 +301,7 @@ const NewPage = () => {
     return data;
   }, [yearFilteredData, selectedCategory, selectedSubcategory, timelineRange]);
 
-  // table filter
+  // Table filter
   const tableFilteredData = useMemo(() => {
     let data = [...yearFilteredData];
     if (tableCategoryFilter !== "All") {
@@ -285,7 +329,7 @@ const NewPage = () => {
     timelineRange,
   ]);
 
-  // distribution stats
+  // Distribution stats
   const totalApps = useMemo(() => 
     distributionFilteredData.reduce((acc, d) => acc + d.appsUsers, 0)
   , [distributionFilteredData]);
@@ -371,7 +415,7 @@ const NewPage = () => {
     return formatNumber(totalSites / distributionFilteredData.length);
   }, [totalSites, distributionFilteredData]);
 
-  // line graph data
+  // Line graph data
   const lineGraphData = useMemo(() => {
     const sorted = [...yearFilteredData].sort(
       (a, b) => new Date(a.eventDate) - new Date(b.eventDate)
@@ -387,7 +431,7 @@ const NewPage = () => {
     };
   }, [yearFilteredData]);
 
-  // table displayed data
+  // Table displayed data
   const recentEvents = useMemo(() => tableFilteredData.slice(0, 5), [tableFilteredData]);
   const displayedTableData = useMemo(
     () => (isTableExpanded ? tableFilteredData : recentEvents),
@@ -434,7 +478,7 @@ const NewPage = () => {
     setSelectedCompareEvents([]);
   };
 
-  // line graph selection
+  // Line graph selection
   const handleEventSelection = (e) => {
     const val = e.target.value;
     if (val && !selectedEvents.includes(val)) {
@@ -445,7 +489,7 @@ const NewPage = () => {
     setSelectedEvents(selectedEvents.filter((id) => id !== eventId));
   };
 
-  // build main traces for "ALL"
+  // Build main traces for "ALL"
   function getMainTracesForAll() {
     const traceAPPS = {
       x: lineGraphData.dates,
@@ -499,7 +543,7 @@ const NewPage = () => {
     return [traceAPPS, traceSITE, traceCTV];
   }
 
-  // build main trace single
+  // Build main trace single
   function getMainTraceSingle(metricData, color, name) {
     return {
       x: lineGraphData.dates,
@@ -520,14 +564,14 @@ const NewPage = () => {
     };
   }
 
-  // build selected traces
+  // Build selected traces
   function getSelectedTraces() {
     const selectedEventData = selectedEvents
       .map((id) => lineGraphData.events.find((ev) => ev.id === id))
       .filter(Boolean)
       .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
 
-    // if "ALL", produce 3 lines per event
+    // If "ALL", produce 3 lines per event
     if (selectedGraphOption === "ALL") {
       const lines = [];
       selectedEventData.forEach((evt) => {
@@ -573,7 +617,7 @@ const NewPage = () => {
       });
       return lines;
     } else {
-      // one metric => single line connecting the chosen events
+      // One metric => single line connecting the chosen events
       const yVals = selectedEventData.map((evt) => {
         switch (selectedGraphOption) {
           case "APPS":     return evt.appsUsers;
@@ -608,15 +652,15 @@ const NewPage = () => {
 
   const plotData = useMemo(() => {
     if (selectedGraphOption === "ALL") {
-      // if no selected events => show 3 lines for entire dataset
+      // If no selected events => show 3 lines for entire dataset
       if (!selectedEvents.length) {
         return getMainTracesForAll();
       } else {
-        // show only selected events lines
+        // Show only selected events lines
         return getSelectedTraces();
       }
     } else {
-      // single metric
+      // Single metric
       let color = "#9966FF";
       let name = "TOTAL";
       let metricArr = lineGraphData.TOTAL;
@@ -642,7 +686,7 @@ const NewPage = () => {
       if (!selectedEvents.length) {
         return [mainTrace];
       } else {
-        // only selected events
+        // Only selected events
         return getSelectedTraces();
       }
     }
@@ -701,8 +745,60 @@ const NewPage = () => {
   const piePlotWidth = useBreakpointValue({ base: 300, md: 500, lg: 600 });
   const piePlotHeight = useBreakpointValue({ base: 300, md: 500, lg: 600 });
 
+  // =======================
+  // Conditional Rendering for PIN Authentication
+  // =======================
+  if (!isAuthorized) {
+    return (
+      <Box
+        position="fixed"
+        top="0"
+        left="0"
+        width="100vw"
+        height="100vh"
+        bg="linear-gradient(90deg, #000000, #7800ff)"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        color="white"
+        zIndex="1000" /* Ensure the PIN form is on top */
+      >
+        <form onSubmit={handlePinSubmit}>
+          <VStack spacing={4}>
+            <Text fontSize="xl">Enter PIN to Access Calendar Page</Text>
+            <Input
+              ref={pinInputRef}
+              type="password"
+              value={pinInput}
+              onChange={(e) => setPinInput(e.target.value)}
+              placeholder="Enter PIN"
+              width="300px"
+              textAlign="center"
+              aria-label="PIN Input"
+              required
+            />
+            <Button type="submit" colorScheme="teal">
+              Submit
+            </Button>
+          </VStack>
+        </form>
+      </Box>
+    );
+  }
+
+  // =======================
+  // Main Component Rendering
+  // =======================
   return (
-    <Box p={0} minH="100vh" color="white" display="flex" flexDirection="column" alignItems="center">
+    <Box
+      p={0}
+      minH="100vh"
+      color="white"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      bgGradient="linear(to-r, black, purple.800)" // Optional: Add background gradient
+    >
       <Flex direction="column" width="100%" maxW="1200px">
         {/* TABLE SECTION */}
         {!isLoading && !error && (
@@ -1034,7 +1130,7 @@ const NewPage = () => {
           </Box>
         )}
 
-        {/* Distribution & Metrics */}
+        {/* DISTRIBUTION & METRICS */}
         {!isLoading && !error && (
           <Grid templateColumns={gridTemplateColumns} gap={6} mb={6}>
             <Box
@@ -1239,6 +1335,7 @@ const NewPage = () => {
           </Grid>
         )}
 
+        {/* LINE GRAPH SECTION */}
         {!isLoading && !error && (
           <Box
             bg="linear-gradient(90deg, #000000, #7800ff)"
@@ -1274,7 +1371,7 @@ const NewPage = () => {
                 <option value="ALL">All</option>
               </Select>
 
-              {/* THE KEY: Include the date in the label */}
+              {/* Include the date in the label */}
               <Box width={["100%", "300px"]}>
                 <Select
                   placeholder="Select Events"
@@ -1287,7 +1384,7 @@ const NewPage = () => {
                   {lineGraphData.events
                     .filter((evt) => !selectedEvents.includes(evt.id))
                     .map((evt) => {
-                      // label includes date + description
+                      // Label includes date + description
                       const label = `${formatDate(evt.eventDate)} - ${evt.eventDescription || "No Description"}`;
                       return (
                         <option key={evt.id} value={evt.id}>
