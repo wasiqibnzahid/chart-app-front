@@ -10,7 +10,7 @@ const LoginPage = ({ onLogin }) => {
 
   // Store the credentials
   const credentials = {
-    'ZC3tDI6i': 'cdXsih759f',
+    'SEO': 'SEO_TEAM',
     'IQI9E44P': 'um3h3TAVyi',
     'UDKO6H4z': 'rlJMTrNp2o',
     '9XgES4tf': '04jZwbzx4q',
