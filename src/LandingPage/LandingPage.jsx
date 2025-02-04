@@ -1,5 +1,4 @@
 // src/LandingPage/LandingPage.js
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -256,7 +255,7 @@ const LandingPage = ({ handleLogout }) => {
             align="center"
             justify="center"
             as={RouterLink}
-            to="/ADMIN-GitRepo"
+            to="/git-repo"  // <-- Updated this route
             border="2px solid white"
             borderRadius="lg"
             p={4}
