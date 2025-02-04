@@ -1,3 +1,5 @@
+// src/LandingPage/LandingPage.js
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -8,7 +10,7 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
-import { FaLock } from 'react-icons/fa';
+import { FaLock, FaGithub } from 'react-icons/fa';
 import { AiOutlineEye, AiOutlineCalendar } from 'react-icons/ai';
 import nasaImage from '../assets/nasa-Q1p7bh3SHj8-unsplash.jpg';
 import logoImage from '../assets/Diseño sin título (1).png';
@@ -63,14 +65,14 @@ const LandingPage = ({ handleLogout }) => {
 
       {/* Logout Button */}
       <Button
-        position="fixed" // Ensure the button stays fixed
+        position="fixed"
         top="20px"
         right="20px"
         variant="link"
         color="white"
         onClick={handleLogout}
         aria-label="Logout"
-        zIndex="1000" // High z-index to stay above other elements
+        zIndex="1000"
         _hover={{ textDecoration: 'none', color: 'white' }}
         _active={{ bg: 'transparent' }}
       >
@@ -106,13 +108,12 @@ const LandingPage = ({ handleLogout }) => {
           width="100%"
         >
           {/* Lighthouse (Static) */}
-       
           <Flex
             direction="column"
             align="center"
             justify="center"
-            as={RouterLink} // Wrap with RouterLink
-            to="/general-app" // Set the route
+            as={RouterLink}
+            to="/general-app"
             border="2px solid white"
             borderRadius="lg"
             p={4}
@@ -140,39 +141,6 @@ const LandingPage = ({ handleLogout }) => {
               Lighthouse
             </Text>
           </Flex>
-
-          {/* Lighthouse AMP (Static) */}
-          {/* <Flex
-            direction="column"
-            align="center"
-            justify="center"
-            border="2px solid white"
-            borderRadius="lg"
-            p={4}
-            width={boxWidth}
-            height={boxHeight}
-            position="relative"
-            _hover={{ transform: 'scale(1.05)' }}
-            transition="transform 0.3s ease"
-            cursor="default"
-            mb={{ base: 4, md: 0 }}
-          >
-            <Image
-              src={ampIcon} // New AMP Icon
-              alt="Lighthouse AMP Icon"
-              width={lighthouseWidth}
-              filter="invert(1)"
-            />
-            <Text
-              mt={6}
-              fontSize={['md', 'lg']}
-              fontWeight="bold"
-              fontFamily="Arial"
-              textAlign="center"
-            >
-              Lighthouse AMP
-            </Text>
-          </Flex> */}
 
           {/* Popular Objects */}
           <Flex
@@ -279,6 +247,60 @@ const LandingPage = ({ handleLogout }) => {
               textAlign="center"
             >
               Digital Calendar
+            </Text>
+          </Flex>
+
+          {/* Git Repo */}
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            as={RouterLink}
+            to="/ADMIN-GitRepo"
+            border="2px solid white"
+            borderRadius="lg"
+            p={4}
+            width={boxWidth}
+            height={boxHeight}
+            position="relative"
+            _hover={{ transform: 'scale(1.05)' }}
+            onMouseEnter={() => handleMouseEnter('gitrepo')}
+            onMouseLeave={handleMouseLeave}
+            transition="transform 0.3s ease"
+            cursor="pointer"
+            mb={{ base: 4, md: 0 }}
+          >
+            {showLock === 'gitrepo' && (
+              <Button
+                as={RouterLink}
+                to="/ADMIN-GitRepo"
+                leftIcon={<FaLock />}
+                aria-label="Admin - Git Repo"
+                position="absolute"
+                top="10px"
+                right="10px"
+                color="white"
+                variant="ghost"
+                _hover={{
+                  textDecoration: 'none',
+                  color: 'yellow.400',
+                  transform: 'scale(1.2)',
+                }}
+                _active={{ bg: 'transparent' }}
+                transition="color 0.3s ease, transform 0.3s ease"
+              >
+                Admin
+              </Button>
+            )}
+            <FaGithub size={iconSize} />
+            <Text
+              mt={6}
+              fontSize={['md', 'lg']}
+              fontWeight="bold"
+              fontFamily="Arial"
+              textAlign="center"
+            >
+              Git Repo
             </Text>
           </Flex>
         </Flex>
