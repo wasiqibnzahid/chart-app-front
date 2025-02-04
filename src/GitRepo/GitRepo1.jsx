@@ -1,4 +1,4 @@
-// src/GitRepo/GitRepo1.js
+// src/GitRepo/GitRepo1.jsx
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
