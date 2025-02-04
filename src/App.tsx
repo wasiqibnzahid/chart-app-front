@@ -1,26 +1,21 @@
-import GeneralApp from "./Pages/GeneralApp";
 import React, { useState, useEffect } from 'react';
 import { ChakraProvider, Box } from '@chakra-ui/react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
+// Pages / Layouts / Components
+import LandingPage from './LandingPage/LandingPage';
+import LoginPage from './LoginPage';
 import HomeAdmin from './HomeAdmin/HomeAdmin';
 import NewPageAdmin from './NewPageAdmin/NewPageAdmin';
+import NewPage from './NewPage/NewPage';
 import General from './General/General';
 import RequestCountGraph from './RequestCountGraph/RequestCountGraph';
 import DataTable from './DataTable/DataTable';
-import NewPage from './NewPage/NewPage';
-import LandingPage from './LandingPage/LandingPage';
 import MainLayout from './layouts/MainLayout';
-import LoginPage from './LoginPage';
+import GitRepo from './GitRepo/GitRepo';
+import GitRepoAdmin from './GitRepo/GitRepoAdmin';
 
-
-
-const App: React.FC = () => {
+function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -38,17 +33,13 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
   };
 
-
-
-return (
-  <>
-  
+  return (
     <ChakraProvider>
       <Box
         width="100vw"
         minHeight="100vh"
         bg="linear-gradient(90deg, #000000, #7800ff)"
-        color="black"
+        color="white"
       >
         <Router>
           {isAuthenticated ? (
@@ -59,54 +50,66 @@ return (
         </Router>
       </Box>
     </ChakraProvider>
-  </>
-);
-};
+  );
+}
 
-const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({ handleLogout }) => (
-<Routes>
-  <Route path="/login" element={<Navigate to="/landing" replace />} />
-  <Route
-    path="/landing"
-    element={<LandingPage handleLogout={handleLogout} />}
-  />
-  <Route path="/" element={<Navigate to="/landing" replace />} />
+//
+// Authenticated Routes
+//
+function AuthenticatedRoutes({ handleLogout }) {
+  return (
+    <Routes>
+      {/* If user hits /login while logged in, go to Landing */}
+      <Route path="/login" element={<Navigate to="/landing" replace />} />
 
-  {/* Admin Routes */}
-  <Route path="/ADMIN-PopularObjects" element={<HomeAdmin />} />
-  <Route path="/ADMIN-DIGITAL-CALENDAR" element={<NewPageAdmin />} />
-  <Route path="/Digital-Calendar" element={<NewPage />} />
-  {/* Authenticated Route for GeneralApp */}
-<Route path="/general-app" element={<GeneralApp />} />
+      {/* Default: / => /landing */}
+      <Route path="/" element={<Navigate to="/landing" replace />} />
 
+      {/* Landing Page */}
+      <Route path="/landing" element={<LandingPage handleLogout={handleLogout} />} />
 
-  {/* Main Application Route */}
-  <Route
-    path="/*"
-    element={
-      <MainLayout>
-        {/* Main Content */}
-        <Box maxW="1600px" py={10} bg="transparent">
-          <General />
-          <RequestCountGraph />
-          <DataTable />
-        </Box>
-      </MainLayout>
-    }
-  />
+      {/* Admin-Related */}
+      <Route path="/ADMIN-PopularObjects" element={<HomeAdmin />} />
+      <Route path="/ADMIN-DIGITAL-CALENDAR" element={<NewPageAdmin />} />
+      <Route path="/ADMIN-GitRepo" element={<GitRepoAdmin />} />
 
-  {/* Catch-all Route */}
-  <Route path="*" element={<Navigate to="/landing" replace />} />
-</Routes>
-);
+      {/* Regular GitRepo */}
+      <Route path="/git-repo" element={<GitRepo />} />
 
-const UnauthenticatedRoutes: React.FC<{ handleLogin: () => void }> = ({ handleLogin }) => (
-<Routes>
-  <Route path="*" element={<Navigate to="/login" replace />} />
-  <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-</Routes>
-);
-   
-  
+      {/* Another example page */}
+      <Route path="/Digital-Calendar" element={<NewPage />} />
+
+      {/* If you want to show General/Graph/Data under a layout: */}
+      <Route
+        path="/dashboard"
+        element={
+          <MainLayout>
+            <General />
+            <RequestCountGraph />
+            <DataTable />
+          </MainLayout>
+        }
+      />
+
+      {/* Catch-all → /landing */}
+      <Route path="*" element={<Navigate to="/landing" replace />} />
+    </Routes>
+  );
+}
+
+//
+// Unauthenticated Routes
+//
+function UnauthenticatedRoutes({ handleLogin }) {
+  return (
+    <Routes>
+      {/* Default route: if not logged in, go to /login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+      {/* Anything else also → /login */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+}
 
 export default App;
