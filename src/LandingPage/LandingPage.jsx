@@ -10,7 +10,7 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
-import { FaLock, FaGithub } from 'react-icons/fa'; // Import FaGithub for Git Repo
+import { FaLock, FaGithub } from 'react-icons/fa';
 import { AiOutlineEye, AiOutlineCalendar } from 'react-icons/ai';
 import nasaImage from '../assets/nasa-Q1p7bh3SHj8-unsplash.jpg';
 import logoImage from '../assets/Diseño sin título (1).png';
@@ -112,6 +112,8 @@ const LandingPage = ({ handleLogout }) => {
             direction="column"
             align="center"
             justify="center"
+            as={RouterLink}
+            to="/general-app"
             border="2px solid white"
             borderRadius="lg"
             p={4}
@@ -120,7 +122,7 @@ const LandingPage = ({ handleLogout }) => {
             position="relative"
             _hover={{ transform: 'scale(1.05)' }}
             transition="transform 0.3s ease"
-            cursor="default"
+            cursor="pointer"
             mb={{ base: 4, md: 0 }}
           >
             <Image
@@ -137,39 +139,6 @@ const LandingPage = ({ handleLogout }) => {
               textAlign="center"
             >
               Lighthouse
-            </Text>
-          </Flex>
-
-          {/* Lighthouse AMP (Static) */}
-          <Flex
-            direction="column"
-            align="center"
-            justify="center"
-            border="2px solid white"
-            borderRadius="lg"
-            p={4}
-            width={boxWidth}
-            height={boxHeight}
-            position="relative"
-            _hover={{ transform: 'scale(1.05)' }}
-            transition="transform 0.3s ease"
-            cursor="default"
-            mb={{ base: 4, md: 0 }}
-          >
-            <Image
-              src={ampIcon}
-              alt="Lighthouse AMP Icon"
-              width={lighthouseWidth}
-              filter="invert(1)"
-            />
-            <Text
-              mt={6}
-              fontSize={['md', 'lg']}
-              fontWeight="bold"
-              fontFamily="Arial"
-              textAlign="center"
-            >
-              Lighthouse AMP
             </Text>
           </Flex>
 
@@ -281,13 +250,13 @@ const LandingPage = ({ handleLogout }) => {
             </Text>
           </Flex>
 
-          {/* Git Repo (New Box) */}
+          {/* Git Repo */}
           <Flex
             direction="column"
             align="center"
             justify="center"
             as={RouterLink}
-            to="/git-repo"
+            to="/ADMIN-GitRepo"
             border="2px solid white"
             borderRadius="lg"
             p={4}
