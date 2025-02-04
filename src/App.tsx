@@ -1,28 +1,29 @@
+import GeneralApp from "./Pages/GeneralApp";
 import React, { useState, useEffect } from 'react';
 import { ChakraProvider, Box } from '@chakra-ui/react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from 'react-router-dom';
 
-import LandingPage from './LandingPage/LandingPage';
-import LoginPage from './LoginPage';
 import HomeAdmin from './HomeAdmin/HomeAdmin';
 import NewPageAdmin from './NewPageAdmin/NewPageAdmin';
-import GitRepoAdmin from './GitRepo/GitRepoAdmin';
-import NewPage from './NewPage/NewPage';
-import GitRepo from './GitRepo/GitRepo';
-
-// If you want these pages on separate URLs:
 import General from './General/General';
 import RequestCountGraph from './RequestCountGraph/RequestCountGraph';
 import DataTable from './DataTable/DataTable';
-
-// Optional layout
+import NewPage from './NewPage/NewPage';
+import LandingPage from './LandingPage/LandingPage';
 import MainLayout from './layouts/MainLayout';
+import LoginPage from './LoginPage';
 
-function App() {
+
+
+const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Read from localStorage only once on mount
     const authStatus = localStorage.getItem('isAuthenticated');
     setIsAuthenticated(authStatus === 'true');
   }, []);
@@ -37,13 +38,17 @@ function App() {
     setIsAuthenticated(false);
   };
 
-  return (
+
+
+return (
+  <>
+  
     <ChakraProvider>
       <Box
         width="100vw"
         minHeight="100vh"
         bg="linear-gradient(90deg, #000000, #7800ff)"
-        color="white"
+        color="black"
       >
         <Router>
           {isAuthenticated ? (
@@ -54,97 +59,54 @@ function App() {
         </Router>
       </Box>
     </ChakraProvider>
-  );
-}
+  </>
+);
+};
 
-//
-// Authenticated Routes
-//
-function AuthenticatedRoutes({ handleLogout }) {
-  return (
-    <Routes>
-      {/*
-        If user is Authenticated and tries to go to /login,
-        we send them to /landing instead.
-      */}
-      <Route path="/login" element={<Navigate to="/landing" replace />} />
+const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({ handleLogout }) => (
+<Routes>
+  <Route path="/login" element={<Navigate to="/landing" replace />} />
+  <Route
+    path="/landing"
+    element={<LandingPage handleLogout={handleLogout} />}
+  />
+  <Route path="/" element={<Navigate to="/landing" replace />} />
 
-      {/*
-        Default route: if user just types "/"
-        we navigate them to /landing
-      */}
-      <Route path="/" element={<Navigate to="/landing" replace />} />
+  {/* Admin Routes */}
+  <Route path="/ADMIN-PopularObjects" element={<HomeAdmin />} />
+  <Route path="/ADMIN-DIGITAL-CALENDAR" element={<NewPageAdmin />} />
+  <Route path="/Digital-Calendar" element={<NewPage />} />
+  {/* Authenticated Route for GeneralApp */}
+<Route path="/general-app" element={<GeneralApp />} />
 
-      {/*
-        1) Landing Page
-      */}
-      <Route path="/landing" element={<LandingPage handleLogout={handleLogout} />} />
 
-      {/*
-        2) ADMIN routes
-      */}
-      <Route path="/ADMIN-PopularObjects" element={<HomeAdmin />} />
-      <Route path="/ADMIN-DIGITAL-CALENDAR" element={<NewPageAdmin />} />
-      <Route path="/ADMIN-GitRepo" element={<GitRepoAdmin />} />
+  {/* Main Application Route */}
+  <Route
+    path="/*"
+    element={
+      <MainLayout>
+        {/* Main Content */}
+        <Box maxW="1600px" py={10} bg="transparent">
+          <General />
+          <RequestCountGraph />
+          <DataTable />
+        </Box>
+      </MainLayout>
+    }
+  />
 
-      {/*
-        3) Non-admin pages
-      */}
-      <Route path="/Digital-Calendar" element={<NewPage />} />
-      <Route path="/git-repo" element={<GitRepo />} />
+  {/* Catch-all Route */}
+  <Route path="*" element={<Navigate to="/landing" replace />} />
+</Routes>
+);
 
-      {/*
-        4) If you want each page on its own route with optional layout
-           (or remove MainLayout if not needed).
-      */}
-      <Route
-        path="/general"
-        element={
-          <MainLayout>
-            <General />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/graphs"
-        element={
-          <MainLayout>
-            <RequestCountGraph />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/table"
-        element={
-          <MainLayout>
-            <DataTable />
-          </MainLayout>
-        }
-      />
-
-      {/*
-        5) Catch-all: any other path → /landing
-      */}
-      <Route path="*" element={<Navigate to="/landing" replace />} />
-    </Routes>
-  );
-}
-
-//
-// Unauthenticated Routes
-//
-function UnauthenticatedRoutes({ handleLogin }) {
-  return (
-    <Routes>
-      {/*
-        If user isn't logged in and tries to go anywhere else,
-        we always send them to /login.
-      */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
-  );
-}
+const UnauthenticatedRoutes: React.FC<{ handleLogin: () => void }> = ({ handleLogin }) => (
+<Routes>
+  <Route path="*" element={<Navigate to="/login" replace />} />
+  <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+</Routes>
+);
+   
+  
 
 export default App;
