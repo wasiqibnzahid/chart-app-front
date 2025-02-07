@@ -24,8 +24,8 @@ import {
   Select,
 } from "@chakra-ui/react";
 import Papa from "papaparse";
-import { FaArrowLeft, FaArrowRight, FaCalendar } from "react-icons/fa";
-import { Bar, Line, Pie, Doughnut } from "react-chartjs-2";
+import { FaArrowLeft, FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa";
+import { Bar, Line } from "react-chartjs-2";
 import "chart.js/auto";
 
 const GitRepo = () => {
@@ -66,13 +66,12 @@ const GitRepo = () => {
   }, [isAuthorized]);
 
   // ───────────────
-  // CSV Data Fetching and Processing
+  // CSV Data Fetching
   // ───────────────
   const [csvData, setCsvData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Make sure this URL is correct for your sheet
   const csvUrl =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnS1uwXU5Va5WZ1ZXz1feDKfvBX4JfbWCFA8SZvaRpZfEWZhf1HKs-h6TDVctf4pz4LfKKCwaP1C0/pub?output=csv";
 
@@ -93,7 +92,7 @@ const GitRepo = () => {
     });
   }, [csvUrl]);
 
-  // Process CSV rows -> numeric fields
+  // Convert fields -> numeric, filter out empty date
   const processedData = useMemo(() => {
     return csvData
       .map((row) => ({
@@ -110,63 +109,18 @@ const GitRepo = () => {
       .filter((row) => row.date);
   }, [csvData]);
 
-  // ───────────────────────────
-  // TOTALS OVER TIME (All Cats)
-  // ───────────────────────────
-  // For each date, sum metrics across all categories
-  const totalOverTime = useMemo(() => {
-    if (!processedData.length) return [];
-
-    // Unique dates, ascending
-    const uniqueDates = Array.from(
-      new Set(processedData.map((row) => row.date))
-    ).sort((a, b) => new Date(a) - new Date(b));
-
-    return uniqueDates.map((date) => {
-      const rowsForDate = processedData.filter((row) => row.date === date);
-      const sums = rowsForDate.reduce(
-        (acc, row) => {
-          acc.createdAt += row.createdAt;
-          acc.openPRs += row.openPRs;
-          acc.mergedAt += row.mergedAt;
-          acc.sDevelopment += row.sDevelopment;
-          acc.sCodeReview += row.sCodeReview;
-          acc.sQA += row.sQA;
-          acc.sUAT += row.sUAT;
-          return acc;
-        },
-        {
-          createdAt: 0,
-          openPRs: 0,
-          mergedAt: 0,
-          sDevelopment: 0,
-          sCodeReview: 0,
-          sQA: 0,
-          sUAT: 0,
-        }
-      );
-      return { date, ...sums };
-    });
-  }, [processedData]);
-
-  // Optional: Just for debugging in console
-  useEffect(() => {
-    console.log("Totals Over Time:", totalOverTime);
-  }, [totalOverTime]);
-
-  // ───────────────
-  // Unique, sorted dates
-  // ───────────────
+  // Unique sorted dates
   const sortedDates = useMemo(() => {
     const datesSet = new Set(processedData.map((row) => row.date));
-    const datesArray = Array.from(datesSet).sort((a, b) => new Date(a) - new Date(b));
-    return datesArray;
+    return Array.from(datesSet).sort((a, b) => new Date(a) - new Date(b));
   }, [processedData]);
 
   // ───────────────
   // Date Navigation & Selection
   // ───────────────
   const [selectedDate, setSelectedDate] = useState(null);
+
+  // Default to last date if none selected
   const currentDate =
     selectedDate || (sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : null);
 
@@ -214,7 +168,7 @@ const GitRepo = () => {
   };
 
   // ───────────────
-  // Category names
+  // Category Mapping
   // ───────────────
   const categoryNameMapping = {
     P_ENTRETENIMIENTO: "ent",
@@ -245,53 +199,309 @@ const GitRepo = () => {
   ];
 
   // ───────────────
-  // Time Period Selection
+  // Time Period Selection (baseline)
   // ───────────────
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("currentDay");
 
-  const filteredData = useMemo(() => {
+  // For "baseline" date range
+  const getBaselineFilteredData = useMemo(() => {
     if (!currentDate) return [];
-    switch (selectedTimePeriod) {
-      case "currentDay":
-        return processedData.filter((row) => row.date === currentDate);
-      case "currentWeek": {
-        const refDate = new Date(currentDate);
-        const startOfWeek = new Date(refDate);
-        startOfWeek.setDate(refDate.getDate() - refDate.getDay());
-        const endOfWeek = new Date(refDate);
-        endOfWeek.setDate(refDate.getDate() - refDate.getDay() + 6);
-        return processedData.filter((row) => {
-          const d = new Date(row.date);
-          return d >= startOfWeek && d <= endOfWeek;
-        });
-      }
-      case "currentMonth": {
-        const refDate = new Date(currentDate);
-        return processedData.filter((row) => {
-          const d = new Date(row.date);
-          return d.getMonth() === refDate.getMonth() && d.getFullYear() === refDate.getFullYear();
-        });
-      }
-      case "currentYear": {
-        const refDate = new Date(currentDate);
-        return processedData.filter((row) => {
-          const d = new Date(row.date);
-          return d.getFullYear() === refDate.getFullYear();
-        });
-      }
-      case "allTime":
-        return processedData;
-      default:
-        return processedData;
+
+    const refDate = new Date(currentDate);
+    refDate.setHours(0, 0, 0, 0);
+    const isSameDay = (d1, d2) =>
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate();
+
+    if (selectedTimePeriod === "currentDay") {
+      return processedData.filter((row) => {
+        const d = new Date(row.date);
+        d.setHours(0, 0, 0, 0);
+        return isSameDay(d, refDate);
+      });
     }
-  }, [selectedTimePeriod, processedData, currentDate]);
+
+    if (selectedTimePeriod === "currentWeek") {
+      const dayOfWeek = refDate.getDay();
+      const startOfWeek = new Date(refDate);
+      startOfWeek.setDate(refDate.getDate() - dayOfWeek);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+      return processedData.filter((row) => {
+        const d = new Date(row.date);
+        return d >= startOfWeek && d <= endOfWeek;
+      });
+    }
+
+    if (selectedTimePeriod === "currentMonth") {
+      return processedData.filter((row) => {
+        const d = new Date(row.date);
+        return (
+          d.getMonth() === refDate.getMonth() &&
+          d.getFullYear() === refDate.getFullYear()
+        );
+      });
+    }
+
+    if (selectedTimePeriod === "currentYear") {
+      return processedData.filter((row) => {
+        const d = new Date(row.date);
+        return d.getFullYear() === refDate.getFullYear();
+      });
+    }
+
+    if (selectedTimePeriod === "allTime") {
+      return processedData; // no filter
+    }
+
+    return processedData; // fallback
+  }, [processedData, currentDate, selectedTimePeriod]);
+
+  // ───────────────────────────────
+  // NEW: "Compare" Ranges (startDate, endDate) array
+  // ───────────────────────────────
+  const [compareRanges, setCompareRanges] = useState([]);
+  const [tempStart, setTempStart] = useState("");
+  const [tempEnd, setTempEnd] = useState("");
+
+  // Add a new compare range
+  const addCompareRange = () => {
+    if (!tempStart || !tempEnd) {
+      toast({
+        title: "Invalid Range",
+        description: "Please select both start and end dates for comparison.",
+        status: "error",
+      });
+      return;
+    }
+    // Ensure start <= end
+    if (new Date(tempStart) > new Date(tempEnd)) {
+      toast({
+        title: "Invalid Range",
+        description: "Start date cannot be after End date.",
+        status: "error",
+      });
+      return;
+    }
+
+    // Add it
+    setCompareRanges((prev) => [
+      ...prev,
+      { start: tempStart, end: tempEnd, id: Date.now() },
+    ]);
+    setTempStart("");
+    setTempEnd("");
+    toast({
+      title: "Added Comparison Range",
+      description: `Range ${tempStart} to ${tempEnd}`,
+      status: "success",
+    });
+  };
+
+  // Remove a compare range
+  const removeCompareRange = (id) => {
+    setCompareRanges((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  // Helper: filter data to a custom [start, end] range
+  const getDataForRange = (start, end) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    return processedData.filter((row) => {
+      const d = new Date(row.date);
+      return d >= startDate && d <= endDate;
+    });
+  };
 
   // ───────────────
-  // Single Chart (Right)
+  // Combine all "ranges" to produce multi-dataset for each chart
+  // We'll treat the baseline time period as "Range 0", then each compare range as "Range 1, 2..."
   // ───────────────
-  const metrics = [
+  const allRangeDatasets = useMemo(() => {
+    // Range 0 (baseline)
+    const result = [
+      {
+        label: "Base Range", 
+        data: getBaselineFilteredData,
+      },
+    ];
+    // Then add compare ranges
+    compareRanges.forEach((rng, idx) => {
+      result.push({
+        label: `Compare #${idx + 1}: ${rng.start} → ${rng.end}`,
+        data: getDataForRange(rng.start, rng.end),
+        id: rng.id,
+      });
+    });
+    return result; // array of { label, data: [rows], id? }
+  }, [getBaselineFilteredData, compareRanges]);
+
+  // ───────────────────────────────────────────────────────
+  // 1) Main Chart: day-by-day breakdown for the chosen metric
+  //    grouped by category, but we do it for each "range" in allRangeDatasets
+  // ───────────────────────────────────────────────────────
+  const [selectedMetric, setSelectedMetric] = useState("createdAt");
+  const [selectedChartType, setSelectedChartType] = useState("bar");
+
+  const dailyBreakdownChartData = useMemo(() => {
+    if (allRangeDatasets.length === 0) return null;
+
+    // We gather all the dates from all ranges
+    let allDatesSet = new Set();
+    allRangeDatasets.forEach((rd) => {
+      rd.data.forEach((row) => {
+        allDatesSet.add(row.date);
+      });
+    });
+    const allDates = Array.from(allDatesSet).sort((a, b) => new Date(a) - new Date(b));
+
+    // We produce multiple datasets => for each Range, for each category
+    // Typically, we group by category for one range, but now we have multiple ranges => we can combine them:
+    // We'll create "Category (Range Label)" as separate dataset
+    let allDatasets = [];
+    // We will pick a consistent color palette or random
+    const palette = [
+      "#f72585",
+      "#b5179e",
+      "#7209b7",
+      "#560bad",
+      "#480ca8",
+      "#3a0ca3",
+      "#3f37c9",
+      "#4361ee",
+      "#4895ef",
+      "#4cc9f0",
+      "#FFB703",
+      "#FB8500",
+      "#8ECAE6",
+      "#219EBC",
+    ];
+    let colorIndex = 0;
+
+    allRangeDatasets.forEach((rangeObj, rangeIdx) => {
+      // For each category
+      fixedCategories.forEach((cat) => {
+        // For each date in allDates, sum the chosen metric for that cat if it exists in rangeObj.data
+        const dataArray = allDates.map((dt) => {
+          const rows = rangeObj.data.filter(
+            (r) => r.date === dt && r.category === cat
+          );
+          const sumVal = rows.reduce(
+            (acc, r) => acc + (r[selectedMetric] || 0),
+            0
+          );
+          return sumVal;
+        });
+
+        // color
+        let color = palette[colorIndex % palette.length];
+        colorIndex++;
+
+        allDatasets.push({
+          label: `${getSimplifiedCategoryName(cat)} (${rangeObj.label})`,
+          data: dataArray,
+          backgroundColor: color,
+          borderColor: color,
+          borderWidth: 1,
+        });
+      });
+    });
+
+    return {
+      labels: allDates,
+      datasets: allDatasets,
+    };
+  }, [allRangeDatasets, fixedCategories, selectedMetric, getSimplifiedCategoryName]);
+
+  // ───────────────────────────────────────────────────────
+  // 2) Day-by-Day Totals (All Metrics Combined, no openPRs)
+  //    We produce for each Range -> we combine all createdAt, mergedAt, sDev, sCodeReview, sQA, sUAT
+  // ───────────────────────────────────────────────────────
+  const dailyTotalsChartData = useMemo(() => {
+    if (allRangeDatasets.length === 0) return null;
+
+    // Collect all unique dates from all ranges
+    let allDatesSet = new Set();
+    allRangeDatasets.forEach((rd) => {
+      rd.data.forEach((row) => {
+        allDatesSet.add(row.date);
+      });
+    });
+    const allDates = Array.from(allDatesSet).sort((a, b) => new Date(a) - new Date(b));
+
+    // We'll have 1 dataset for each range, for each metric? Actually we want day-by-day totals for each metric -> typically we do a "grouped bar" with 6 metrics for each day. But now we have multiple ranges...
+    // Easiest approach: We'll produce multiple "groups" for each range. 
+    // So for each range, we produce 6 sub-datasets (one per metric).
+    // We'll label them "Created At (Base Range)", "Created At (Compare#1)", etc.
+
+    // The 6 metrics we want for the day-by-day totals:
+    const totalMetrics = [
+      { key: "createdAt", label: "Created At" },
+      { key: "mergedAt", label: "Merged At" },
+      { key: "sDevelopment", label: "S_DEVELOPMENT" },
+      { key: "sCodeReview", label: "S_CODE_REVIEW" },
+      { key: "sQA", label: "S_QA" },
+      { key: "sUAT", label: "S_UAT" },
+    ];
+
+    let allDatasets = [];
+    const palette = [
+      "#F94144",
+      "#F3722C",
+      "#F8961E",
+      "#F9C74F",
+      "#90BE6D",
+      "#43AA8B",
+      "#577590",
+      "#4cc9f0",
+      "#7209b7",
+      "#D00000",
+      "#FFB703",
+      "#4361ee",
+      "#8ECAE6",
+    ];
+    let colorIndex = 0;
+
+    allRangeDatasets.forEach((rangeObj) => {
+      // We'll produce 6 sub-datasets for each range
+      totalMetrics.forEach((mt) => {
+        const dataArr = allDates.map((dt) => {
+          // sum that metric for dt across all categories in this range
+          const rows = rangeObj.data.filter((r) => r.date === dt);
+          const sumVal = rows.reduce((acc, r) => acc + (r[mt.key] || 0), 0);
+          return sumVal;
+        });
+        let color = palette[colorIndex % palette.length];
+        colorIndex++;
+        allDatasets.push({
+          label: `${mt.label} (${rangeObj.label})`,
+          data: dataArr,
+          backgroundColor: color,
+          borderColor: color,
+          borderWidth: 1,
+        });
+      });
+    });
+
+    return {
+      labels: allDates,
+      datasets: allDatasets,
+    };
+  }, [allRangeDatasets]);
+
+  // ───────────────────────────────────────────────────────
+  // 3) Category-Specific Day-by-Day Chart:
+  //    (CreatedAt, MergedAt, sDevelopment, sCodeReview, sQA, sUAT)
+  //    for each range
+  // ───────────────────────────────────────────────────────
+  const [selectedCategoryForSChart, setSelectedCategoryForSChart] = useState("");
+
+  const catDayMetrics = [
     { key: "createdAt", label: "Created At" },
-    { key: "openPRs", label: "Open PRs" },
     { key: "mergedAt", label: "Merged At" },
     { key: "sDevelopment", label: "S_DEVELOPMENT" },
     { key: "sCodeReview", label: "S_CODE_REVIEW" },
@@ -299,191 +509,82 @@ const GitRepo = () => {
     { key: "sUAT", label: "S_UAT" },
   ];
 
-  const [selectedMetric, setSelectedMetric] = useState("createdAt");
-  const [selectedChartType, setSelectedChartType] = useState("bar");
+  const categorySChartData = useMemo(() => {
+    if (!selectedCategoryForSChart || allRangeDatasets.length === 0) return null;
 
-  // bar: sum metric by category
-  const barChartDataForMetric = (metricKey) => {
-    const dataValues = fixedCategories.map((cat) =>
-      filteredData.filter((row) => row.category === cat).reduce((acc, row) => acc + row[metricKey], 0)
-    );
-    const metricLabel = metrics.find((m) => m.key === metricKey)?.label || metricKey;
-    return {
-      labels: fixedCategories.map((cat) => getSimplifiedCategoryName(cat)),
-      datasets: [
-        {
-          label: metricLabel,
-          data: dataValues,
-          backgroundColor: "rgba(75,192,192,0.6)",
-        },
-      ],
-    };
-  };
-
-  // line: sum metric by date + category
-  const lineChartDataForMetric = (metricKey) => {
-    const uniqueDates = Array.from(new Set(filteredData.map((row) => row.date))).sort(
-      (a, b) => new Date(a) - new Date(b)
-    );
-    const datasets = fixedCategories.map((cat) => {
-      const data = uniqueDates.map((date) =>
-        filteredData
-          .filter((row) => row.date === date && row.category === cat)
-          .reduce((acc, row) => acc + row[metricKey], 0)
-      );
-      const color = "#" + Math.floor(Math.random() * 16777215).toString(16);
-      return {
-        label: getSimplifiedCategoryName(cat),
-        data,
-        borderColor: color,
-        backgroundColor: color,
-        fill: false,
-        tension: 0.1,
-      };
+    // gather all relevant dates from all ranges
+    let allDatesSet = new Set();
+    allRangeDatasets.forEach((rd) => {
+      rd.data.forEach((row) => {
+        if (row.category === selectedCategoryForSChart) {
+          allDatesSet.add(row.date);
+        }
+      });
     });
-    return {
-      labels: uniqueDates,
-      datasets,
-    };
-  };
+    const allDates = Array.from(allDatesSet).sort((a, b) => new Date(a) - new Date(b));
 
-  // pie/doughnut: sum metric by category
-  const pieChartDataForMetric = (metricKey) => {
-    const dataValues = fixedCategories.map((cat) =>
-      filteredData.filter((row) => row.category === cat).reduce((acc, row) => acc + row[metricKey], 0)
-    );
-    const backgroundColors = fixedCategories.map(
-      () => "#" + Math.floor(Math.random() * 16777215).toString(16)
-    );
-    return {
-      labels: fixedCategories.map((cat) => getSimplifiedCategoryName(cat)),
-      datasets: [
-        {
-          data: dataValues,
-          backgroundColor: backgroundColors,
-        },
-      ],
-    };
-  };
+    // We'll produce a dataset for each range * each catDayMetric
+    // or simpler approach: we do "one dataset per metric for each range"? Actually that might be huge. 
+    // Let's do 1 dataset per metric, labeled "Metric (Range #)" → but we have multiple ranges, so for each range we add one dataset. Actually, that means # of datasets = #metrics * #ranges. That is big but consistent.
 
-  // pick the correct chart data
-  const chartData = useMemo(() => {
-    if (!filteredData.length) return null;
-    if (selectedChartType === "bar") {
-      return barChartDataForMetric(selectedMetric);
-    } else if (selectedChartType === "line") {
-      return lineChartDataForMetric(selectedMetric);
-    } else if (selectedChartType === "pie" || selectedChartType === "doughnut") {
-      return pieChartDataForMetric(selectedMetric);
-    }
-    return null;
-  }, [selectedMetric, selectedChartType, filteredData]);
+    let allDatasets = [];
+    const palette = [
+      "#F94144",
+      "#F3722C",
+      "#F8961E",
+      "#F9C74F",
+      "#90BE6D",
+      "#43AA8B",
+      "#577590",
+      "#7209b7",
+      "#4cc9f0",
+      "#FFB703",
+      "#B5179E",
+    ];
+    let colorIndex = 0;
 
-  const ChartComponent = {
-    bar: Bar,
-    line: Line,
-    pie: Pie,
-    doughnut: Doughnut,
-  }[selectedChartType];
-
-  // ──────────────────────────────────────────────
-  // Left Chart: sum of ALL metrics (Totals)
-  // ──────────────────────────────────────────────
-  const statusTotals = useMemo(() => {
-    let sums = {
-      createdAt: 0,
-      openPRs: 0,
-      mergedAt: 0,
-      sDev: 0,
-      sCodeReview: 0,
-      sQA: 0,
-      sUAT: 0,
-    };
-    for (const row of filteredData) {
-      sums.createdAt += row.createdAt;
-      sums.openPRs += row.openPRs;
-      sums.mergedAt += row.mergedAt;
-      sums.sDev += row.sDevelopment;
-      sums.sCodeReview += row.sCodeReview;
-      sums.sQA += row.sQA;
-      sums.sUAT += row.sUAT;
-    }
-    return sums;
-  }, [filteredData]);
-
-  const statusTotalsChartData = useMemo(() => {
-    return {
-      labels: [
-        "Created At",
-        "Open PRs",
-        "Merged At",
-        "S_DEVELOPMENT",
-        "S_CODE_REVIEW",
-        "S_QA",
-        "S_UAT",
-      ],
-      datasets: [
-        {
-          label: "Totals",
-          data: [
-            statusTotals.createdAt,
-            statusTotals.openPRs,
-            statusTotals.mergedAt,
-            statusTotals.sDev,
-            statusTotals.sCodeReview,
-            statusTotals.sQA,
-            statusTotals.sUAT,
-          ],
-          backgroundColor: [
-            "#F94144",
-            "#F3722C",
-            "#F8961E",
-            "#F9C74F",
-            "#90BE6D",
-            "#43AA8B",
-            "#577590",
-          ],
-        },
-      ],
-    };
-  }, [statusTotals]);
-
-  // ─────────────────────────────────────────
-  // "Over Time" line chart: pick single metric
-  // ─────────────────────────────────────────
-  const [selectedOverTimeMetric, setSelectedOverTimeMetric] = useState("openPRs");
-
-  // Build chart data from totalOverTime for the chosen metric
-  const overTimeChartData = useMemo(() => {
-    if (!totalOverTime.length) return null;
-
-    const labels = totalOverTime.map((item) => item.date);
-    const dataValues = totalOverTime.map(
-      (item) => item[selectedOverTimeMetric] || 0
-    );
+    allRangeDatasets.forEach((rangeObj, rangeI) => {
+      catDayMetrics.forEach((mt) => {
+        const dataArr = allDates.map((dt) => {
+          const rows = rangeObj.data.filter(
+            (r) => r.date === dt && r.category === selectedCategoryForSChart
+          );
+          const sumVal = rows.reduce((acc, cur) => acc + (cur[mt.key] || 0), 0);
+          return sumVal;
+        });
+        let color = palette[colorIndex % palette.length];
+        colorIndex++;
+        allDatasets.push({
+          label: `${mt.label} (${rangeObj.label})`,
+          data: dataArr,
+          backgroundColor: color,
+          borderColor: color,
+          borderWidth: 1,
+        });
+      });
+    });
 
     return {
-      labels,
-      datasets: [
-        {
-          label: selectedOverTimeMetric,
-          data: dataValues,
-          borderColor: "rgba(255, 99, 132, 1)",
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
-          fill: false,
-          tension: 0.1,
-        },
-      ],
+      labels: allDates,
+      datasets: allDatasets,
     };
-  }, [totalOverTime, selectedOverTimeMetric]);
+  }, [selectedCategoryForSChart, allRangeDatasets]);
 
-  // Chart styling for all charts
+  // ───────────────
+  // Chart styling
+  // ───────────────
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      x: { ticks: { color: "white" } },
-      y: { ticks: { color: "white" } },
+      x: {
+        ticks: { color: "white" },
+        grid: { color: "rgba(255,255,255,0.3)" },
+      },
+      y: {
+        ticks: { color: "white" },
+        grid: { color: "rgba(255,255,255,0.3)" },
+      },
     },
     plugins: {
       legend: { labels: { color: "white" } },
@@ -491,32 +592,27 @@ const GitRepo = () => {
   };
 
   // ───────────────
-  // Double-Click => Detailed Category
+  // Table logic (Totals row)
   // ───────────────
   const [detailedCategory, setDetailedCategory] = useState(null);
-
   const handleRowDoubleClick = (category) => {
     setDetailedCategory(category);
   };
-
   const closeDetailedView = () => {
     setDetailedCategory(null);
   };
 
-  // ───────────────────────────────────────────
-  // Render
-  // ───────────────────────────────────────────
   return (
-    <Box minH="100vh" bg="linear-gradient(90deg, #000000, #7800ff)" color="white" p={4}>
-      {/* PIN Authentication Overlay */}
+    <Box minH="100vh" bg="black" color="white" p={4}>
+      {/* PIN Authentication Overlay (Optional) */}
       {!isAuthorized && (
         <Box
           position="fixed"
-          top="0"
-          left="0"
+          top={0}
+          left={0}
           width="100vw"
           height="100vh"
-          bg="rgba(0, 0, 0, 0.8)"
+          bg="rgba(0,0,0,0.8)"
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -547,7 +643,6 @@ const GitRepo = () => {
         </Box>
       )}
 
-      {/* Main Dashboard */}
       {isAuthorized && (
         <Box maxW="1200px" mx="auto">
           <Text fontSize="2xl" mb={4} fontWeight="bold">
@@ -581,7 +676,7 @@ const GitRepo = () => {
                   }
                   colorScheme="gray"
                 />
-                {/* POPUP CALENDAR ICON */}
+                {/* POPUP CALENDAR for single date */}
                 <Popover placement="bottom">
                   <PopoverTrigger>
                     <IconButton
@@ -620,8 +715,8 @@ const GitRepo = () => {
                 </Popover>
               </Flex>
 
-              {/* Time Period Dropdown */}
-              <Flex mb={6} gap={4} flexWrap="wrap">
+              {/* Time Period Dropdown & Compare Ranges */}
+              <Flex mb={6} gap={4} flexWrap="wrap" alignItems="center">
                 <Select
                   value={selectedTimePeriod}
                   onChange={(e) => setSelectedTimePeriod(e.target.value)}
@@ -642,20 +737,81 @@ const GitRepo = () => {
                   <option style={{ color: "black" }} value="currentYear">
                     Current Year
                   </option>
-                  {/* "All Time Average" styled */}
-                  <option
-                    style={{
-                      color: "white",
-                      background: "linear-gradient(90deg, #000000, #7800ff)",
-                    }}
-                    value="allTime"
-                  >
-                    All Time Average
+                  <option style={{ color: "black" }} value="allTime">
+                    All Time
                   </option>
                 </Select>
+
+                {/* Compare Ranges Popover */}
+                <Popover placement="bottom">
+                  <PopoverTrigger>
+                    <Button leftIcon={<FaPlus />} colorScheme="pink">
+                      Compare
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent bg="black" borderColor="whiteAlpha.300" color="white">
+                    <PopoverArrow bg="black" />
+                    <PopoverCloseButton color="white" />
+                    <PopoverHeader borderBottom="1px solid" borderColor="whiteAlpha.300">
+                      Add Comparison Range
+                    </PopoverHeader>
+                    <PopoverBody>
+                      <VStack spacing={2} align="stretch">
+                        <Text fontSize="sm">Start Date</Text>
+                        <Input
+                          type="date"
+                          value={tempStart}
+                          onChange={(e) => setTempStart(e.target.value)}
+                          bg="gray.700"
+                          color="white"
+                          borderColor="whiteAlpha.300"
+                        />
+                        <Text fontSize="sm">End Date</Text>
+                        <Input
+                          type="date"
+                          value={tempEnd}
+                          onChange={(e) => setTempEnd(e.target.value)}
+                          bg="gray.700"
+                          color="white"
+                          borderColor="whiteAlpha.300"
+                        />
+                        <Button size="sm" colorScheme="teal" onClick={addCompareRange}>
+                          Add
+                        </Button>
+                      </VStack>
+                    </PopoverBody>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Show existing compare ranges */}
+                {compareRanges.length > 0 && (
+                  <Flex flexWrap="wrap" gap={2}>
+                    {compareRanges.map((rng, i) => (
+                      <Flex
+                        key={rng.id}
+                        bg="gray.700"
+                        px={2}
+                        py={1}
+                        alignItems="center"
+                        borderRadius="md"
+                      >
+                        <Text fontSize="sm" mr={2}>
+                          {`#${i + 1}: ${rng.start} → ${rng.end}`}
+                        </Text>
+                        <Button
+                          size="xs"
+                          colorScheme="red"
+                          onClick={() => removeCompareRange(rng.id)}
+                        >
+                          X
+                        </Button>
+                      </Flex>
+                    ))}
+                  </Flex>
+                )}
               </Flex>
 
-              {/* Chart Selection Dropdowns */}
+              {/* Chart Metric & Type Selection (bar/line only) */}
               <Flex mb={6} gap={4} flexWrap="wrap">
                 <Select
                   value={selectedMetric}
@@ -665,22 +821,19 @@ const GitRepo = () => {
                   borderColor="whiteAlpha.300"
                   maxW="200px"
                 >
-                  {metrics.map((metric) => {
-                    // highlight sDevelopment with gradient
-                    const specialStyle =
-                      metric.key === "sDevelopment"
-                        ? {
-                            color: "white",
-                            background: "linear-gradient(90deg, #000000, #7800ff)",
-                          }
-                        : { color: "black" };
-
-                    return (
-                      <option key={metric.key} value={metric.key} style={specialStyle}>
-                        {metric.label}
-                      </option>
-                    );
-                  })}
+                  {[
+                    { key: "createdAt", label: "Created At" },
+                    { key: "openPRs", label: "Open PRs" },
+                    { key: "mergedAt", label: "Merged At" },
+                    { key: "sDevelopment", label: "S_DEVELOPMENT" },
+                    { key: "sCodeReview", label: "S_CODE_REVIEW" },
+                    { key: "sQA", label: "S_QA" },
+                    { key: "sUAT", label: "S_UAT" },
+                  ].map((metric) => (
+                    <option key={metric.key} value={metric.key} style={{ color: "black" }}>
+                      {metric.label}
+                    </option>
+                  ))}
                 </Select>
 
                 <Select
@@ -697,86 +850,95 @@ const GitRepo = () => {
                   <option style={{ color: "black" }} value="line">
                     Line Chart
                   </option>
-                  {/* "Pie Chart" with gradient */}
-                  <option
-                    style={{
-                      color: "white",
-                      background: "linear-gradient(90deg, #000000, #7800ff)",
-                    }}
-                    value="pie"
-                  >
-                    Pie Chart
-                  </option>
-                  <option style={{ color: "black" }} value="doughnut">
-                    Doughnut Chart
-                  </option>
+                  {/* Pie & Doughnut removed */}
                 </Select>
               </Flex>
 
-              {/* TWO CHARTS SIDE BY SIDE */}
-              <Flex mb={6} gap={4} flexWrap="wrap">
-                {/* LEFT: Totals (ALL metrics) */}
-                <Box
-                  flex="1"
-                  minW="300px"
-                  height="400px"
-                  border="1px solid white"
-                  p={2}
-                >
-                  <Bar data={statusTotalsChartData} options={chartOptions} />
-                </Box>
-
-                {/* RIGHT: The user-selectable chart */}
-                {chartData && ChartComponent && filteredData.length > 0 && (
-                  <Box
-                    flex="1"
-                    minW="300px"
-                    height="400px"
-                    border="1px solid white"
-                    p={2}
-                  >
-                    <ChartComponent data={chartData} options={chartOptions} />
-                  </Box>
-                )}
-              </Flex>
-
-              {/* NEW Over Time Section */}
-              <Text fontSize="xl" mb={2} fontWeight="bold">
-                Track a Single Metric Over Time (All Categories)
+              {/* 1) MAIN Chart: Day-by-Day for single chosen metric, grouped by category, multi-range */}
+              <Text fontSize="lg" fontWeight="bold" mb={2}>
+                Day-by-Day Chart for <em>{selectedMetric}</em> (by Category, All Ranges)
               </Text>
-              <Flex mb={4} gap={4} flexWrap="wrap">
+              <Box
+                mb={6}
+                border="1px solid white"
+                borderRadius="md"
+                p={2}
+                width="100%"
+                minH="400px"
+                height="400px"
+              >
+                {dailyBreakdownChartData && dailyBreakdownChartData.labels.length > 0 ? (
+                  selectedChartType === "bar" ? (
+                    <Bar data={dailyBreakdownChartData} options={chartOptions} />
+                  ) : (
+                    <Line data={dailyBreakdownChartData} options={chartOptions} />
+                  )
+                ) : (
+                  <Text>No data for this selection.</Text>
+                )}
+              </Box>
+
+              {/* 2) Day-by-Day Totals (All Metrics Combined, no openPRs), multi-range */}
+              <Text fontSize="lg" fontWeight="bold" mb={2}>
+                Day-by-Day Totals (All Metrics Combined, All Ranges)
+              </Text>
+              <Box
+                mb={6}
+                border="1px solid white"
+                borderRadius="md"
+                p={2}
+                width="100%"
+                minH="400px"
+                height="400px"
+              >
+                {dailyTotalsChartData && dailyTotalsChartData.labels.length > 0 ? (
+                  <Bar data={dailyTotalsChartData} options={chartOptions} />
+                ) : (
+                  <Text>No data for this selection.</Text>
+                )}
+              </Box>
+
+              {/* 3) Category-Specific Day-by-Day Chart (CreatedAt, MergedAt, S_..., multi-range) */}
+              <Text fontSize="lg" fontWeight="bold" mb={2}>
+                Category-Specific Totals Over Time (CreatedAt, MergedAt, QA, etc.)
+              </Text>
+              <Flex mb={4} gap={4} alignItems="center">
                 <Select
-                  value={selectedOverTimeMetric}
-                  onChange={(e) => setSelectedOverTimeMetric(e.target.value)}
-                  bg="linear-gradient(90deg, #000000, #7800ff)"
+                  placeholder="Select Category"
+                  value={selectedCategoryForSChart}
+                  onChange={(e) => setSelectedCategoryForSChart(e.target.value)}
+                  bg="gray.700"
                   color="white"
                   borderColor="whiteAlpha.300"
-                  maxW="200px"
+                  maxW="300px"
                 >
-                  <option value="openPRs">Open PRs</option>
-                  <option value="sQA">S_QA</option>
-                  <option value="createdAt">Created At</option>
-                  <option value="mergedAt">Merged At</option>
-                  <option value="sDevelopment">S_DEVELOPMENT</option>
-                  <option value="sCodeReview">S_CODE_REVIEW</option>
-                  <option value="sUAT">S_UAT</option>
+                  {fixedCategories.map((cat) => (
+                    <option key={cat} value={cat} style={{ color: "black" }}>
+                      {getSimplifiedCategoryName(cat)}
+                    </option>
+                  ))}
                 </Select>
               </Flex>
+              <Box
+                mb={6}
+                border="1px solid white"
+                borderRadius="md"
+                p={2}
+                width="100%"
+                minH="400px"
+                height="400px"
+              >
+                {categorySChartData && categorySChartData.labels.length > 0 ? (
+                  <Bar data={categorySChartData} options={chartOptions} />
+                ) : (
+                  <Text>Please select a category above.</Text>
+                )}
+              </Box>
 
-              {overTimeChartData && (
-                <Box
-                  mb={8}
-                  border="1px solid white"
-                  borderRadius="md"
-                  p={2}
-                  width="100%"
-                  height="400px"
-                >
-                  <Line data={overTimeChartData} options={chartOptions} />
-                </Box>
-              )}
-
-              {/* Data Table (Totals by Category) */}
+              {/* Table: Category Totals for Selected Time Period (with total row) */}
+              <Text fontSize="lg" fontWeight="bold" mb={2}>
+                Table: Category Totals for Selected Time Period
+              </Text>
               <Box overflowX="auto" mb={6}>
                 <Table
                   bg="linear-gradient(90deg, #000000, #7800ff)"
@@ -804,61 +966,120 @@ const GitRepo = () => {
                   <Thead>
                     <Tr>
                       <Th color="white">Category</Th>
-                      <Th isNumeric color="white">Created At (total)</Th>
-                      <Th isNumeric color="white">Open PRs (total)</Th>
-                      <Th isNumeric color="white">Merged At (total)</Th>
-                      <Th isNumeric color="white">S_DEVELOPMENT (total)</Th>
-                      <Th isNumeric color="white">S_CODE_REVIEW (total)</Th>
-                      <Th isNumeric color="white">S_QA (total)</Th>
-                      <Th isNumeric color="white">S_UAT (total)</Th>
+                      <Th isNumeric color="white">
+                        Created At
+                      </Th>
+                      <Th isNumeric color="white">
+                        Open PRs
+                      </Th>
+                      <Th isNumeric color="white">
+                        Merged At
+                      </Th>
+                      <Th isNumeric color="white">
+                        S_DEVELOPMENT
+                      </Th>
+                      <Th isNumeric color="white">
+                        S_CODE_REVIEW
+                      </Th>
+                      <Th isNumeric color="white">
+                        S_QA
+                      </Th>
+                      <Th isNumeric color="white">
+                        S_UAT
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {fixedCategories.map((cat) => {
-                      const rows = filteredData.filter((row) => row.category === cat);
-                      const sums = rows.reduce(
-                        (acc, row) => {
-                          acc.createdAt += row.createdAt;
-                          acc.openPRs += row.openPRs;
-                          acc.mergedAt += row.mergedAt;
-                          acc.sDevelopment += row.sDevelopment;
-                          acc.sCodeReview += row.sCodeReview;
-                          acc.sQA += row.sQA;
-                          acc.sUAT += row.sUAT;
-                          return acc;
-                        },
-                        {
-                          createdAt: 0,
-                          openPRs: 0,
-                          mergedAt: 0,
-                          sDevelopment: 0,
-                          sCodeReview: 0,
-                          sQA: 0,
-                          sUAT: 0,
-                        }
-                      );
+                    {(() => {
+                      // We'll accumulate a grand total
+                      const grandTotals = {
+                        createdAt: 0,
+                        openPRs: 0,
+                        mergedAt: 0,
+                        sDevelopment: 0,
+                        sCodeReview: 0,
+                        sQA: 0,
+                        sUAT: 0,
+                      };
+
+                      // The baseline data only for this table
+                      const baselineRows = getBaselineFilteredData;
+
+                      const rowsForRender = fixedCategories.map((cat) => {
+                        const rows = baselineRows.filter(
+                          (row) => row.category === cat
+                        );
+                        const sums = rows.reduce(
+                          (acc, row) => {
+                            acc.createdAt += row.createdAt;
+                            acc.openPRs += row.openPRs;
+                            acc.mergedAt += row.mergedAt;
+                            acc.sDevelopment += row.sDevelopment;
+                            acc.sCodeReview += row.sCodeReview;
+                            acc.sQA += row.sQA;
+                            acc.sUAT += row.sUAT;
+                            return acc;
+                          },
+                          {
+                            createdAt: 0,
+                            openPRs: 0,
+                            mergedAt: 0,
+                            sDevelopment: 0,
+                            sCodeReview: 0,
+                            sQA: 0,
+                            sUAT: 0,
+                          }
+                        );
+
+                        // accumulate into grandTotals
+                        grandTotals.createdAt += sums.createdAt;
+                        grandTotals.openPRs += sums.openPRs;
+                        grandTotals.mergedAt += sums.mergedAt;
+                        grandTotals.sDevelopment += sums.sDevelopment;
+                        grandTotals.sCodeReview += sums.sCodeReview;
+                        grandTotals.sQA += sums.sQA;
+                        grandTotals.sUAT += sums.sUAT;
+
+                        return (
+                          <Tr
+                            key={cat}
+                            onDoubleClick={() => handleRowDoubleClick(cat)}
+                            _hover={{ cursor: "pointer" }}
+                          >
+                            <Td>{getSimplifiedCategoryName(cat)}</Td>
+                            <Td isNumeric>{sums.createdAt}</Td>
+                            <Td isNumeric>{sums.openPRs}</Td>
+                            <Td isNumeric>{sums.mergedAt}</Td>
+                            <Td isNumeric>{sums.sDevelopment}</Td>
+                            <Td isNumeric>{sums.sCodeReview}</Td>
+                            <Td isNumeric>{sums.sQA}</Td>
+                            <Td isNumeric>{sums.sUAT}</Td>
+                          </Tr>
+                        );
+                      });
+
                       return (
-                        <Tr
-                          key={cat}
-                          onDoubleClick={() => handleRowDoubleClick(cat)}
-                          _hover={{ cursor: "pointer" }}
-                        >
-                          <Td color="white">{getSimplifiedCategoryName(cat)}</Td>
-                          <Td isNumeric color="white">{sums.createdAt}</Td>
-                          <Td isNumeric color="white">{sums.openPRs}</Td>
-                          <Td isNumeric color="white">{sums.mergedAt}</Td>
-                          <Td isNumeric color="white">{sums.sDevelopment}</Td>
-                          <Td isNumeric color="white">{sums.sCodeReview}</Td>
-                          <Td isNumeric color="white">{sums.sQA}</Td>
-                          <Td isNumeric color="white">{sums.sUAT}</Td>
-                        </Tr>
+                        <>
+                          {rowsForRender}
+                          {/* Totals row */}
+                          <Tr bg="blackAlpha.600">
+                            <Td fontWeight="bold">TOTAL</Td>
+                            <Td isNumeric fontWeight="bold">{grandTotals.createdAt}</Td>
+                            <Td isNumeric fontWeight="bold">{grandTotals.openPRs}</Td>
+                            <Td isNumeric fontWeight="bold">{grandTotals.mergedAt}</Td>
+                            <Td isNumeric fontWeight="bold">{grandTotals.sDevelopment}</Td>
+                            <Td isNumeric fontWeight="bold">{grandTotals.sCodeReview}</Td>
+                            <Td isNumeric fontWeight="bold">{grandTotals.sQA}</Td>
+                            <Td isNumeric fontWeight="bold">{grandTotals.sUAT}</Td>
+                          </Tr>
+                        </>
                       );
-                    })}
+                    })()}
                   </Tbody>
                 </Table>
               </Box>
 
-              {/* Detailed View: Historical Data for Double-Clicked Category */}
+              {/* Detailed Category View (double-click), with total row */}
               {detailedCategory && (
                 <Box mt={8}>
                   <Flex justify="space-between" align="center" mb={2}>
@@ -907,21 +1128,60 @@ const GitRepo = () => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {filteredData
-                          .filter((row) => row.category === detailedCategory)
-                          .sort((a, b) => new Date(a.date) - new Date(b.date))
-                          .map((row, idx) => (
-                            <Tr key={idx}>
-                              <Td color="white">{row.date}</Td>
-                              <Td isNumeric color="white">{row.createdAt}</Td>
-                              <Td isNumeric color="white">{row.openPRs}</Td>
-                              <Td isNumeric color="white">{row.mergedAt}</Td>
-                              <Td isNumeric color="white">{row.sDevelopment}</Td>
-                              <Td isNumeric color="white">{row.sCodeReview}</Td>
-                              <Td isNumeric color="white">{row.sQA}</Td>
-                              <Td isNumeric color="white">{row.sUAT}</Td>
-                            </Tr>
-                          ))}
+                        {(() => {
+                          let totals = {
+                            createdAt: 0,
+                            openPRs: 0,
+                            mergedAt: 0,
+                            sDevelopment: 0,
+                            sCodeReview: 0,
+                            sQA: 0,
+                            sUAT: 0,
+                          };
+                          const rowsForCat = getBaselineFilteredData
+                            .filter((r) => r.category === detailedCategory)
+                            .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                          const rowEls = rowsForCat.map((row, idx) => {
+                            totals.createdAt += row.createdAt;
+                            totals.openPRs += row.openPRs;
+                            totals.mergedAt += row.mergedAt;
+                            totals.sDevelopment += row.sDevelopment;
+                            totals.sCodeReview += row.sCodeReview;
+                            totals.sQA += row.sQA;
+                            totals.sUAT += row.sUAT;
+                            return (
+                              <Tr key={idx}>
+                                <Td>{row.date}</Td>
+                                <Td isNumeric>{row.createdAt}</Td>
+                                <Td isNumeric>{row.openPRs}</Td>
+                                <Td isNumeric>{row.mergedAt}</Td>
+                                <Td isNumeric>{row.sDevelopment}</Td>
+                                <Td isNumeric>{row.sCodeReview}</Td>
+                                <Td isNumeric>{row.sQA}</Td>
+                                <Td isNumeric>{row.sUAT}</Td>
+                              </Tr>
+                            );
+                          });
+
+                          return (
+                            <>
+                              {rowEls}
+                              {rowEls.length > 0 && (
+                                <Tr bg="blackAlpha.600">
+                                  <Td fontWeight="bold">TOTAL</Td>
+                                  <Td isNumeric fontWeight="bold">{totals.createdAt}</Td>
+                                  <Td isNumeric fontWeight="bold">{totals.openPRs}</Td>
+                                  <Td isNumeric fontWeight="bold">{totals.mergedAt}</Td>
+                                  <Td isNumeric fontWeight="bold">{totals.sDevelopment}</Td>
+                                  <Td isNumeric fontWeight="bold">{totals.sCodeReview}</Td>
+                                  <Td isNumeric fontWeight="bold">{totals.sQA}</Td>
+                                  <Td isNumeric fontWeight="bold">{totals.sUAT}</Td>
+                                </Tr>
+                              )}
+                            </>
+                          );
+                        })()}
                       </Tbody>
                     </Table>
                   </Box>
