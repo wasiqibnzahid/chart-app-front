@@ -20,7 +20,7 @@ const LoginPage = ({ onLogin }) => {
     'Y7wW8oRY': '2MlbXakHIv',
     'cNwSpkcK': '4gVcWNzLS9',
     '0wskc45F': '9Mw8K9LOkT',
-    '29pvmjga': 'mzr6xxl9uJ',
+    'Cindy': '2025',
     'Gudiño': '12345',
     'Aliaga': '1793',
     'Charly': '2024',
