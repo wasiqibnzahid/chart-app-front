@@ -19,7 +19,7 @@ const LoginPage = ({ onLogin }) => {
     '5N8D4qmy': 'eYFJ4YjM2h',
     'Y7wW8oRY': '2MlbXakHIv',
     'cNwSpkcK': '4gVcWNzLS9',
-    '0wskc45F': '9Mw8K9LOkT',
+    'Teo': '2025',
     'Cindy': '2025',
     'Gudiño': '12345',
     'Aliaga': '1793',
