@@ -20,7 +20,7 @@ import MainLayout from './layouts/MainLayout';
 import LoginPage from './LoginPage';
 
 // ─── ADDED: Import GitRepo & GitRepoAdmin ─────────────────────────────────────
-import GitRepo from './GitRepo/GitRepo1';
+import GitRepo from './GitRepo/GitRepo2';
 import GitRepoAdmin from './GitRepo/GitRepoAdmin';
 
 const App: React.FC = () => {
