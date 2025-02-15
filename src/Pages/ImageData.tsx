@@ -95,11 +95,7 @@ export const ImageData = () => {
             getImageData(),
             getImageQuarters(),
           ]);
-        console.log(
-          "FLAUSD",
-          averageData.weekly.data,
-          localAverageData.weekly.data
-        );
+
         setData((old) => ({
           ...old,
           ...localAverageData,
@@ -110,22 +106,12 @@ export const ImageData = () => {
                 "Note Avg",
                 "General Azteca"
               ),
-              ...changeLabel(
-                localAverageData.weekly.data,
-                "TV Azteca",
-                "Local Azteca"
-              ),
             ],
             changes: [
               ...changeLabel(
                 averageData.weekly.changes,
                 "Note Avg",
                 "General Azteca"
-              ),
-              ...changeLabel(
-                localAverageData.weekly.changes,
-                "Note Avg",
-                "Local Azteca"
               ),
             ],
           },
@@ -145,14 +131,25 @@ export const ImageData = () => {
   const [isAzteca] = useState<[boolean, boolean, boolean]>([true, true, true]);
 
   const {
-    selectedData: currentQuarter,
+    selectedData: _currentQuarter,
     setCurrentRecordIndex,
     topbarMode,
     currentRecordIndex,
     selectedFilterRecordsLength,
     changeTopbarMode,
   } = useSelectedData(data);
-
+  const currentQuarter = useMemo(() => {
+    if (topbarMode !== "weekly" && topbarMode !== "week") {
+      return _currentQuarter;
+    }
+    if (!_currentQuarter) return null;
+    const lastWeek =
+      data?.weekly?.data[0]?.data[data?.weekly?.data[0]?.data.length - 1];
+    return {
+      ..._currentQuarter,
+      "Note Avg": lastWeek?.y || _currentQuarter["Note Avg"],
+    };
+  }, [_currentQuarter, data.weekly.data, topbarMode]);
   const combinedData = useMemo(() => {
     if (
       currentQuarter?.azteca?.length > 0 &&
@@ -165,6 +162,10 @@ export const ImageData = () => {
   const [monthWeek, setMonthWeek] = useState<
     [number[], number[], number[], number[]]
   >([[0], [0], [0], [0]]);
+  const lastWeek = useMemo(() => {
+    return data.weekly.data;
+  }, [data.weekly.data]);
+
   return (
     <div className="main">
       <DateDisplay
