@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
 import Chart from "react-apexcharts";
 
 // Api
-import {
-  getInsights,
-} from "../data";
+import { getInsights } from "../data";
 
 // UI Elements
 import {
@@ -49,6 +46,7 @@ const seriesColors = {
   "Local Azteca": "#009900", // Darker Green
   // Add more series colors here if needed
 };
+
 const LocalAverageChart = ({ data: propData }) => {
   // States
   const [showZoomIn, setShowZoomIn] = useState(false);
@@ -292,7 +290,6 @@ const LocalAverageChart = ({ data: propData }) => {
         x: d.x,
         y: d.y,
       })),
-      // Color is handled via the 'colors' array in ApexOptions
     }));
   }, [dataToUse]);
 
@@ -304,12 +301,12 @@ const LocalAverageChart = ({ data: propData }) => {
     prevReqController.current = new AbortController();
     getInsights(
       {
-        start: `${quarterVal[0] > 8 ? "" : "0"}${
-          quarterVal[0] + 1
-        }-${selectedYear}`,
-        end: `${quarterVal[1] > 8 ? "" : "0"}${
-          quarterVal[1] + 1
-        }-${selectedYear}`,
+        start: `${quarterVal[0] > 8 ? "" : "0"}${quarterVal[0] + 1}-${
+          selectedYear
+        }`,
+        end: `${quarterVal[1] > 8 ? "" : "0"}${quarterVal[1] + 1}-${
+          selectedYear
+        }`,
       },
       prevReqController.current.signal
     ).then((res) => setInsights(res));
@@ -323,8 +320,6 @@ const LocalAverageChart = ({ data: propData }) => {
 
   const handleSelectDateChange = (e) => {
     const value = e.target.value;
-
-    // Check if the value is already in the dateFilter array
     if (!dateFilter.includes(value) && value) {
       setDateFilter([...dateFilter, value]);
       setSelectedDate(value);
@@ -336,11 +331,11 @@ const LocalAverageChart = ({ data: propData }) => {
       {/* Header Text */}
       <div className="justify-content-between align-items-center mb-4">
         <div>
-          <h5>Local Azteca vs General Azteca Overview</h5>
+          <h5 style={{ color: "black" }}>Local Azteca vs General Azteca Overview</h5>
         </div>
 
         <section className="VerticalBarChart__legend">
-          {/* control SVG Start */}
+          {/* Control SVG */}
           <div>
             <button
               onClick={() => setShowControls(!showControls)}
@@ -365,41 +360,39 @@ const LocalAverageChart = ({ data: propData }) => {
                 <g id="SVGRepo_iconCarrier">
                   <path
                     d="M6 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M18 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill="black"
                   />
                   <path
                     d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill="black"
                   />
                   <path
                     d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill="black"
                   />
                 </g>
               </svg>
             </button>
           </div>
-          {/* Control SVG End */}
-
-          {/* Insights SVG Start */}
+          {/* Zoom In SVG */}
           <div>
             <button
               onClick={() => setShowZoomIn(!showZoomIn)}
@@ -417,7 +410,7 @@ const LocalAverageChart = ({ data: propData }) => {
                 height="20"
                 viewBox="0 0 488.484 488.484"
                 xmlSpace="preserve"
-                fill={showZoomIn ? "white" : "gray"}
+                fill="black"
               >
                 <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                 <g
@@ -448,8 +441,6 @@ const LocalAverageChart = ({ data: propData }) => {
               </svg>
             </button>
           </div>
-          {/* Insights SVG End */}
-
           {/* Dropdown */}
           <div>
             <Box>
@@ -457,14 +448,14 @@ const LocalAverageChart = ({ data: propData }) => {
                 value={selectedDropdown}
                 onChange={(e) => setSelectedDropdown(e.target.value)}
                 border="2px"
-                borderColor="#cbd5e0" // Apply the border color
+                borderColor="#cbd5e0"
                 borderRadius="8px"
                 size="sm"
-                color="white"
+                color="black"
                 bg="transparent"
                 _hover={{ borderColor: "gray.300" }}
                 _focus={{ borderColor: "gray.300", boxShadow: "none" }}
-                iconColor="white"
+                iconColor="black"
                 width="fit-content"
               >
                 {dropdownOptions.map((item) => (
@@ -476,19 +467,6 @@ const LocalAverageChart = ({ data: propData }) => {
             </Box>
           </div>
         </section>
-        {/*         
-        <div style={{ width: "300px" }}>
-          <Select
-            value={selectedDropdown}
-            onChange={(e) => setSelectedDropdown(e.target.value)}
-          >
-            {dropdownOptions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </Select>
-        </div> */}
       </div>
 
       {/* Chart */}
@@ -499,12 +477,10 @@ const LocalAverageChart = ({ data: propData }) => {
         height={250}
       />
 
-      {/* Range Line */}
+      {/* Range Slider */}
       <div
         className="px-4 mb-3 slider-container"
-        style={{
-          position: "relative",
-        }}
+        style={{ position: "relative" }}
       >
         <RangeSlider
           defaultValue={[0, 100]}
@@ -524,12 +500,7 @@ const LocalAverageChart = ({ data: propData }) => {
 
         <div className="d-flex justify-content-between slider-custom-text">
           {months.map((month) => (
-            <span
-              key={month}
-              style={{
-                color: "#cbd5e0",
-              }}
-            >
+            <span key={month} style={{ color: "black" }}>
               {month}
             </span>
           ))}
@@ -554,18 +525,11 @@ const LocalAverageChart = ({ data: propData }) => {
         </div>
       </div>
 
-      {/* Open When user click on Zoom in then show this */}
-      <section
-        style={{
-          marginTop: "3%",
-          overflow: "hidden",
-          transition: "max-height 0.7s ease",
-        }}
-      >
-        <Box p={0} borderRadius="md" color="white">
+      {/* Zoom/Controls Section */}
+      <section style={{ marginTop: "3%", overflow: "hidden", transition: "max-height 0.7s ease" }}>
+        <Box p={0} borderRadius="md" color="black">
           {showControls && (
             <>
-              {/* Check Box Row's */}
               <section
                 style={{
                   display: "flex",
@@ -577,7 +541,6 @@ const LocalAverageChart = ({ data: propData }) => {
                   marginBottom: "2%",
                 }}
               >
-                {/* control SVG Start */}
                 <div>
                   <button
                     onClick={() => setShowControls(!showControls)}
@@ -602,39 +565,38 @@ const LocalAverageChart = ({ data: propData }) => {
                       <g id="SVGRepo_iconCarrier">
                         <path
                           d="M6 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke="black"
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M12 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke="black"
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M18 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke="black"
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill="black"
                         />
                         <path
                           d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill="black"
                         />
                         <path
                           d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill="black"
                         />
                       </g>
                     </svg>
                   </button>
                 </div>
-                {/* Control SVG End */}
                 <div>
                   <Stack direction="row" spacing={5} align="center" mb={0}>
                     <Checkbox
@@ -643,8 +605,8 @@ const LocalAverageChart = ({ data: propData }) => {
                       onChange={(e) => setShowPercentages(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show percentages
@@ -656,8 +618,8 @@ const LocalAverageChart = ({ data: propData }) => {
                       onChange={(e) => setShowAllData(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show All Data
@@ -665,24 +627,24 @@ const LocalAverageChart = ({ data: propData }) => {
 
                     <Checkbox
                       id="raw-value"
-                      checked={showVals}
+                      isChecked={showVals}
                       onChange={(e) => setShowVals(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show Raw Values
                     </Checkbox>
                     <Checkbox
                       id="datefilter"
-                      checked={showdateFilter}
+                      isChecked={showdateFilter}
                       onChange={(e) => setShowDateFilter(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show Date Filter
@@ -716,6 +678,7 @@ const LocalAverageChart = ({ data: propData }) => {
                         fontSize: "14px",
                         padding: "4px",
                         borderRadius: "5px",
+                        color: "black",
                       }}
                     >
                       {propData.weekly.data?.[1].data.map((date) => (
@@ -751,7 +714,6 @@ const LocalAverageChart = ({ data: propData }) => {
                     alignItems: "start",
                   }}
                 >
-                  {/* Insights SVG Start */}
                   <div>
                     <button
                       onClick={() => setShowZoomIn(!showZoomIn)}
@@ -770,7 +732,7 @@ const LocalAverageChart = ({ data: propData }) => {
                         height="20"
                         viewBox="0 0 488.484 488.484"
                         xmlSpace="preserve"
-                        fill={showZoomIn ? "white" : "gray"}
+                        fill="black"
                       >
                         <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                         <g
@@ -801,10 +763,20 @@ const LocalAverageChart = ({ data: propData }) => {
                       </svg>
                     </button>
                   </div>
-                  {/* Insights SVG End */}
                   <Text style={{ lineHeight: "2rem" }}>
-                    {insights ? insights.self.replaceAll(tvAztecaLabel, localAztecaLabel) : "There is no insights"} <br />
-                    {insights ? insights.competition.replaceAll(Competition, generalAzetaLabel) : "There is no insights"}
+                    {insights
+                      ? insights.self.replaceAll(
+                          tvAztecaLabel,
+                          localAztecaLabel
+                        )
+                      : "There is no insights"}{" "}
+                    <br />
+                    {insights
+                      ? insights.competition.replaceAll(
+                          Competition,
+                          generalAzetaLabel
+                        )
+                      : "There is no insights"}
                   </Text>
                 </HStack>
               </Stack>
