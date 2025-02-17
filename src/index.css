@@ -179,19 +179,22 @@ strong {
   border-radius: 5px !important;
 }
 
+/* Changed details text to black */
 .sparkboxes .box .details {
   position: absolute !important;
-  color: #fff !important;
+  color: #000 !important;
   transform: scale(0.7) translate(-22px, 20px) !important;
 }
 
+/* Changed strong text to black */
 .sparkboxes strong {
   position: relative !important;
   z-index: 3 !important;
   top: -8px !important;
-  color: #fff !important;
+  color: #000 !important;
 }
 
+/* Replaced gradient backgrounds with white */
 .sparkboxes .box1 {
   background: white !important;
 }
@@ -208,17 +211,19 @@ strong {
   background: white !important;
 }
 
+/* Changed text and legend fill colors to black */
 text,
 .apexcharts-legend-text {
-  color: #fff !important;
-  fill: #fff !important;
+  color: #000 !important;
+  fill: #000 !important;
 }
 
+/* Changed h4, h5, li text to black */
 h4,
 h5,
 li {
-  color: #fff !important;
-  fill: #fff !important;
+  color: #000 !important;
+  fill: #000 !important;
 }
 
 .my-image {
@@ -241,14 +246,14 @@ li {
   margin-right: auto;
   padding-bottom: 0;
   font-size: 35px;
+  color: #000; /* changed from white to black */
 }
+
 .title-section-i img {
   height: 80px;
   margin-right: 15px;
 }
-.title-section-i {
-  color: #fff;
-}
+
 .title-section-i span {
   color: #ffde59;
 }
@@ -260,7 +265,6 @@ li {
 
 .top-row {
   padding: 0 5rem;
-  /* gap: 10rem; */
   margin-bottom: 2rem;
   justify-content: space-between;
 }
@@ -271,7 +275,6 @@ li {
 
 .top-row-dual {
   padding: 0 0rem;
-  /* gap: 10rem; */
   margin-bottom: 2rem;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -302,7 +305,7 @@ li {
 
 .toggles.d-flex {
   font-weight: lighter;
-  color: #fff;
+  color: #000; /* changed to black */
   font-size: 10px;
 }
 
@@ -311,6 +314,7 @@ li {
   font-family: NeueMachina !important;
   font-weight: bold;
 }
+
 .percentage:not(span) {
   font-size: 50px;
 }
@@ -322,6 +326,7 @@ li {
 .text-red {
   color: #dc2c3e !important;
 }
+
 .text-orange {
   color: #ff9900 !important;
 }
@@ -422,7 +427,7 @@ h5 {
 }
 
 .toggle-sidebar {
-  color: white;
+  color: #000; /* changed from white to black */
   background: none;
   border: none;
   cursor: pointer;
@@ -512,7 +517,7 @@ h5 {
 .custom-tooltip {
   background: rgba(0, 0, 0, 0.7);
   padding: 10px;
-  color: white;
+  color: #000; /* changed from white to black */
   border-radius: 4px;
 }
 
@@ -541,7 +546,7 @@ h5 {
   padding: 4px;
   border-radius: 5px;
   background: white;
-  color: white; /* Text color remains white */
+  color: #000; /* changed from white to black */
   border: 1px solid #ccc;
 }
 
@@ -556,11 +561,11 @@ h5 {
 
 .custom-select:focus,
 .custom-select:valid {
-  color: white;
+  color: #000; /* changed from white to black */
 }
 
 .custom-select option:disabled {
-  color: white;
+  color: #000; /* changed from white to black */
 }
 
 .test-container {
@@ -643,7 +648,7 @@ h5 {
   letter-spacing: 1px;
   font-size: 18px;
   font-family: Livvic;
-  color: #fff;
+  color: #000; /* changed from white to black */
 }
 
 .sidebar-test > .button .text {
@@ -678,7 +683,7 @@ h5 {
 .spinner-border {
   width: 40px;
   height: 40px;
-  border: 2px solid white;
+  border: 2px solid #000; /* changed from white to black */
   border-top: 2px solid transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -698,6 +703,7 @@ h5 {
   }
 }
 
+/* Changed the .text-white class to force black text */
 .text-white {
-  color: #fff !important;
+  color: #000 !important;
 }
