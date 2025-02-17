@@ -4,8 +4,8 @@ const theme = extendTheme({
   styles: {
     global: {
       body: {
-        bgGradient: "linear(180deg, #000000, #7800ff)", // Updated to linear gradient
-        color: "white",
+        bg: "white", // Changed background to white
+        color: "black", // Adjusted text color for readability on white
         minHeight: "100vh", // Ensure the body covers the full viewport height
         margin: 0,
         padding: 0,
@@ -19,8 +19,8 @@ const theme = extendTheme({
         borderWidth: "2px",
         borderStyle: "solid",
         borderColor: "gray.300", // Light grey border
-        boxShadow: "lg", // Large box shadow for a subtle shiny effect
-        bgGradient: "linear(180deg, #000000, #7800ff)", // Same gradient as main background
+        boxShadow: "lg", // Large box shadow for a subtle effect
+        bg: "white", // Changed Box background to white
       },
     },
   },
