@@ -102,7 +102,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
         },
       });
     }
-  }, [showdateFilter, dateFilter.length]);
+  }, [showdateFilter, dateFilter.length, propData]);
 
   const dataToUse = useMemo(() => {
     let mainDataUse = [...data.weekly.data];
@@ -194,7 +194,10 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
         },
       },
       grid: {
-        show: false,
+        show: true,
+        padding: {
+          bottom: 0,
+        },
       },
       plotOptions: {
         bar: {
@@ -218,12 +221,6 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
         align: "left",
         offsetY: 25,
         offsetX: 20,
-      },
-      grid: {
-        show: true,
-        padding: {
-          bottom: 0,
-        },
       },
       fill: {
         type: "gradient",
@@ -254,7 +251,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
         type: "datetime",
         labels: {
           style: {
-            colors: "#ffffff",
+            colors: ["black"],
           },
         },
       },
@@ -280,14 +277,18 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
             : 0,
         enabled: true,
         formatter(val, data) {
-          const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
+          const item =
+            dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
           const prevItem =
             dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
           let str = "";
           if (item && prevItem) {
             str += item > prevItem ? "▲ " : item < prevItem ? "▼ " : "- ";
             let difference = item - prevItem;
-            let percentageDifference = +((difference / prevItem) * 100).toFixed?.(1);
+            let percentageDifference = +(
+              (difference / prevItem) *
+              100
+            ).toFixed?.(1);
             str += percentageDifference;
           }
           const res = [];
@@ -308,7 +309,8 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
           colors: [
             function (data) {
               const item = data.series[data.seriesIndex][data.dataPointIndex];
-              const prevItem = data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
+              const prevItem =
+                data.series[data.seriesIndex]?.[data.dataPointIndex - 1];
               if (item && prevItem) {
                 if (item > prevItem) return "#3dae63";
                 else if (item < prevItem) return "#dc2c3e";
@@ -335,7 +337,8 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
       },
       prevReqController.current.signal
     ).then((res) => setInsights(res));
-  }, [quarterVal]);
+  }, [quarterVal, selectedYear]);
+
   const insights =
     selectedDropdown === "Both"
       ? insightsData.total
@@ -343,7 +346,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
       ? insightsData.videos
       : insightsData.notes;
 
-  const handleSelectDateChange = (e) => {
+  const handleSelectDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     if (!dateFilter.includes(value) && value) {
       setDateFilter([...dateFilter, value]);
@@ -382,33 +385,33 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
                 <g id="SVGRepo_iconCarrier">
                   <path
                     d="M6 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M18 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill="black"
                   />
                   <path
                     d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill="black"
                   />
                   <path
                     d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill="black"
                   />
                 </g>
               </svg>
@@ -437,24 +440,20 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
                   strokeLinejoin="round"
                 />
                 <g id="SVGRepo_iconCarrier">
-                  <g>
-                    <g>
-                      <path
-                        d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 
+                  <path
+                    d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 
               c134.684,0,244.249-109.564,244.249-244.244C488.484,109.566,378.92,0.002,244.236,0.002z 
               M244.236,413.619c-93.4,0-169.38-75.979-169.38-169.379c0-93.396,75.979-169.375,169.38-169.375
               s169.391,75.979,169.391,169.375C413.627,337.641,337.637,413.619,244.236,413.619z"
-                      />
-                      <path
-                        d="M244.236,206.816c-14.757,0-26.619,11.962-26.619,26.73v118.709c0,14.769,11.862,26.735,26.619,26.735 
+                  />
+                  <path
+                    d="M244.236,206.816c-14.757,0-26.619,11.962-26.619,26.73v118.709c0,14.769,11.862,26.735,26.619,26.735 
               c14.769,0,26.62-11.967,26.62-26.735V233.546C270.855,218.778,259.005,206.816,244.236,206.816z"
-                      />
-                      <path
-                        d="M244.236,107.893c-19.949,0-36.102,16.158-36.102,36.091c0,19.934,16.152,36.092,36.102,36.092 
+                  />
+                  <path
+                    d="M244.236,107.893c-19.949,0-36.102,16.158-36.102,36.091c0,19.934,16.152,36.092,36.102,36.092 
               c19.929,0,36.081-16.158,36.081-36.092C280.316,124.051,264.165,107.893,244.236,107.893z"
-                      />
-                    </g>
-                  </g>
+                  />
                 </g>
               </svg>
             </button>
@@ -543,7 +542,7 @@ const PipeCombineChart: React.FC<AverageChartProps> = ({
           transition: "max-height 0.7s ease",
         }}
       >
-        <Box p={0} borderRadius="md" color="white">
+        <Box p={0} borderRadius="md" color="black">
           {showControls && (
             <>
               {/* Checkbox Row */}
