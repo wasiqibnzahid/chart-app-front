@@ -7,17 +7,14 @@ import LocalOverview from "./LocalOverview";
 // Logo Sidebar
 import Vertical from "../assets/Vertical.svg";
 import Local from "../assets/Local.svg";
-import ampIcon from '../assets/amp-svgrepo-com.svg';
-import testIcon from '../assets/test-svgrepo-com.svg';
-import ImageIcon from '../assets/gallery-svgrepo-com.svg';
+import ampIcon from "../assets/amp-svgrepo-com.svg";
+import testIcon from "../assets/test-svgrepo-com.svg";
+import ImageIcon from "../assets/gallery-svgrepo-com.svg";
 
 import General from "../assets/General.svg";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import AmpOverview from "./AmpOverview";
 import { TestManager } from "./TestManager";
 import ImageData from "./ImageData";
@@ -25,6 +22,12 @@ import ImageData from "./ImageData";
 const GeneralApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Common style for icons to ensure they appear black
+  const iconStyle = {
+    marginRight: "10px",
+    filter: "brightness(0) saturate(100%)",
+  };
 
   return (
     <div className="app-container flex" style={{ color: "black" }}>
@@ -46,9 +49,7 @@ const GeneralApp: React.FC = () => {
             src={General}
             height={10}
             width={20}
-            style={{
-              marginRight: "10px",
-            }}
+            style={iconStyle}
             alt="General Icon"
           />{" "}
           General Overview
@@ -62,9 +63,7 @@ const GeneralApp: React.FC = () => {
             src={Vertical}
             height={10}
             width={20}
-            style={{
-              marginRight: "10px",
-            }}
+            style={iconStyle}
             alt="Vertical Icon"
           />{" "}
           Vertical Overview
@@ -78,9 +77,7 @@ const GeneralApp: React.FC = () => {
             src={Local}
             height={10}
             width={20}
-            style={{
-              marginRight: "10px",
-            }}
+            style={iconStyle}
             alt="Local Icon"
           />{" "}
           Local Overview
@@ -94,13 +91,12 @@ const GeneralApp: React.FC = () => {
             src={ampIcon}
             height={10}
             width={20}
-            style={{
-              marginRight: "10px",
-            }}
+            style={iconStyle}
             alt="AMP Icon"
           />{" "}
           AMP Overview
         </button>
+
         <button
           className={`tab-button ${activeTab === 4 ? "active" : ""}`}
           onClick={() => setActiveTab(4)}
@@ -109,13 +105,12 @@ const GeneralApp: React.FC = () => {
             src={testIcon}
             height={10}
             width={20}
-            style={{
-              marginRight: "10px",
-            }}
+            style={iconStyle}
             alt="Test Manager Icon"
           />{" "}
           Test Manager
         </button>
+
         <button
           className={`tab-button ${activeTab === 5 ? "active" : ""}`}
           onClick={() => setActiveTab(5)}
@@ -124,9 +119,7 @@ const GeneralApp: React.FC = () => {
             src={ImageIcon}
             height={10}
             width={20}
-            style={{
-              marginRight: "10px",
-            }}
+            style={iconStyle}
             alt="Gallery Icon"
           />{" "}
           Gallery
