@@ -85,14 +85,15 @@ export interface BarChartProps {
     quarterData: QuarterData[];
   };
   titleHeading: string;
-
   hideChecked?: boolean;
 }
+
 function calculatePercentageChange(num1: number, num2: number) {
   const difference = num2 - num1;
   const percentageChange = (difference / num1) * 100;
   return percentageChange;
 }
+
 const dropdownOptions = ["Video", "Note", "Both"];
 
 const PipCombineGrouped: React.FC<BarChartProps> = ({
@@ -115,9 +116,9 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
 
-  // Show and hide Menu
+  // Toggle raw values display
   const handleCheckboxChange = () => {
-    setShowRawValues(!showRawValues); // Toggle the state
+    setShowRawValues(!showRawValues);
   };
 
   useEffect(() => {
@@ -126,27 +127,21 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   }, [propData]);
 
   useEffect(() => {
-    if (showdateFilter === false) {
+    if (!showdateFilter) {
       setData(propData);
     } else {
-      const matchedweeklyData = propData.weekly.data.map((outerData) => {
-        return {
-          ...outerData,
-          data: outerData.data.filter((innerData) =>
-            dateFilter.includes(innerData.x)
-          ),
-        };
-      });
-
-      const matchedchangesData = propData.weekly.changes.map((outerData) => {
-        return {
-          ...outerData,
-          data: outerData.data.filter((innerData) =>
-            dateFilter.includes(innerData.x)
-          ),
-        };
-      });
-
+      const matchedweeklyData = propData.weekly.data.map((outerData) => ({
+        ...outerData,
+        data: outerData.data.filter((innerData) =>
+          dateFilter.includes(innerData.x)
+        ),
+      }));
+      const matchedchangesData = propData.weekly.changes.map((outerData) => ({
+        ...outerData,
+        data: outerData.data.filter((innerData) =>
+          dateFilter.includes(innerData.x)
+        ),
+      }));
       setData({
         ...propData,
         weekly: {
@@ -164,8 +159,9 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
           return item.name.includes("Video");
         } else if (selectedOption === "Note") {
           return item.name.includes("Note");
-        } else
+        } else {
           return !item.name.includes("Note") && !item.name.includes("Video");
+        }
       })
       .map((data) => ({
         ...data,
@@ -191,7 +187,6 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
         data: item.data.filter((date) => {
           const f = new Date(date.x);
           const month = f.getMonth();
-
           return (
             f.getFullYear() === selectedYear &&
             month >= quarterVal[0] &&
@@ -200,9 +195,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
         }),
       }));
     }
-
     const firstItem = items[0];
-
     let dateList = firstItem.data.map((item) => item.x);
     const dateOptions = firstItem.data.map((item) => item.x);
     const stuff = dateList.map((date, index) => ({
@@ -215,28 +208,12 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       allNames,
       dateOptions,
     };
-  }, [
-    data,
-    selectedOption,
-    selectedYear,
-    quarterVal,
-    removedNames,
-    showAllData,
-  ]);
+  }, [data, selectedOption, selectedYear, quarterVal, removedNames, showAllData]);
 
   const [insightsData, setInsights] = useState<Insights>({
-    notes: {
-      competition: "",
-      self: "",
-    },
-    total: {
-      competition: "",
-      self: "",
-    },
-    videos: {
-      competition: "",
-      self: "",
-    },
+    notes: { competition: "", self: "" },
+    total: { competition: "", self: "" },
+    videos: { competition: "", self: "" },
   });
   const prevReqController = useRef(new AbortController());
   useEffect(() => {
@@ -246,12 +223,8 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     prevReqController.current = new AbortController();
     getInsights(
       {
-        start: `${quarterVal[0] > 8 ? "" : "0"}${
-          quarterVal[0] + 1
-        }-${selectedYear}`,
-        end: `${quarterVal[1] > 8 ? "" : "0"}${
-          quarterVal[1] + 1
-        }-${selectedYear}`,
+        start: `${quarterVal[0] > 8 ? "" : "0"}${quarterVal[0] + 1}-${selectedYear}`,
+        end: `${quarterVal[1] > 8 ? "" : "0"}${quarterVal[1] + 1}-${selectedYear}`,
       },
       prevReqController.current.signal
     ).then((res) => setInsights(res));
@@ -263,7 +236,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       stacked: false,
     },
     grid: {
-      show: false, // Disable the grid lines
+      show: false,
     },
     yaxis: {
       title: {
@@ -282,7 +255,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       },
       labels: {
         style: {
-          colors: ["#fff"],
+          colors: ["#000"], // Black x-axis labels
         },
       },
     },
@@ -292,52 +265,43 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     fill: {
       type: "gradient",
       gradient: {
-        type: "horizontal", // Gradient from left to right
+        type: "horizontal",
         colorStops: [
           [
-            {
-              offset: 40,
-              color: "#0574cd",
-              opacity: 1,
-            },
+            { offset: 40, color: "#0574cd", opacity: 1 },
           ],
           [
-            {
-              offset: 80,
-              color: "#f32e42",
-              opacity: 1,
-            },
+            { offset: 80, color: "#f32e42", opacity: 1 },
           ],
         ],
       },
     },
     dataLabels: {
-      enabled: showRawValues, // Enable data labels
+      enabled: showRawValues,
       style: {
         fontSize: "7px",
-        colors: ["#fff"], // White color for visibility
+        colors: ["#000"], // Black data labels
       },
       formatter: function (val) {
         return val % 1 === 0 ? val.toFixed?.(0) : val.toFixed?.(2);
       },
-      offsetY: -20, // Position the label above the bar
+      offsetY: -20,
     },
     tooltip: {
       enabled: true,
       y: {
-        formatter: function (val) {
-          return `${val}  units`; // Customize this to show your units
+        formatter(val) {
+          return `${val}  units`;
         },
       },
     },
-
     plotOptions: {
       bar: {
         horizontal: false,
         distributed: true,
         borderRadius: 0,
         dataLabels: {
-          position: "top", // Show data labels on top of each bar
+          position: "top",
         },
       },
     },
@@ -348,17 +312,10 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       const values = series
         .map((s) => s.data[index])
         .filter((v) => v !== undefined);
-
-      // Use indices as x values (0, 1, 2, ...) if x is evenly spaced
       const x = Array.from({ length: values.length }, (_, i) => i);
-
-      if (values.length < 2) {
-        return NaN; // Not enough data points to calculate slope
-      }
-
+      if (values.length < 2) return NaN;
       const { slope } = linearRegression(x, values);
-
-      return Number(slope.toFixed(1)); // Return the slope, rounded to 1 decimal place
+      return Number(slope.toFixed(1));
     });
   }, [series]);
 
@@ -402,10 +359,8 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     }
   }, [isChecked, names]);
 
-  const handleSelectDateChange = (e) => {
+  const handleSelectDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-
-    // Check if the value is already in the dateFilter array
     if (!dateFilter.includes(value) && value) {
       setDateFilter([...dateFilter, value]);
       setSelectedDate(value);
@@ -413,26 +368,18 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
   };
 
   return (
-    <section
-      style={{
-        position: "relative",
-      }}
-    >
+    <section style={{ position: "relative" }}>
       {/* Header Text */}
       <div className="justify-content-between align-items-center">
         <div>
           <h5 style={{ color: "black" }}>{titleHeading}</h5>
         </div>
         <section className="VerticalBarChart__legend">
-          {/* control SVG Start */}
+          {/* Control SVG Start */}
           <div>
             <button
               onClick={() => setShowControls(!showControls)}
-              style={{
-                outline: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
+              style={{ outline: "none", border: "none", cursor: "pointer" }}
             >
               <svg
                 width="20"
@@ -461,21 +408,21 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   />
                   <path
                     d="M18 5V20"
-                    stroke="white"
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                    fill="white"
+                    fill="black"
                   />
                   <path
                     d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                    fill="white"
+                    fill="black"
                   />
                   <path
                     d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                    fill="white"
+                    fill="black"
                   />
                 </g>
               </svg>
@@ -487,11 +434,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
           <div>
             <button
               onClick={() => setShowZoomIn(!showZoomIn)}
-              style={{
-                outline: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
+              style={{ outline: "none", border: "none", cursor: "pointer" }}
             >
               <svg
                 version="1.1"
@@ -501,7 +444,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                 height="20"
                 viewBox="0 0 488.484 488.484"
                 xmlSpace="preserve"
-                fill="white"
+                fill="black"
               >
                 <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                 <g
@@ -541,18 +484,18 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                 value={selectedOption}
                 onChange={(e) => setSelectedOption(e.target.value)}
                 border="2px"
-                borderColor="#cbd5e0" // Apply the border color
+                borderColor="#cbd5e0"
                 borderRadius="8px"
                 size="sm"
-                color="white"
+                color="black"
                 bg="transparent"
                 _hover={{ borderColor: "gray.300" }}
                 _focus={{ borderColor: "gray.300", boxShadow: "none" }}
-                iconColor="white"
+                iconColor="black"
                 width="fit-content"
               >
                 {dropdownOptions.map((item) => (
-                  <option key={item} value={item} style={{ color: "white" }}>
+                  <option key={item} value={item} style={{ color: "black" }}>
                     {item}
                   </option>
                 ))}
@@ -563,15 +506,11 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       </div>
 
       {/* Chart */}
-      <div
-        style={{
-          position: "relative",
-        }}
-      >
+      <div style={{ position: "relative" }}>
         <Chart options={options} series={series} type="bar" height={200} />
       </div>
 
-      {/* Perncentages Color Values before Chart */}
+      {/* Percentages (slope values) above the chart */}
       {isChecked && (
         <div
           style={{
@@ -580,8 +519,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
             zIndex: 1000,
             width: "100%",
             display: "flex",
-            justifyContent:
-              names.length === 2 ? "space-around" : "space-between",
+            justifyContent: names.length === 2 ? "space-around" : "space-between",
             fontSize: "10px",
             textAlign: "center",
           }}
@@ -598,7 +536,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   : "#dc2c3e",
                 borderRadius: "8px",
                 padding: "0.25rem 0.25rem",
-                color: "#fff",
+                color: "black",
                 width: "50px",
               }}
             >
@@ -613,13 +551,10 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
         </div>
       )}
 
-      {/* Range Line */}
+      {/* Range Slider */}
       <div
         className="px-4 mb-3 slider-container"
-        style={{
-          marginTop: "3%",
-          position: "relative",
-        }}
+        style={{ marginTop: "3%", position: "relative" }}
       >
         <RangeSlider
           isDisabled={showAllData}
@@ -638,12 +573,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
 
         <div className="d-flex justify-content-between">
           {months.map((month) => (
-            <span
-              key={month}
-              style={{
-                color: "white",
-              }}
-            >
+            <span key={month} style={{ color: "black" }}>
               {month}
             </span>
           ))}
@@ -668,44 +598,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
         </div>
       </div>
 
-      {/* Open When user click on Zoom in then show this */}
-
-      {/* Companies Checkbox */}
-      {showControls && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "12px",
-            color: "#fff",
-            gap: "0.75rem",
-            marginBottom: "1rem",
-            flexWrap: "wrap",
-          }}
-        >
-          {allNames.map((name, i) => (
-            <span
-              key={name + i}
-              className="checkbox-container-sm d-flex justify-content-center align-items-center"
-              style={{
-                cursor: "pointer",
-              }}
-            >
-              <Checkbox
-                size="sm"
-                colorScheme="purple"
-                isChecked={!removedNames.includes(name)}
-                id={`ASD-${name}`}
-                onChange={() => onClickHandler(name)}
-              />
-              <label htmlFor={`ASD-${name}`}>{name}</label>
-            </span>
-          ))}
-        </div>
-      )}
-      {/* Checkbox for row, percentage and show all data */}
-
+      {/* Controls & Zoom Section */}
       <section
         style={{
           marginTop: "3%",
@@ -713,10 +606,10 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
           transition: "max-height 0.7s ease",
         }}
       >
-        <Box p={0} borderRadius="md" color="white">
+        <Box p={0} borderRadius="md" color="black">
           {showControls && (
             <>
-              {/* Check Box Row's */}
+              {/* Checkbox Row */}
               <section
                 style={{
                   display: "flex",
@@ -728,15 +621,11 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   marginBottom: "2%",
                 }}
               >
-                {/* control SVG Start */}
+                {/* Control SVG */}
                 <div>
                   <button
                     onClick={() => setShowControls(!showControls)}
-                    style={{
-                      outline: "none",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
+                    style={{ outline: "none", border: "none", cursor: "pointer" }}
                   >
                     <svg
                       width="20"
@@ -753,39 +642,39 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                       <g id="SVGRepo_iconCarrier">
                         <path
                           d="M6 5V20"
-                          stroke="white"
+                          stroke="black"
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M12 5V20"
-                          stroke="white"
+                          stroke="black"
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M18 5V20"
-                          stroke="white"
+                          stroke="black"
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                          fill="white"
+                          fill="black"
                         />
                         <path
                           d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                          fill="white"
+                          fill="black"
                         />
                         <path
                           d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                          fill="white"
+                          fill="black"
                         />
                       </g>
                     </svg>
                   </button>
                 </div>
-                {/* Control SVG End */}
+                {/* End Control SVG */}
                 <div>
                   <Stack direction="row" spacing={5} align="center" mb={0}>
                     {!hideChecked && (
@@ -794,36 +683,31 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                         disabled={names.length < 9 && names.length !== 2}
                         isChecked={isChecked}
                         onChange={(e) => setIsChecked(e.target.checked)}
-                        colorScheme="transparent"
-                        outline="none"
-                        iconColor="white"
-                        borderColor="white"
+                        colorScheme="purple"
+                        iconColor="black"
+                        borderColor="black"
                         size="lg"
                       >
                         Show percentages
                       </Checkbox>
                     )}
-
                     <Checkbox
                       id="show-all-data-2"
                       isChecked={showAllData}
                       onChange={(e) => setShowAllData(e.target.checked)}
-                      colorScheme="transparent"
-                      outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      colorScheme="purple"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show All Data
                     </Checkbox>
-
                     <Checkbox
                       checked={showRawValues}
                       onChange={handleCheckboxChange}
-                      colorScheme="transparent"
-                      outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      colorScheme="purple"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show Raw Values
@@ -832,10 +716,9 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                       id="datefilter"
                       checked={showdateFilter}
                       onChange={(e) => setShowDateFilter(e.target.checked)}
-                      colorScheme="transparent"
-                      outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      colorScheme="purple"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show Date Filter
@@ -870,12 +753,13 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                         fontSize: "14px",
                         padding: "4px",
                         borderRadius: "5px",
+                        color: "black",
                       }}
                     >
                       {propData.weekly.data?.[1].data.map((date) => (
                         <option
                           key={date.x}
-                          style={{ color: "white" }}
+                          style={{ color: "black" }}
                           value={date.x}
                         >
                           {date.x}
@@ -924,7 +808,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                         height="20"
                         viewBox="0 0 488.484 488.484"
                         xmlSpace="preserve"
-                        fill="white"
+                        fill="black"
                       >
                         <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                         <g
@@ -956,7 +840,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                     </button>
                   </div>
                   {/* Insights SVG End */}
-                  <Text style={{ lineHeight: "2rem", color: "white" }}>
+                  <Text style={{ lineHeight: "2rem", color: "black" }}>
                     {insights ? insights.self : "There is no insights"} <br />
                     {insights ? insights.competition : "There is no insights"}
                   </Text>
