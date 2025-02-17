@@ -23,7 +23,6 @@ import Papa from "papaparse";
 import { FaExpand } from "react-icons/fa";
 import Plot from "react-plotly.js";
 
-
 /** ========== Helpers ========== */
 
 // Parse YYYY-MM-DD -> Date
@@ -137,7 +136,7 @@ const GROUPS = {
 };
 
 const GROUP_NAMES = Object.keys(GROUPS);
-const INDIVIDUAL_COMPANIES = Object.values(GROUPS).flat(); // Removed the empty string
+const INDIVIDUAL_COMPANIES = Object.values(GROUPS).flat();
 
 // 5 metrics
 const METRICS = ["LCP", "CLS", "INP", "FCP", "TTFB"];
@@ -208,7 +207,6 @@ const PerformanceMapLocal = () => {
                 : "N/A",
           }));
 
-          // Filter valid
           const validData = parsed.filter((r, idx) => {
             if (!r.website) {
               console.warn(`Row ${idx + 2} missing 'Website'`);
@@ -225,7 +223,6 @@ const PerformanceMapLocal = () => {
             return true;
           });
 
-          // Unique weeks
           const weeks = Array.from(new Set(validData.map((d) => d.weekRange)));
           weeks.sort((a, b) => {
             const dateA = a.split(" - ")[0] ? parseDate(a.split(" - ")[0]) : new Date(0);
@@ -253,20 +250,16 @@ const PerformanceMapLocal = () => {
   // Company select options (Groups + Individuals)
   const companyOptions = useMemo(() => {
     const opts = [];
-    // Add "Local"
     opts.push(
       <option
         key="Local"
         value="Local"
-        style={
-          selectedCompany === "Local" ? { color: "black", fontWeight: "bold" } : { color: "black" }
-        }
+        style={selectedCompany === "Local" ? { color: "black", fontWeight: "bold" } : { color: "black" }}
       >
         Local
       </option>
     );
 
-    // Add each individual company without any empty option
     INDIVIDUAL_COMPANIES.forEach((co) => {
       opts.push(
         <option
@@ -284,20 +277,15 @@ const PerformanceMapLocal = () => {
   // Filtered data by company + week
   const filteredData = useMemo(() => {
     if (!data.length) return [];
-
     return data.filter((row) => {
-      // Week filter
       if (selectedWeek && selectedWeek !== "All Weeks") {
         if (row.weekRange !== selectedWeek) return false;
       }
-      // If "Local," aggregator logic happens later. Just pass it along.
       if (selectedCompany === "Local") {
-        // All items that belong to local group
         const localCompanies = GROUPS["Local"];
         const localURLs = localCompanies.map((c) => COMPANY_URLS[c]);
         return localURLs.includes(row.website);
       } else if (selectedCompany) {
-        // Single company
         const selectedURL = COMPANY_URLS[selectedCompany];
         return row.website === selectedURL;
       }
@@ -308,14 +296,11 @@ const PerformanceMapLocal = () => {
   // Build final “series” for each metric
   const plotlySeries = useMemo(() => {
     const seriesByMetric = {};
-
     METRICS.forEach((metric) => {
       if (selectedCompany === "Local") {
-        // Aggregated
         const points = getAggregatedLocalData(filteredData, metric);
         seriesByMetric[metric] = points;
       } else {
-        // Single
         const points = getSingleCompanyData(filteredData, metric);
         seriesByMetric[metric] = points;
       }
@@ -326,28 +311,21 @@ const PerformanceMapLocal = () => {
   // Averages
   const averages = useMemo(() => {
     if (!filteredData.length) return {};
-
     const sums = {};
     const counts = {};
     METRICS.forEach((m) => {
       sums[m] = 0;
       counts[m] = 0;
     });
-
     filteredData.forEach((row) => {
       if (METRICS.includes(row.metric) && !isNaN(row.p75)) {
         sums[row.metric] += row.p75;
         counts[row.metric] += 1;
       }
     });
-
     const result = {};
     METRICS.forEach((m) => {
-      if (counts[m] > 0) {
-        result[m] = (sums[m] / counts[m]).toFixed(2);
-      } else {
-        result[m] = "N/A";
-      }
+      result[m] = counts[m] > 0 ? (sums[m] / counts[m]).toFixed(2) : "N/A";
     });
     return result;
   }, [filteredData]);
@@ -359,13 +337,13 @@ const PerformanceMapLocal = () => {
       allPoints = allPoints.concat(arr);
     });
     const dt = getMostRecentDate(allPoints);
-    return dt; // May be null
+    return dt;
   }, [plotlySeries]);
 
   // Current date line in Plotly
   const getCurrentDateLine = (dt) => {
     if (!dt) return {};
-    const iso = dt.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    const iso = dt.toISOString().split("T")[0];
     return {
       shapes: [
         {
@@ -377,7 +355,7 @@ const PerformanceMapLocal = () => {
           y0: 0,
           y1: 1,
           line: {
-            color: "gray",
+            color: "black",
             width: 2,
             dash: "dot",
           },
@@ -389,12 +367,12 @@ const PerformanceMapLocal = () => {
           y: 1,
           xref: "x",
           yref: "paper",
-          text: "", // If you want a label, put it here
+          text: "",
           showarrow: true,
           arrowhead: 2,
           ax: 0,
           ay: -40,
-          font: { color: "white" },
+          font: { color: "black" },
         },
       ],
     };
@@ -425,16 +403,15 @@ const PerformanceMapLocal = () => {
     }
   };
 
-  // Keeps the function, but it's no longer used anywhere:
   const showAllWeeks = () => {
     setSelectedWeek("All Weeks");
   };
 
   if (isLoading) {
     return (
-      <Flex justifyContent="center" alignItems="center" height="50vh" bg="transparent">
+      <Flex justifyContent="center" alignItems="center" height="50vh" bg="white">
         <Spinner size="xl" color="teal.500" />
-        <Text ml={4} fontSize="xl" color="white">
+        <Text ml={4} fontSize="xl" color="black">
           Loading data...
         </Text>
       </Flex>
@@ -443,7 +420,7 @@ const PerformanceMapLocal = () => {
 
   if (error) {
     return (
-      <Flex justifyContent="center" alignItems="center" height="50vh" bg="transparent">
+      <Flex justifyContent="center" alignItems="center" height="50vh" bg="white">
         <Text color="red.500" fontSize="xl" textAlign="center">
           {error}
         </Text>
@@ -461,7 +438,7 @@ const PerformanceMapLocal = () => {
         align="center"
         p={4}
         mx="auto"
-        bg="transparent"
+        bg="white"
       >
         {/* Controls Row */}
         <Flex
@@ -470,23 +447,23 @@ const PerformanceMapLocal = () => {
           alignItems="center"
           flexWrap="wrap"
           gap={4}
-          bg="transparent"
+          bg="white"
         >
           {/* Company */}
           <Flex alignItems="center" gap={2}>
-            <Text color="white" fontSize="md" fontWeight="semibold">
+            <Text color="black" fontSize="md" fontWeight="semibold">
               Company:
             </Text>
             <Select
               value={selectedCompany}
               onChange={handleCompanyChange}
               width="200px"
-              bg="transparent"
+              bg="white"
               borderRadius="md"
-              border="1px solid rgba(255, 255, 255, 0.6)"
+              border="1px solid rgba(0, 0, 0, 0.6)"
               size="sm"
               _placeholder={{ color: "gray.300" }}
-              color="white" // <-- Added
+              color="black"
             >
               {companyOptions}
             </Select>
@@ -494,7 +471,7 @@ const PerformanceMapLocal = () => {
 
           {/* Week */}
           <Flex alignItems="center" gap={2}>
-            <Text color="white" fontSize="md" fontWeight="semibold">
+            <Text color="black" fontSize="md" fontWeight="semibold">
               Week:
             </Text>
             <Select
@@ -502,17 +479,19 @@ const PerformanceMapLocal = () => {
               onChange={handleWeekChange}
               placeholder="Select Week"
               width="200px"
-              bg="transparent"
+              bg="white"
               borderRadius="md"
-              border="1px solid rgba(255, 255, 255, 0.6)"
+              border="1px solid rgba(0, 0, 0, 0.6)"
               size="sm"
               _placeholder={{ color: "gray.300" }}
-              color="white" // <-- Added
+              color="black"
             >
               <option
                 value="All Weeks"
                 style={
-                  selectedWeek === "All Weeks" ? { color: "black", fontWeight: "bold" } : { color: "black" }
+                  selectedWeek === "All Weeks"
+                    ? { color: "black", fontWeight: "bold" }
+                    : { color: "black" }
                 }
               >
                 All Weeks
@@ -544,23 +523,21 @@ const PerformanceMapLocal = () => {
         >
           {METRICS.map((metric) => {
             const pts = plotlySeries[metric] || [];
-
-            // Single trace
             const trace = {
               x: pts.map((p) => p.date),
               y: pts.map((p) => p.value),
               type: "scatter",
               mode: "lines+markers",
               line: {
-                color: "#00FFFF", // Bright cyan
+                color: "black",
                 width: 2,
                 shape: "linear",
               },
               marker: {
                 size: 6,
-                color: "#00FFFF",
+                color: "black",
               },
-              name: "All", // Hover says “All”
+              name: "All",
               hovertemplate: `
                 <b>All</b><br>
                 <b>Date:</b> %{x|%b %d}<br>
@@ -569,7 +546,6 @@ const PerformanceMapLocal = () => {
               connectgaps: true,
             };
 
-            // Performance color
             const avgVal = parseFloat(averages[metric]);
             let performance = "Poor";
             if (!isNaN(avgVal)) {
@@ -586,7 +562,6 @@ const PerformanceMapLocal = () => {
                 ? "yellow.400"
                 : "red.400";
 
-            // Current date line
             const { shapes, annotations } = getCurrentDateLine(mostRecentDate);
 
             return (
@@ -613,14 +588,14 @@ const PerformanceMapLocal = () => {
                     </Box>
                   </>
                 }
-                bg="gray.700"
-                color="white"
+                bg="white"
+                color="black"
                 fontSize="sm"
                 placement="top"
                 hasArrow
               >
                 <Box
-                  bg="transparent"
+                  bg="white"
                   p={4}
                   transition="box-shadow 0.2s, transform 0.2s"
                   _hover={{ boxShadow: "lg", transform: "translateY(-4px)" }}
@@ -643,14 +618,14 @@ const PerformanceMapLocal = () => {
                         textAlign="center"
                         flex="1"
                       >
-                        <Text color="white" fontSize="sm" fontWeight="bold" isTruncated>
+                        <Text color="black" fontSize="sm" fontWeight="bold" isTruncated>
                           {metric}
                         </Text>
                       </Box>
                       <IconButton
                         aria-label="Expand Graph"
                         icon={<FaExpand />}
-                        color="white"
+                        color="black"
                         bg="transparent"
                         _hover={{ bg: "transparent" }}
                         size="sm"
@@ -660,12 +635,7 @@ const PerformanceMapLocal = () => {
 
                     {/* Average & Performance */}
                     <Flex direction="column" justify="center" align="center" mt={2}>
-                      <Text
-                        color="white"
-                        fontSize="2xl"
-                        fontWeight="bold"
-                        textAlign="center"
-                      >
+                      <Text color="black" fontSize="2xl" fontWeight="bold" textAlign="center">
                         {formatNumber(averages[metric])} {METRIC_UNITS[metric]}
                       </Text>
                       <Text color={performanceColor} fontSize="sm" fontWeight="bold" mt={1}>
@@ -682,7 +652,7 @@ const PerformanceMapLocal = () => {
                         autosize: true,
                         margin: { l: 40, r: 10, t: 10, b: 30 },
                         xaxis: {
-                          tickfont: { size: 10, color: "white" },
+                          tickfont: { size: 10, color: "black" },
                           type: "date",
                           showgrid: false,
                           zeroline: false,
@@ -693,7 +663,7 @@ const PerformanceMapLocal = () => {
                           showticklabels: true,
                         },
                         yaxis: {
-                          tickfont: { size: 10, color: "white" },
+                          tickfont: { size: 10, color: "black" },
                           showgrid: false,
                           zeroline: false,
                           showline: false,
@@ -705,8 +675,8 @@ const PerformanceMapLocal = () => {
                         annotations: annotations,
                         showlegend: false,
                         hovermode: "closest",
-                        paper_bgcolor: "transparent",
-                        plot_bgcolor: "transparent",
+                        paper_bgcolor: "white",
+                        plot_bgcolor: "white",
                       }}
                       config={{
                         displayModeBar: false,
@@ -726,7 +696,7 @@ const PerformanceMapLocal = () => {
       {/* Expanded Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
         <ModalOverlay />
-        <ModalContent bg="gray.800" color="white" border="2.5px solid" borderColor="gray.300">
+        <ModalContent bg="white" color="black" border="2.5px solid" borderColor="black">
           <ModalHeader>{modalMetric}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -742,10 +712,10 @@ const PerformanceMapLocal = () => {
                     tickformat: "%B %d, %Y",
                     dtick: "M1",
                     showticklabels: true,
-                    tickfont: { size: 12, color: "white" },
+                    tickfont: { size: 12, color: "black" },
                   },
                   yaxis: {
-                    tickfont: { size: 12, color: "white" },
+                    tickfont: { size: 12, color: "black" },
                     showgrid: true,
                     zeroline: false,
                     showline: false,
@@ -755,8 +725,8 @@ const PerformanceMapLocal = () => {
                   },
                   showlegend: false,
                   hovermode: "closest",
-                  paper_bgcolor: "transparent",
-                  plot_bgcolor: "transparent",
+                  paper_bgcolor: "white",
+                  plot_bgcolor: "white",
                 }}
                 config={{
                   displayModeBar: true,
