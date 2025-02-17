@@ -129,7 +129,7 @@ export const TestManager = () => {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Enter the website url..."
-            bgGradient="linear-gradient(90deg, #000000, #7800ff)"
+            bgGradient="white"
             color="white"
             borderColor="whiteAlpha.700"
             _placeholder={{ color: "whiteAlpha.700" }}
@@ -146,7 +146,7 @@ export const TestManager = () => {
             colorScheme="transparent"
             width="full"
             mt={6}
-            bgGradient="linear-gradient(90deg, #000000, #7800ff)"
+            bgGradient="white"
             _hover={{ bg: "rgba(0, 0, 0, 0.2)" }}
             border="2px solid white"
           >
@@ -162,7 +162,7 @@ export const TestManager = () => {
             colorScheme="transparent"
             width="full"
             mt={6}
-            bgGradient="linear-gradient(90deg, #000000, #7800ff)"
+            bgGradient="white"
             _hover={{ bg: "rgba(0, 0, 0, 0.2)" }}
             border="2px solid white"
           >
