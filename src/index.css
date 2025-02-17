@@ -1,23 +1,12 @@
 /* =======================================================
-   Dark/Light Mode Variables and Global Styles
+   Global Variables and Styles (White Background)
    ======================================================= */
 :root {
-  /* Colors for light mode */
+  /* Colors */
   --main-bg: white;
   --main-text: #000;
-  
-  /* Colors for dark mode */
-  --gradient-bg: white;
-  --dark-text: #fff;
-  
-  /* Toggle button colors */
-  --btn-bg-light: #ccc;
-  --btn-text-light: #000;
-  --btn-bg-dark: #444;
-  --btn-text-dark: #fff;
 }
 
-/* Default (light mode) styles */
 body {
   overflow-x: hidden;
   background: var(--main-bg) !important;
@@ -28,36 +17,8 @@ body {
   transition: background 0.5s ease, color 0.5s ease;
 }
 
-/* When dark mode is active, add the class "dark-mode" to <body> */
-body.dark-mode {
-  background: var(--gradient-bg) !important;
-  color: var(--dark-text) !important;
-}
-
 /* =======================================================
-   Dark/Light Mode Toggle Button (Place in your HTML)
-   ======================================================= */
-#modeToggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background: var(--btn-bg-light);
-  color: var(--btn-text-light);
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-body.dark-mode #modeToggle {
-  background: var(--btn-bg-dark);
-  color: var(--btn-text-dark);
-}
-
-/* =======================================================
-   Your Existing CSS Code (Adjusted for Mode Flexibility)
+   Your Existing CSS Code
    ======================================================= */
 
 @font-face {
@@ -199,7 +160,7 @@ h1, h2, h3, h4, h5, h6, strong {
   margin: 0 auto !important;
 }
 
-/* Box Styles (these remain white in both modes) */
+/* Box Styles (remain white) */
 .box {
   background: white;
   padding: 25px 20px;
@@ -218,7 +179,7 @@ h1, h2, h3, h4, h5, h6, strong {
   box-shadow: 0px 1px 15px 1px rgba(69, 65, 78, 0.08) !important;
 }
 
-/* Sparkboxes – using “inherit” so text will follow the current mode’s text color */
+/* Sparkboxes – using “inherit” so text follows the current text color */
 .sparkboxes .box {
   padding-top: 10px;
   padding-bottom: 10px !important;
@@ -249,7 +210,7 @@ h1, h2, h3, h4, h5, h6, strong {
   background: white !important;
 }
 
-/* Text and icon colors – using “inherit” so they change with mode */
+/* Text and icon colors – using “inherit” so they change with the mode */
 text,
 .apexcharts-legend-text,
 h4, h5, li {
@@ -455,20 +416,6 @@ h4, h5, li {
 
 .sidebar.open {
   transform: translateX(0);
-}
-
-.toggle-sidebar {
-  color: inherit;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 24px;
-  position: fixed;
-  left: 250px;
-  top: calc(50% + 60px);
-  z-index: 10;
-  transition: left 0.3s ease;
-  transform: translateY(-50%);
 }
 
 .sidebar-header {
