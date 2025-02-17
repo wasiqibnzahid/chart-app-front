@@ -93,10 +93,10 @@ export const GeneralOverview = () => {
         date={currentQuarter?.Date}
       />
 
-      {/* Updated container: Removed text-white and set text color to black */}
+      {/* Updated container: Text color set to white */}
       <div
         className="d-flex top-row custom-row"
-        style={{ color: "black" }}
+        style={{ color: "white" }}
       >
         <div className="box pt-2 px-3 ">
           <div className="d-flex align-items-center justify-content-between">
@@ -271,6 +271,7 @@ export const GeneralOverview = () => {
                 style={{
                   width: "20px",
                   opacity: "1",
+                  filter: "invert(1)" // Makes the icon appear white
                 }}
               />
             </span>
@@ -391,6 +392,7 @@ export const GeneralOverview = () => {
               note_change: number;
             }) => (
               <div
+                key={company.name}
                 style={{
                   paddingLeft: "20%",
                   fontSize: "16px",
@@ -443,6 +445,7 @@ export const GeneralOverview = () => {
                 style={{
                   width: "20px",
                   opacity: "1",
+                  filter: "invert(1)",
                 }}
               />
             </span>
@@ -616,6 +619,7 @@ export const GeneralOverview = () => {
                 style={{
                   width: "20px",
                   opacity: "1",
+                  filter: "invert(1)",
                 }}
               />
             </span>
@@ -657,7 +661,7 @@ export const GeneralOverview = () => {
               <ExpandWrapper>
                 <PipeCombineChart
                   data={data}
-                  titleHeading="General Overview - TVA vs. Comp. Weeb by Week Bar"
+                  titleHeading="General Overview - TVA vs. Comp. Week by Week Bar"
                 />
               </ExpandWrapper>
             </div>
