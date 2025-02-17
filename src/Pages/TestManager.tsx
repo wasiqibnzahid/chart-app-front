@@ -119,7 +119,7 @@ export const TestManager = () => {
   }
 
   return (
-    // The inline style here ensures that all text and icons (like the arrow symbols) appear black.
+    // The inline style here ensures that all text is rendered in black.
     <div className="main" style={{ color: "black" }}>
       <div className="search-container d-flex">
         <div style={{ width: "70%" }}>
@@ -129,11 +129,11 @@ export const TestManager = () => {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Enter the website url..."
-            bgGradient="white"
-            color="white"
-            borderColor="whiteAlpha.700"
-            _placeholder={{ color: "whiteAlpha.700" }}
-            _focus={{ borderColor: "white" }}
+            bg="transparent"
+            color="black"
+            borderColor="black"
+            _placeholder={{ color: "black" }}
+            _focus={{ borderColor: "black" }}
             _hover={{ bg: "transparent" }}
           />
         </div>
@@ -143,12 +143,12 @@ export const TestManager = () => {
             isDisabled={isButtonDisabled}
             className="box"
             onClick={() => addWebsite()}
-            colorScheme="transparent"
+            bg="transparent"
+            _hover={{ bg: "transparent" }}
+            border="2px solid black"
+            color="black"
             width="full"
             mt={6}
-            bgGradient="white"
-            _hover={{ bg: "rgba(0, 0, 0, 0.2)" }}
-            border="2px solid white"
           >
             RUN
           </Button>
@@ -159,19 +159,20 @@ export const TestManager = () => {
             isDisabled={isButtonDisabled}
             className="box"
             onClick={() => getWebsiteData()}
-            colorScheme="transparent"
+            bg="transparent"
+            _hover={{ bg: "transparent" }}
+            border="2px solid black"
+            color="black"
             width="full"
             mt={6}
-            bgGradient="white"
-            _hover={{ bg: "rgba(0, 0, 0, 0.2)" }}
-            border="2px solid white"
           >
             GET
           </Button>
         </div>
       </div>
       <div className="d-flex test-container">
-        <div className="d-flex top-row-dual text-white custom-row">
+        {/* Removed any text-white classes and enforce black text */}
+        <div className="d-flex top-row-dual custom-row" style={{ color: "black" }}>
           <div className="box relative box-large pt-2 px-3">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">Performance</div>
@@ -181,15 +182,8 @@ export const TestManager = () => {
             ) : (
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
-                  className={`circle mr-2 ${
-                    !latestItem?.metrics.performance_score
-                      ? ""
-                      : latestItem?.metrics.performance_score >= 0.9
-                      ? "bg-green"
-                      : latestItem?.metrics.performance_score >= 0.5
-                      ? "bg-orange"
-                      : "bg-red"
-                  }`}
+                  className="circle mr-2"
+                  style={{ backgroundColor: "black" }}
                 ></div>
                 <AnimateNumber
                   number={(latestItem?.metrics.performance_score ?? 0) * 100}
@@ -207,15 +201,8 @@ export const TestManager = () => {
             ) : (
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
-                  className={`circle mr-2 ${
-                    !selectedJsonData?.categories?.seo.score
-                      ? ""
-                      : selectedJsonData?.categories?.seo.score >= 0.9
-                      ? "bg-green"
-                      : selectedJsonData?.categories?.seo.score >= 0.5
-                      ? "bg-orange"
-                      : "bg-red"
-                  }`}
+                  className="circle mr-2"
+                  style={{ backgroundColor: "black" }}
                 ></div>
                 <AnimateNumber
                   number={(selectedJsonData?.categories?.seo.score || 0) * 100}
@@ -233,15 +220,8 @@ export const TestManager = () => {
             ) : (
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
-                  className={`circle mr-2 ${
-                    !selectedJsonData?.categories?.accessibility.score
-                      ? ""
-                      : selectedJsonData?.categories?.accessibility.score >= 0.9
-                      ? "bg-green"
-                      : selectedJsonData?.categories?.accessibility.score >= 0.5
-                      ? "bg-orange"
-                      : "bg-red"
-                  }`}
+                  className="circle mr-2"
+                  style={{ backgroundColor: "black" }}
                 ></div>
                 <AnimateNumber
                   number={
@@ -262,17 +242,8 @@ export const TestManager = () => {
             ) : (
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
-                  className={`circle mr-2 ${
-                    !selectedJsonData?.categories?.["best-practices"].score
-                      ? ""
-                      : selectedJsonData?.categories?.["best-practices"].score >=
-                        0.9
-                      ? "bg-green"
-                      : selectedJsonData?.categories?.["best-practices"].score >=
-                        0.5
-                      ? "bg-orange"
-                      : "bg-red"
-                  }`}
+                  className="circle mr-2"
+                  style={{ backgroundColor: "black" }}
                 ></div>
                 <AnimateNumber
                   number={
@@ -293,7 +264,7 @@ export const TestManager = () => {
             }}
           >
             <span className="text">Download JSON</span>
-            <span>&rarr;</span>
+            <span style={{ color: "black" }}>&rarr;</span>
           </div>
           <div
             className="button"
@@ -305,13 +276,13 @@ export const TestManager = () => {
             }}
           >
             <span className="text">Github Viewer</span>
-            <span>&rarr;</span>
+            <span style={{ color: "black" }}>&rarr;</span>
           </div>
         </div>
       </div>
       {data?.length > 0 && (
         <div className="box">
-          <table className="table">
+          <table className="table" style={{ color: "black" }}>
             <thead>
               <tr>
                 <th>Test Requested At</th>
@@ -335,13 +306,8 @@ export const TestManager = () => {
                     <div className="d-flex justify-content-center align-items-center">
                       {check.metrics?.first_contentful_paint && (
                         <div
-                          className={`circle mr-2 ${
-                            check.metrics.first_contentful_paint <= 2
-                              ? "bg-green"
-                              : check.metrics.first_contentful_paint <= 4
-                              ? "bg-orange"
-                              : "bg-red"
-                          }`}
+                          className="circle mr-2"
+                          style={{ backgroundColor: "black" }}
                         ></div>
                       )}
                       {check.metrics?.first_contentful_paint?.toFixed(1) || "-"}
@@ -351,13 +317,8 @@ export const TestManager = () => {
                     <div className="d-flex justify-content-center align-items-center">
                       {check.metrics?.total_blocking_time && (
                         <div
-                          className={`circle mr-2 ${
-                            check.metrics.total_blocking_time <= 200
-                              ? "bg-green"
-                              : check.metrics.total_blocking_time <= 600
-                              ? "bg-orange"
-                              : "bg-red"
-                          }`}
+                          className="circle mr-2"
+                          style={{ backgroundColor: "black" }}
                         ></div>
                       )}
                       {check.metrics?.total_blocking_time?.toFixed(1) || "-"}
@@ -367,13 +328,8 @@ export const TestManager = () => {
                     <div className="d-flex justify-content-center align-items-center">
                       {check.metrics?.speed_index && (
                         <div
-                          className={`circle mr-2 ${
-                            check.metrics.speed_index <= 3.4
-                              ? "bg-green"
-                              : check.metrics.speed_index <= 5.8
-                              ? "bg-orange"
-                              : "bg-red"
-                          }`}
+                          className="circle mr-2"
+                          style={{ backgroundColor: "black" }}
                         ></div>
                       )}
                       {check.metrics?.speed_index?.toFixed(1) || "-"}
@@ -383,13 +339,8 @@ export const TestManager = () => {
                     <div className="d-flex justify-content-center align-items-center">
                       {check.metrics?.largest_contentful_paint && (
                         <div
-                          className={`circle mr-2 ${
-                            check.metrics.largest_contentful_paint <= 2.5
-                              ? "bg-green"
-                              : check.metrics.largest_contentful_paint <= 4
-                              ? "bg-orange"
-                              : "bg-red"
-                          }`}
+                          className="circle mr-2"
+                          style={{ backgroundColor: "black" }}
                         ></div>
                       )}
                       {check.metrics?.largest_contentful_paint?.toFixed(1) || "-"}
@@ -399,28 +350,14 @@ export const TestManager = () => {
                     <div className="d-flex justify-content-center align-items-center">
                       {check.metrics?.cumulative_layout_shift && (
                         <div
-                          className={`circle mr-2 ${
-                            check.metrics.cumulative_layout_shift <= 0.1
-                              ? "bg-green"
-                              : check.metrics.cumulative_layout_shift <= 0.25
-                              ? "bg-orange"
-                              : "bg-red"
-                          }`}
+                          className="circle mr-2"
+                          style={{ backgroundColor: "black" }}
                         ></div>
                       )}
                       {check.metrics?.cumulative_layout_shift?.toFixed(1) || "-"}
                     </div>
                   </td>
-                  <td
-                    className={
-                      check.status === "done"
-                        ? "text-green"
-                        : check.status === "failed"
-                        ? "text-red"
-                        : "text-orange"
-                    }
-                    style={{ textTransform: "capitalize" }}
-                  >
+                  <td style={{ textTransform: "capitalize", color: "black" }}>
                     {check.status}
                   </td>
                 </tr>
