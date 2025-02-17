@@ -16,6 +16,7 @@ import {
     ModalBody,
     ModalCloseButton,
     useDisclosure,
+    Button,
 } from "@chakra-ui/react";
 import Papa from "papaparse";
 import { FaExpand } from "react-icons/fa";
@@ -34,10 +35,7 @@ const formatDateRange = (start, end) => {
     const startDate = parseDate(start);
     const endDate = parseDate(end);
     const options = { month: "short", day: "numeric", year: "numeric" };
-    return `${startDate.toLocaleDateString(undefined, options)} - ${endDate.toLocaleDateString(
-        undefined,
-        options
-    )}`;
+    return `${startDate.toLocaleDateString(undefined, options)} - ${endDate.toLocaleDateString(undefined, options)}`;
 };
 
 // Helper: format number with or without decimals
@@ -121,14 +119,14 @@ const THRESHOLDS = {
     LCP: { good: 2500, needsImprovement: 4000 },
 };
 
-// Colors
+// Colors (originally for traces)
 const COLORS_TV_AZTECA = {
     phone: "#0000FF",   // Blue for phone
     desktop: "#87CEFA", // Light blue for desktop
 };
 const COLORS_COMPETITORS = {
-    phone: "#0000FF",   // Red for phone
-    desktop: "#87CEFA", // Light salmon for desktop
+    phone: "#0000FF",   // Blue for phone
+    desktop: "#87CEFA", // Light blue for desktop
 };
 
 // Aggregation for groups
@@ -165,18 +163,17 @@ const PerformanceMapVertical = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Preselect TV Azteca
+    // Preselect TV Azteca Companies by default
     const [selectedCompany, setSelectedCompany] = useState("TV Azteca Companies");
-
-    // Example of a week-range selector
     const [selectedWeekRange, setSelectedWeekRange] = useState("all");
-
     // NEW: Select "phone" or "desktop"
     const [selectedFormFactor, setSelectedFormFactor] = useState("phone");
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [modalPlotData, setModalPlotData] = useState(null);
     const [modalMetric, setModalMetric] = useState("");
+
+    const toast = useToast();
 
     // Fetch CSV once
     useEffect(() => {
@@ -199,10 +196,7 @@ const PerformanceMapVertical = () => {
                         endDate: row["End Date"] ? row["End Date"].trim() : "",
                         weekRange:
                             row["Start Date"] && row["End Date"]
-                                ? formatDateRange(
-                                      row["Start Date"].trim(),
-                                      row["End Date"].trim()
-                                  )
+                                ? formatDateRange(row["Start Date"].trim(), row["End Date"].trim())
                                 : "N/A",
                     }));
 
@@ -269,11 +263,9 @@ const PerformanceMapVertical = () => {
     const filteredDataAllTime = useMemo(() => {
         if (!selectedCompany) return [];
         let filtered = data;
-
         if (selectedWeekRange !== "all") {
             filtered = filtered.filter((row) => row.weekRange === selectedWeekRange);
         }
-
         if (GROUP_NAMES.includes(selectedCompany)) {
             const groupCompanies = GROUPS[selectedCompany];
             const groupURLs = groupCompanies.map((c) => COMPANY_URLS[c]);
@@ -291,7 +283,6 @@ const PerformanceMapVertical = () => {
             const series = GROUP_NAMES.includes(selectedCompany)
                 ? getAggregatedGroupData(filteredDataAllTime, metric, selectedFormFactor)
                 : getSingleCompanyData(filteredDataAllTime, metric, selectedFormFactor);
-
             dataByMetric[metric] = series;
         });
         return dataByMetric;
@@ -336,7 +327,7 @@ const PerformanceMapVertical = () => {
         return maxDt.getTime() === 0 ? null : maxDt;
     }, [filteredDataAllTime]);
 
-    // Color logic
+    // Determine trace color based on company selection and form factor
     const isAztecaSelection =
         selectedCompany === "TV Azteca" || selectedCompany === "TV Azteca Companies";
     const getColor = (isAzteca, formFactor) => {
@@ -360,7 +351,7 @@ const PerformanceMapVertical = () => {
         onOpen();
     };
 
-    // Mark current date line
+    // Mark current date line and annotation (change annotation font to black)
     function getCurrentDateLineAndAnnotation(date) {
         if (!date) return {};
         const isoString = date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
@@ -392,17 +383,18 @@ const PerformanceMapVertical = () => {
                     arrowhead: 2,
                     ax: 0,
                     ay: -40,
-                    font: { color: "white" },
+                    font: { color: "black" },
                 },
             ],
         };
     }
+    const { shapes, annotations } = getCurrentDateLineAndAnnotation(mostRecentDate);
 
     if (isLoading) {
         return (
-            <Flex justifyContent="center" alignItems="center" height="50vh" bg="transparent">
+            <Flex justifyContent="center" alignItems="center" height="50vh" bg="white">
                 <Spinner size="xl" color="teal.500" />
-                <Text ml={4} fontSize="xl" color="white">
+                <Text ml={4} fontSize="xl" color="black">
                     Loading data...
                 </Text>
             </Flex>
@@ -411,7 +403,7 @@ const PerformanceMapVertical = () => {
 
     if (error) {
         return (
-            <Flex justifyContent="center" alignItems="center" height="50vh" bg="transparent">
+            <Flex justifyContent="center" alignItems="center" height="50vh" bg="white">
                 <Text color="red.500" fontSize="xl" textAlign="center">
                     {error}
                 </Text>
@@ -429,7 +421,7 @@ const PerformanceMapVertical = () => {
             p={4}
             borderRadius="15px"
             mx="auto"
-            bg="transparent"
+            bg="white"
         >
             {/* Header: Company, Week, Form Factor */}
             <Flex
@@ -438,46 +430,43 @@ const PerformanceMapVertical = () => {
                 alignItems="center"
                 flexWrap="wrap"
                 gap={4}
-                bg="transparent"
+                bg="white"
             >
-                {/* Grouping Company Selector */}
+                {/* Company Selector */}
                 <Flex alignItems="center" gap={2}>
-                    <Text color="white" fontSize="md" fontWeight="semibold">
+                    <Text color="black" fontSize="md" fontWeight="semibold">
                         Company:
                     </Text>
                     <Select
                         value={selectedCompany}
                         onChange={(e) => setSelectedCompany(e.target.value)}
-                        // placeholder="Select Company"
                         width="200px"
-                        bg="transparent"
+                        bg="white"
                         borderRadius="md"
-                        border="1px solid rgba(255, 255, 255, 0.6)"
+                        border="1px solid rgba(0, 0, 0, 0.6)"
                         size="sm"
                         _placeholder={{ color: "gray.300" }}
-                        color="white" // ← added
+                        color="black"
                     >
                         {companyOptions}
                     </Select>
                 </Flex>
 
-                {/* Grouping Week and Form Factor Selectors */}
+                {/* Week and Form Factor Selectors */}
                 <Flex alignItems="center" gap={2}>
-                    {/* Week Selector */}
-                    <Text color="white" fontSize="md" fontWeight="semibold">
+                    <Text color="black" fontSize="md" fontWeight="semibold">
                         Week:
                     </Text>
                     <Select
                         value={selectedWeekRange}
                         onChange={(e) => setSelectedWeekRange(e.target.value)}
-                        // placeholder="All Weeks"
                         width="200px"
-                        bg="transparent"
+                        bg="white"
                         borderRadius="md"
-                        border="1px solid rgba(255, 255, 255, 0.6)"
+                        border="1px solid rgba(0, 0, 0, 0.6)"
                         size="sm"
                         _placeholder={{ color: "gray.300" }}
-                        color="white" // ← added
+                        color="black"
                     >
                         {weekOptions.map((week) => (
                             <option style={{ color: "black" }} key={week} value={week}>
@@ -486,22 +475,25 @@ const PerformanceMapVertical = () => {
                         ))}
                     </Select>
 
-                    {/* Form Factor Selector */}
-                    <Text color="white" fontSize="md" fontWeight="semibold">
+                    <Text color="black" fontSize="md" fontWeight="semibold">
                         Form Factor:
                     </Text>
                     <Select
                         value={selectedFormFactor}
                         onChange={(e) => setSelectedFormFactor(e.target.value)}
                         width="200px"
-                        bg="transparent"
+                        bg="white"
                         borderRadius="md"
-                        border="1px solid rgba(255, 255, 255, 0.6)"
+                        border="1px solid rgba(0, 0, 0, 0.6)"
                         size="sm"
-                        color="white" // ← added
+                        color="black"
                     >
-                        <option style={{ color: "black" }} value="phone">Mobile</option>
-                        <option style={{ color: "black" }} value="desktop">Desktop</option>
+                        <option style={{ color: "black" }} value="phone">
+                            Mobile
+                        </option>
+                        <option style={{ color: "black" }} value="desktop">
+                            Desktop
+                        </option>
                     </Select>
                 </Flex>
             </Flex>
@@ -519,9 +511,7 @@ const PerformanceMapVertical = () => {
                 overflowX="auto"
             >
                 {METRICS.map((metric) => {
-                    // Data for this metric & selected form factor
                     const seriesData = plotlyData[metric] || [];
-
                     // Single trace
                     const trace = {
                         x: seriesData.map((pt) => pt.date),
@@ -539,8 +529,8 @@ const PerformanceMapVertical = () => {
                         },
                         name:
                             selectedFormFactor === "phone"
-                                ? "<b style='color:white;'>Mobile</b>"
-                                : "<b style='color:white;'>Desktop</b>",
+                                ? "<b style='color:black;'>Mobile</b>"
+                                : "<b style='color:black;'>Desktop</b>",
                         hovertemplate: `
                             <b>${selectedFormFactor === "phone" ? "Mobile" : "Desktop"}</b><br>
                             <b>Date:</b> %{x|%b %d}<br>
@@ -549,7 +539,6 @@ const PerformanceMapVertical = () => {
                         connectgaps: true,
                     };
 
-                    // Performance label
                     const avgVal = parseFloat(averages[metric] || "NaN");
                     const performance = getPerformanceCategory(metric, avgVal);
                     const performanceColor =
@@ -559,76 +548,38 @@ const PerformanceMapVertical = () => {
                             ? "yellow.400"
                             : "red.400";
 
-                    // Mark current date
-                    const getCurrentDateLineAndAnnotation = (date) => {
-                        if (!date) return {};
-                        const isoString = date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-                        return {
-                            shapes: [
-                                {
-                                    type: "line",
-                                    xref: "x",
-                                    yref: "paper",
-                                    x0: isoString,
-                                    x1: isoString,
-                                    y0: 0,
-                                    y1: 1,
-                                    line: {
-                                        color: "gray",
-                                        width: 2,
-                                        dash: "dot",
-                                    },
-                                },
-                            ],
-                            annotations: [
-                                {
-                                    x: isoString,
-                                    y: 1,
-                                    xref: "x",
-                                    yref: "paper",
-                                    text: "",
-                                    showarrow: true,
-                                    arrowhead: 2,
-                                    ax: 0,
-                                    ay: -40,
-                                    font: { color: "white" },
-                                },
-                            ],
-                        };
-                    };
-                    const { shapes, annotations } = getCurrentDateLineAndAnnotation(mostRecentDate);
-
                     return (
                         <Tooltip
                             key={metric}
                             label={
                                 <>
-                                    <Text fontWeight="bold">{metric} Performance:</Text>
-                                    <Text>{METRIC_DESCRIPTIONS[metric]}</Text>
-                                    <Text>
+                                    <Text fontWeight="bold" color="black">
+                                        {metric} Performance:
+                                    </Text>
+                                    <Text color="black">{METRIC_DESCRIPTIONS[metric]}</Text>
+                                    <Text color="black">
                                         Good: ≤ {formatNumber(THRESHOLDS[metric].good)}
                                         {METRIC_UNITS[metric]}
                                     </Text>
-                                    <Text>
+                                    <Text color="black">
                                         Needs Improvement: ≤{" "}
                                         {formatNumber(THRESHOLDS[metric].needsImprovement)}
                                         {METRIC_UNITS[metric]}
                                     </Text>
-                                    <Text>
-                                        Poor: &gt;{" "}
-                                        {formatNumber(THRESHOLDS[metric].needsImprovement)}
+                                    <Text color="black">
+                                        Poor: &gt; {formatNumber(THRESHOLDS[metric].needsImprovement)}
                                         {METRIC_UNITS[metric]}
                                     </Text>
                                 </>
                             }
-                            bg="gray.700"
-                            color="white"
+                            bg="white"
+                            color="black"
                             fontSize="sm"
                             placement="top"
                             hasArrow
                         >
                             <Box
-                                bg="transparent"
+                                bg="white"
                                 p={4}
                                 transition="box-shadow 0.2s, transform 0.2s"
                                 _hover={{ boxShadow: "lg", transform: "translateY(-4px)" }}
@@ -655,19 +606,14 @@ const PerformanceMapVertical = () => {
                                             textAlign="center"
                                             flex="1"
                                         >
-                                            <Text
-                                                color="white"
-                                                fontSize="sm"
-                                                fontWeight="bold"
-                                                isTruncated
-                                            >
+                                            <Text color="black" fontSize="sm" fontWeight="bold" isTruncated>
                                                 {metric}
                                             </Text>
                                         </Box>
                                         <IconButton
                                             aria-label="Expand Graph"
                                             icon={<FaExpand />}
-                                            color="white"
+                                            color="black"
                                             bg="transparent"
                                             _hover={{ bg: "transparent" }}
                                             size="sm"
@@ -676,47 +622,25 @@ const PerformanceMapVertical = () => {
                                     </Flex>
 
                                     {/* Averages + Performance */}
-                                    <Flex
-                                        direction="column"
-                                        justify="center"
-                                        align="center"
-                                        mt={2}
-                                    >
-                                        <Text
-                                            color="white"
-                                            fontSize="2xl"
-                                            fontWeight="bold"
-                                            textAlign="center"
-                                        >
-                                            {formatNumber(averages[metric])}{" "}
-                                            {METRIC_UNITS[metric]}
+                                    <Flex direction="column" justify="center" align="center" mt={2}>
+                                        <Text color="black" fontSize="2xl" fontWeight="bold" textAlign="center">
+                                            {formatNumber(averages[metric])} {METRIC_UNITS[metric]}
                                         </Text>
-                                        <Text
-                                            color={performanceColor}
-                                            fontSize="sm"
-                                            fontWeight="bold"
-                                            mt={1}
-                                        >
+                                        <Text color={performanceColor} fontSize="sm" fontWeight="bold" mt={1}>
                                             {performance}
                                         </Text>
                                     </Flex>
                                 </Flex>
 
                                 {/* Graph */}
-                                <Box
-                                    mt={4}
-                                    width="100%"
-                                    height="150px"
-                                    position="relative"
-                                    className="plot-container"
-                                >
+                                <Box mt={4} width="100%" height="150px" position="relative">
                                     <Plot
                                         data={[trace]}
                                         layout={{
                                             autosize: true,
                                             margin: { l: 40, r: 10, t: 10, b: 30 },
                                             xaxis: {
-                                                tickfont: { size: 10, color: "white" },
+                                                tickfont: { size: 10, color: "black" },
                                                 type: "date",
                                                 showgrid: false,
                                                 zeroline: false,
@@ -727,7 +651,7 @@ const PerformanceMapVertical = () => {
                                                 showticklabels: true,
                                             },
                                             yaxis: {
-                                                tickfont: { size: 10, color: "white" },
+                                                tickfont: { size: 10, color: "black" },
                                                 showgrid: false,
                                                 zeroline: false,
                                                 showline: false,
@@ -739,8 +663,8 @@ const PerformanceMapVertical = () => {
                                             annotations: annotations || [],
                                             showlegend: false,
                                             hovermode: "closest",
-                                            paper_bgcolor: "transparent",
-                                            plot_bgcolor: "transparent",
+                                            paper_bgcolor: "white",
+                                            plot_bgcolor: "white",
                                         }}
                                         config={{
                                             displayModeBar: false,
@@ -759,12 +683,7 @@ const PerformanceMapVertical = () => {
             {/* Modal for expanded graph */}
             <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
                 <ModalOverlay />
-                <ModalContent
-                    bg="gray.800"
-                    color="white"
-                    border="2.5px solid"
-                    borderColor="gray.300"
-                >
+                <ModalContent bg="white" color="black" border="2.5px solid" borderColor="black">
                     <ModalHeader>{modalMetric}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
@@ -779,11 +698,11 @@ const PerformanceMapVertical = () => {
                                         tickformat: "%b %d",
                                         dtick: "M1",
                                         showticklabels: true,
-                                        titlefont: { size: 14, color: "white" },
-                                        tickfont: { size: 12, color: "white" },
+                                        titlefont: { size: 14, color: "black" },
+                                        tickfont: { size: 12, color: "black" },
                                     },
                                     yaxis: {
-                                        tickfont: { size: 12, color: "white" },
+                                        tickfont: { size: 12, color: "black" },
                                         showgrid: false,
                                         zeroline: false,
                                         showline: false,
@@ -792,8 +711,8 @@ const PerformanceMapVertical = () => {
                                     },
                                     showlegend: false,
                                     hovermode: "closest",
-                                    paper_bgcolor: "transparent",
-                                    plot_bgcolor: "transparent",
+                                    paper_bgcolor: "white",
+                                    plot_bgcolor: "white",
                                 }}
                                 config={{
                                     displayModeBar: true,
