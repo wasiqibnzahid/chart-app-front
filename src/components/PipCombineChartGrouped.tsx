@@ -336,7 +336,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
     dataLabels: {
       enabled: showRawValues, // Enable data labels
       style: {
-        fontSize: "7px",
+        fontSize: "27px",
         colors: ["#fff"], // White color for visibility
       },
       formatter: function (val) {
