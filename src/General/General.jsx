@@ -69,12 +69,14 @@ const General = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const pinInputRef = useRef(null);
   const toastAuth = useToast();
-  const navigate = useRef(null); // Adjust as per your routing setup
+  const navigate = useRef(null); // Assuming you might need to navigate; adjust as per your routing setup
 
   const handlePinSubmit = (e) => {
     e.preventDefault();
-    if (pinInput.trim() === '123456') { // Replace with your desired PIN
+    if (pinInput.trim() === '123456') { // Replace '123456' with your desired PIN
       setIsAuthorized(true);
+      // Optionally, store authorization state in localStorage for session persistence
+      // localStorage.setItem('isAuthorized', 'true');
       toastAuth({
         title: "Access Granted",
         description: "You have successfully accessed the General page.",
@@ -90,8 +92,18 @@ const General = () => {
         duration: 3000,
         isClosable: true,
       });
+      // Optionally, navigate to a different page on incorrect PIN
+      // navigate.current('/landing');
     }
   };
+
+  // Optionally, check for existing authorization state (e.g., from localStorage)
+  // useEffect(() => {
+  //   const auth = localStorage.getItem('isAuthorized');
+  //   if (auth === 'true') {
+  //     setIsAuthorized(true);
+  //   }
+  // }, []);
 
   // Automatically focus the PIN input when the component mounts
   useEffect(() => {
@@ -109,13 +121,13 @@ const General = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [comparisonMode, setComparisonMode] = useState("percentage"); // 'percentage' or 'raw'
-  const [selectedPeriod, setSelectedPeriod] = useState(PERIODS.CURRENT_MONTH); // Default to Current Month
+  const [selectedPeriod, setSelectedPeriod] = useState(PERIODS.CURRENT_MONTH); // **Default to Current Month**
   const [averageData, setAverageData] = useState({
     totalAvg: "N/A",
     envivoAvg: "N/A",
   });
 
-  // New State for Selected Date
+  // **New State for Selected Date**
   const [selectedDate, setSelectedDate] = useState(null); // Stores the user-selected date
 
   const toast = useToast(); // For user feedback
@@ -132,6 +144,8 @@ const General = () => {
       complete: (results) => {
         try {
           const parsedData = results.data;
+
+          // Debug: Log first few rows to verify data
           console.log("Parsed CSV Data Sample:", parsedData.slice(0, 5));
 
           // Process total request counts per day
@@ -145,15 +159,22 @@ const General = () => {
             const requestCount = parseInt(requestCountStr, 10);
 
             if (!date || isNaN(requestCount)) {
-              console.warn(`Skipping row ${index + 2} due to missing date or request count.`);
+              console.warn(
+                `Skipping row ${
+                  index + 2
+                } due to missing date or request count.`
+              );
               return;
             }
 
+            // Aggregate total requests
             if (!totalRequestsMap[date]) {
               totalRequestsMap[date] = 0;
             }
             totalRequestsMap[date] += requestCount;
 
+            // Aggregate envivo query requests
+            // Ensure exact match with leading slash
             if (object.toLowerCase() === "/envivo/query") {
               if (!envivoRequestsMap[date]) {
                 envivoRequestsMap[date] = 0;
@@ -162,6 +183,7 @@ const General = () => {
             }
           });
 
+          // Convert maps to sorted arrays
           const sortedDates = Object.keys(totalRequestsMap).sort(
             (a, b) => parseLocalDate(a) - parseLocalDate(b)
           );
@@ -176,6 +198,7 @@ const General = () => {
             envivoRequests: envivoRequestsMap[date] || 0,
           }));
 
+          // Debug: Log aggregated data
           console.log("Total Requests Data:", totalRequestsData);
           console.log("Envivo Requests Data:", envivoRequestsData);
 
@@ -196,11 +219,13 @@ const General = () => {
     });
   }, []);
 
-  // Helper Function to Filter Data Based on Selected Period or Selected Date
+  // **Helper Function to Filter Data Based on Selected Period or Selected Date**
   const filterData = (period, date) => {
-    if (totalData.length === 0) return { filteredTotal: [], filteredEnvivo: [] };
+    if (totalData.length === 0)
+      return { filteredTotal: [], filteredEnvivo: [] };
 
     if (date) {
+      // If a specific date is selected
       const totalForDate = totalData.find((d) => d.date === date);
       const envivoForDate = envivoData.find((d) => d.date === date);
       return {
@@ -208,6 +233,7 @@ const General = () => {
         filteredEnvivo: envivoForDate ? [envivoForDate] : [],
       };
     } else {
+      // Filter based on the selected period
       const latestDateStr = totalData[totalData.length - 1].date;
       const latestDate = parseLocalDate(latestDateStr);
 
@@ -221,8 +247,12 @@ const General = () => {
         case PERIODS.CURRENT_WEEK:
           const startOfWeek = getStartOfWeek(latestDate);
           const endOfWeek = getEndOfWeek(latestDate);
-          console.log(`Start of Week: ${startOfWeek.toISOString().split("T")[0]}`);
-          console.log(`End of Week: ${endOfWeek.toISOString().split("T")[0]}`);
+          console.log(
+            `Start of Week (Monday): ${startOfWeek.toISOString().split("T")[0]}`
+          );
+          console.log(
+            `End of Week (Sunday): ${endOfWeek.toISOString().split("T")[0]}`
+          );
           filteredTotal = totalData.filter((d) => {
             const current = parseLocalDate(d.date);
             return current >= startOfWeek && current <= endOfWeek;
@@ -234,7 +264,7 @@ const General = () => {
           break;
 
         case PERIODS.CURRENT_MONTH:
-          const currentMonth = latestDate.getMonth();
+          const currentMonth = latestDate.getMonth(); // 0-11
           const currentYear = latestDate.getFullYear();
           filteredTotal = totalData.filter(
             (d) =>
@@ -274,29 +304,47 @@ const General = () => {
 
   // Calculate averages based on selected period or selected date
   useEffect(() => {
-    const { filteredTotal, filteredEnvivo } = filterData(selectedPeriod, selectedDate);
+    const { filteredTotal, filteredEnvivo } = filterData(
+      selectedPeriod,
+      selectedDate
+    );
 
     if (filteredTotal.length === 0) {
-      setAverageData({ totalAvg: "N/A", envivoAvg: "N/A" });
+      setAverageData({
+        totalAvg: "N/A",
+        envivoAvg: "N/A",
+      });
       return;
     }
 
     const totalSum = filteredTotal.reduce((sum, d) => sum + d.totalRequests, 0);
-    const envivoSum = filteredEnvivo.reduce((sum, d) => sum + d.envivoRequests, 0);
+    const envivoSum = filteredEnvivo.reduce(
+      (sum, d) => sum + d.envivoRequests,
+      0
+    );
 
-    const totalAvg = (totalSum / filteredTotal.length).toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-    const envivoAvg = (envivoSum / filteredEnvivo.length).toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
+    const totalAvg = (totalSum / filteredTotal.length).toLocaleString(
+      undefined,
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }
+    ); // No decimals
+    const envivoAvg = (envivoSum / filteredEnvivo.length).toLocaleString(
+      undefined,
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }
+    ); // No decimals
 
-    setAverageData({ totalAvg, envivoAvg });
+    setAverageData({
+      totalAvg,
+      envivoAvg,
+    });
   }, [selectedPeriod, selectedDate, totalData, envivoData]);
 
-  // Function to Find Data from 7 Days Ago
+  // **Function to Find Data from 7 Days Ago**
   const findDataSevenDaysAgo = (date, dataSet) => {
     const current = new Date(date);
     current.setDate(current.getDate() - 7);
@@ -323,7 +371,8 @@ const General = () => {
   }, [totalData, currentTotalRequest, selectedDate]);
 
   const totalRequestChange = useMemo(() => {
-    if (previousTotalRequest === null || currentTotalRequest === null) return "N/A";
+    if (previousTotalRequest === null || currentTotalRequest === null)
+      return "N/A";
     const change = currentTotalRequest - previousTotalRequest;
     return change.toLocaleString(undefined, {
       minimumFractionDigits: 0,
@@ -332,7 +381,8 @@ const General = () => {
   }, [currentTotalRequest, previousTotalRequest]);
 
   const totalPercentageChange = useMemo(() => {
-    if (previousTotalRequest === null || currentTotalRequest === null) return "N/A";
+    if (previousTotalRequest === null || currentTotalRequest === null)
+      return "N/A";
     return calculatePercentageChange(currentTotalRequest, previousTotalRequest);
   }, [currentTotalRequest, previousTotalRequest]);
 
@@ -354,7 +404,8 @@ const General = () => {
   }, [envivoData, currentEnvivoRequest, selectedDate]);
 
   const envivoRequestChange = useMemo(() => {
-    if (previousEnvivoRequest === null || currentEnvivoRequest === null) return "N/A";
+    if (previousEnvivoRequest === null || currentEnvivoRequest === null)
+      return "N/A";
     const change = currentEnvivoRequest - previousEnvivoRequest;
     return change.toLocaleString(undefined, {
       minimumFractionDigits: 0,
@@ -363,7 +414,8 @@ const General = () => {
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
   const envivoPercentageChange = useMemo(() => {
-    if (previousEnvivoRequest === null || currentEnvivoRequest === null) return "N/A";
+    if (previousEnvivoRequest === null || currentEnvivoRequest === null)
+      return "N/A";
     return calculatePercentageChange(currentEnvivoRequest, previousEnvivoRequest);
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
@@ -372,7 +424,7 @@ const General = () => {
     setComparisonMode((prev) => (prev === "percentage" ? "raw" : "percentage"));
   };
 
-  // Compute the Latest or Selected Date Label
+  // **Compute the Latest or Selected Date Label**
   const latestDateLabel = useMemo(() => {
     if (selectedDate) {
       const selected = parseLocalDate(selectedDate);
@@ -382,7 +434,10 @@ const General = () => {
         month: "long",
         day: "numeric",
       };
-      return `Viewing data for ${selected.toLocaleDateString(undefined, options)}`;
+      return `Viewing data for ${selected.toLocaleDateString(
+        undefined,
+        options
+      )}`;
     }
 
     if (totalData.length === 0) return "No data available";
@@ -397,7 +452,7 @@ const General = () => {
     return `Viewing data for ${latestDate.toLocaleDateString(undefined, options)}`;
   }, [selectedDate, totalData]);
 
-  // Handle Date Selection
+  // **Handle Date Selection**
   const handleDateChange = (e) => {
     const date = e.target.value;
     if (date) {
@@ -412,7 +467,7 @@ const General = () => {
     }
   };
 
-  // Function to Reset Selected Date
+  // **Function to Reset Selected Date**
   const resetSelectedDate = () => {
     setSelectedDate(null);
     toast({
@@ -424,15 +479,17 @@ const General = () => {
     });
   };
 
-  // Helper Function for Color Coding
+  // **Helper Function for Color Coding**
   const comparisonColor = (change) => {
     if (change === "N/A") return "gray.400";
     return change >= 0 ? "green.400" : "red.400";
   };
 
-  // Handle Arrow Navigation
+  // **Handle Arrow Navigation**
   const navigateDate = (direction) => {
     if (!totalData.length) return;
+
+    // Determine the current date
     const currentDate = selectedDate || totalData[totalData.length - 1].date;
     const currentIndex = totalData.findIndex((d) => d.date === currentDate);
 
@@ -461,7 +518,9 @@ const General = () => {
 
   return (
     <>
-      {/* PIN Authentication Overlay */}
+      {/* =======================
+           PIN Authentication Overlay
+         ======================= */}
       {!isAuthorized && (
         <Box
           position="fixed"
@@ -469,18 +528,16 @@ const General = () => {
           left="0"
           width="100vw"
           height="100vh"
-          bg="white"
+          bg="linear-gradient(90deg, #000000, #7800ff)"
           display="flex"
           alignItems="center"
           justifyContent="center"
-          color="black"
-          zIndex="1000"
+          color="white"
+          zIndex="1000" /* Ensure the PIN form is on top */
         >
           <form onSubmit={handlePinSubmit}>
             <VStack spacing={4}>
-              <Text fontSize="xl" color="black">
-                Enter PIN to Access General Page
-              </Text>
+              <Text fontSize="xl">Enter PIN to Access General Page</Text>
               <Input
                 ref={pinInputRef}
                 type="password"
@@ -491,7 +548,6 @@ const General = () => {
                 textAlign="center"
                 aria-label="PIN Input"
                 required
-                color="black"
               />
               <Button type="submit" colorScheme="teal">
                 Submit
@@ -501,7 +557,9 @@ const General = () => {
         </Box>
       )}
 
-      {/* Main Component Rendering */}
+      {/* =======================
+           Main Component Rendering
+         ======================= */}
       {isAuthorized && (
         <Flex
           direction="column"
@@ -509,12 +567,11 @@ const General = () => {
           width="100%"
           maxW="1200px"
           align="center"
-          bg="white"
-          color="black"
-          mx="auto"
+          bg="transparent" // Explicitly set the background to transparent
+          mx="auto" // Center this Flex container
           p={4}
         >
-          {/* Header with Latest Date Label and Navigation Icons */}
+          {/* **Header with Latest Date Label and Navigation Icons** */}
           <Flex
             width="100%"
             maxW="800px"
@@ -526,8 +583,9 @@ const General = () => {
               <IconButton
                 aria-label="Previous Day"
                 icon={<FaArrowLeft />}
+                colorScheme="whiteAlpha"
                 variant="ghost"
-                color="black"
+                color="white"
                 onClick={() => navigateDate("left")}
                 isDisabled={
                   selectedDate
@@ -535,11 +593,15 @@ const General = () => {
                     : totalData.length === 0
                 }
                 size="sm"
-                _hover={{ background: "transparent" }}
+                _hover={{ background: "transparent" }} // No hover background
               />
 
               {/* Date Label */}
-              <Text fontSize="lg" fontWeight="bold" color="black">
+              <Text
+                fontSize="lg"
+                fontWeight="bold"
+                color="white"
+              >
                 {latestDateLabel}
               </Text>
 
@@ -547,8 +609,9 @@ const General = () => {
               <IconButton
                 aria-label="Next Day"
                 icon={<FaArrowRight />}
+                colorScheme="whiteAlpha"
                 variant="ghost"
-                color="black"
+                color="white"
                 onClick={() => navigateDate("right")}
                 isDisabled={
                   selectedDate
@@ -556,19 +619,20 @@ const General = () => {
                     : totalData.length === 0
                 }
                 size="sm"
-                _hover={{ background: "transparent" }}
+                _hover={{ background: "transparent" }} // No hover background
               />
             </Flex>
 
-            {/* Date Selection Button with Calendar Icon */}
+            {/* **Date Selection Button with Calendar Icon** */}
             <Popover placement="bottom-end">
               <PopoverTrigger>
                 <IconButton
                   aria-label="Select Date"
                   icon={<FaCalendar />}
-                  variant="ghost"
-                  _hover={{ background: "transparent" }}
-                  color="black"
+                  colorScheme="whiteAlpha"
+                  variant="ghost" // Transparent background
+                  _hover={{ background: "transparent" }} // No hover background
+                  color="white"
                   size="sm"
                 />
               </PopoverTrigger>
@@ -620,28 +684,38 @@ const General = () => {
           <Flex
             direction={{ base: "column", md: "row" }}
             gap={10}
+            className="text-white"
             width="100%"
             maxW="800px"
             justifyContent="center"
           >
             {/* Daily Request Count Box */}
             <Box
-              bg="white"
+              bg="linear-gradient(90deg, #000000, #7800ff)"
               borderRadius="20px"
-              border="2.5px solid black"
+              border="2.5px solid rgba(255, 255, 255, 0.8)"
               p={6}
               flex="1"
             >
               <Flex justifyContent="space-between" alignItems="center" mb={4}>
-                <Text fontSize="lg" fontWeight="bold" color="black">
+                <Text
+                  fontSize="lg"
+                  fontWeight="bold"
+                  color="white"
+                  className="text-white"
+                >
                   Daily Request Count
                 </Text>
-                <Button onClick={toggleComparisonMode} colorScheme="teal" size="sm">
+                <Button
+                  onClick={toggleComparisonMode}
+                  colorScheme="teal"
+                  size="sm"
+                >
                   Show {comparisonMode === "percentage" ? "Raw" : "Percentage"}
                 </Button>
               </Flex>
               <Flex direction="column" alignItems="center">
-                <Text fontSize="4xl" fontWeight="bold" color="black">
+                <Text fontSize="4xl" fontWeight="bold" className="text-white">
                   {selectedDate
                     ? (
                         totalData.find((d) => d.date === selectedDate)
@@ -663,7 +737,7 @@ const General = () => {
                           ? "N/A"
                           : `${totalPercentageChange}%`}
                       </Text>
-                      <Text fontSize="md" color="black">
+                      <Text fontSize="md" className="text-white">
                         compared to last week
                       </Text>
                     </>
@@ -676,9 +750,11 @@ const General = () => {
                       >
                         {totalRequestChange === "N/A"
                           ? "N/A"
-                          : `${totalRequestChange >= 0 ? "+" : ""}${totalRequestChange}`}
+                          : `${
+                              totalRequestChange >= 0 ? "+" : ""
+                            }${totalRequestChange}`}
                       </Text>
-                      <Text fontSize="md" color="black">
+                      <Text fontSize="md" className="text-white">
                         compared to last week
                       </Text>
                     </>
@@ -689,22 +765,31 @@ const General = () => {
 
             {/* Daily Envivo Query Count Box */}
             <Box
-              bg="white"
+              bg="linear-gradient(90deg, #000000, #7800ff)"
               borderRadius="20px"
-              border="2.5px solid black"
+              border="2.5px solid rgba(255, 255, 255, 0.8)"
               p={6}
               flex="1"
             >
               <Flex justifyContent="space-between" alignItems="center" mb={4}>
-                <Text fontSize="lg" fontWeight="bold" color="black">
+                <Text
+                  fontSize="lg"
+                  fontWeight="bold"
+                  color="white"
+                  className="text-white"
+                >
                   Daily Envivo Query Count
                 </Text>
-                <Button onClick={toggleComparisonMode} colorScheme="teal" size="sm">
+                <Button
+                  onClick={toggleComparisonMode}
+                  colorScheme="teal"
+                  size="sm"
+                >
                   Show {comparisonMode === "percentage" ? "Raw" : "Percentage"}
                 </Button>
               </Flex>
               <Flex direction="column" alignItems="center">
-                <Text fontSize="4xl" fontWeight="bold" color="black">
+                <Text fontSize="4xl" fontWeight="bold" className="text-white">
                   {selectedDate
                     ? (
                         envivoData.find((d) => d.date === selectedDate)
@@ -726,7 +811,7 @@ const General = () => {
                           ? "N/A"
                           : `${envivoPercentageChange}%`}
                       </Text>
-                      <Text fontSize="md" color="black">
+                      <Text fontSize="md" className="text-white">
                         compared to last week
                       </Text>
                     </>
@@ -739,9 +824,11 @@ const General = () => {
                       >
                         {envivoRequestChange === "N/A"
                           ? "N/A"
-                          : `${envivoRequestChange >= 0 ? "+" : ""}${envivoRequestChange}`}
+                          : `${
+                              envivoRequestChange >= 0 ? "+" : ""
+                            }${envivoRequestChange}`}
                       </Text>
-                      <Text fontSize="md" color="black">
+                      <Text fontSize="md" className="text-white">
                         compared to last week
                       </Text>
                     </>
@@ -753,16 +840,20 @@ const General = () => {
 
           {/* Averages Display */}
           <Box
-            bg="white"
+            bg="linear-gradient(90deg, #000000, #7800ff)"
             borderRadius="20px"
-            border="2.5px solid black"
+            border="2.5px solid rgba(255, 255, 255, 0.8)"
             p={6}
             width="100%"
             maxW="800px"
             mb={10}
           >
             <Flex justifyContent="space-between" alignItems="center" mb={4}>
-              <Text fontSize="lg" fontWeight="bold" color="black">
+              <Text
+                fontSize="lg"
+                fontWeight="bold"
+                color="white"
+              >
                 Averages for {selectedPeriod}
               </Text>
 
@@ -777,19 +868,22 @@ const General = () => {
                 size="sm"
                 width="150px"
                 aria-label="Select Time Period"
-                bgColor="transparent"
-                color="black"
-                borderColor="black"
-                _focus={{ boxShadow: "none", borderColor: "black" }}
-                _hover={{ borderColor: "black" }}
+                /* ---------------------------- */
+                /* The important styling changes */
+                /* ---------------------------- */
+                bgColor="transparent"     // Transparent background
+                color="white"            // Make text white
+                borderColor="white"      // Border white
+                _focus={{ boxShadow: "none", borderColor: "white" }}
+                _hover={{ borderColor: "white" }}
               >
                 {Object.values(PERIODS).map((period) => (
                   <option
                     key={period}
                     value={period}
                     style={{
-                      backgroundColor: "#fff",
-                      color: "#000",
+                      backgroundColor: "#000", // Dark background for dropdown items
+                      color: "#fff",           // White text in dropdown items
                     }}
                   >
                     {period}
@@ -800,20 +894,28 @@ const General = () => {
 
             <Grid templateColumns="repeat(2, 1fr)" gap={6}>
               <Box textAlign="center">
-                <Text fontSize="md" fontWeight="bold" color="black">
+                <Text
+                  fontSize="md"
+                  fontWeight="bold"
+                  color="white"
+                >
                   Request Count
                 </Text>
-                <Text fontSize="2xl" color="black">
+                <Text fontSize="2xl" className="text-white">
                   {averageData.totalAvg !== "N/A"
                     ? averageData.totalAvg.toLocaleString()
                     : "N/A"}
                 </Text>
               </Box>
               <Box textAlign="center">
-                <Text fontSize="md" fontWeight="bold" color="black">
+                <Text
+                  fontSize="md"
+                  fontWeight="bold"
+                  color="white"
+                >
                   Envivo Query Count
                 </Text>
-                <Text fontSize="2xl" color="black">
+                <Text fontSize="2xl" className="text-white">
                   {averageData.envivoAvg !== "N/A"
                     ? averageData.envivoAvg.toLocaleString()
                     : "N/A"}
