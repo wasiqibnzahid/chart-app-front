@@ -32,6 +32,7 @@ import {
 } from "@chakra-ui/react";
 import Papa from "papaparse";
 import { FaFilter, FaExpand } from "react-icons/fa";
+
 import Plot from "react-plotly.js";
 import { Loader } from "../components/common/Loader";
 import { useAsyncFn } from "../hooks/useAsync";
@@ -48,6 +49,7 @@ const getWeekStartDate = (date) => {
   const diff = day === 0 ? -6 : 1 - day; // Adjust if day is Sunday
   const monday = new Date(date);
   monday.setDate(date.getDate() + diff);
+
   const dd = String(monday.getDate()).padStart(2, "0");
   const mm = String(monday.getMonth() + 1).padStart(2, "0");
   const yyyy = monday.getFullYear();
@@ -104,24 +106,38 @@ const METRIC_KEYS = {
 const calculateSlope = (x, y) => {
   const n = x.length;
   if (n === 0) return 0;
+
   const sum_x = x.reduce((a, b) => a + b, 0);
   const sum_y = y.reduce((a, b) => a + b, 0);
   const sum_xy = x.reduce((a, b, idx) => a + b * y[idx], 0);
   const sum_xx = x.reduce((a, b) => a + b * b, 0);
+
   const numerator = n * sum_xy - sum_x * sum_y;
   const denominator = n * sum_xx - sum_x * sum_x;
+
   if (denominator === 0) return 0;
   return numerator / denominator;
 };
 
-const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_category = false }) => {
+const General = ({
+  fetchData,
+  groups,
+  preSelectedWebsites = "ADN40",
+  hide_category = false,
+}) => {
   const GROUPS = groups;
   const GROUP_NAMES = Object.keys(GROUPS);
-  const INDIVIDUAL_COMPANIES = GROUP_NAMES.reduce((acc, group) => acc.concat(GROUPS[group]), []);
+  const INDIVIDUAL_COMPANIES = GROUP_NAMES.reduce(
+    (acc, group) => acc.concat(GROUPS[group]),
+    []
+  );
 
   const [data, setData] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(preSelectedWebsites);
-  const [selectedCategories, setSelectedCategories] = useState(["nota", "video"]);
+  const [selectedCategories, setSelectedCategories] = useState([
+    "nota",
+    "video",
+  ]);
   const [selectedWeek, setSelectedWeek] = useState("");
   const [availableWeeks, setAvailableWeeks] = useState([]);
   const [comparisonMode, setComparisonMode] = useState("Monthly"); // Default
@@ -139,11 +155,12 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
 
   const { isLoading, error, execute } = useAsyncFn(fetchData);
 
-  useEffect(() => {
+  React.useEffect(() => {
     execute().then((res) => {
       let parsedData = res.map((item) => {
         const dateObj = parseDate(item["date"]);
         const weekStart = getWeekStartDate(dateObj);
+
         const noteValues = {
           date: item["date"],
           company: item["name"].toUpperCase(),
@@ -168,9 +185,12 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
         };
         return [noteValues, videoValues];
       });
+
       parsedData = parsedData.flat();
+
       const weeks = Array.from(new Set(parsedData.map((d) => d.week)));
       weeks.sort((a, b) => parseDate(a) - parseDate(b));
+
       setAvailableWeeks(weeks);
       setData(parsedData);
       if (weeks.length > 0) {
@@ -184,7 +204,11 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
     const options = [];
     INDIVIDUAL_COMPANIES.forEach((company) => {
       options.push(
-        <option key={company} value={company} style={{ color: "black" }}>
+        <option
+          key={company}
+          value={company}
+          style={{ color: "black" }} // <-- changed (was black before)
+        >
           {company}
         </option>
       );
@@ -238,18 +262,23 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
         if (!selectedCompany) {
           companyMatch = true;
         } else if (GROUP_NAMES.includes(selectedCompany)) {
-          const groupCompanies = GROUPS[selectedCompany].map((c) => c.toUpperCase());
+          const groupCompanies = GROUPS[selectedCompany].map((c) =>
+            c.toUpperCase()
+          );
           companyMatch = groupCompanies.includes(row.company);
         } else {
           companyMatch = row.company === selectedCompany.toUpperCase();
         }
+
         const categoryMatch =
           selectedCategories.length === 0 ||
           selectedCategories.includes(row.category);
+
         let timeMatch = true;
         if (dateFilter) {
           const rowDate = parseDateStr(row.date);
           const filterDate = parseDateStr(dateFilter);
+
           if (comparisonMode === "Weekly") {
             timeMatch = row.week === dateFilter;
           } else if (comparisonMode === "Monthly") {
@@ -263,7 +292,14 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
         return companyMatch && categoryMatch && timeMatch;
       });
     },
-    [selectedCompany, selectedCategories, comparisonMode, parseDateStr, GROUP_NAMES, GROUPS]
+    [
+      selectedCompany,
+      selectedCategories,
+      comparisonMode,
+      parseDateStr,
+      GROUP_NAMES,
+      GROUPS,
+    ]
   );
 
   const filteredDataMemo = useMemo(() => {
@@ -286,44 +322,44 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
 
   const averages = useMemo(() => {
     if (filteredDataMemo.length === 0) return {};
-    const sums = {};
+    const metricSums = {};
     METRICS.forEach((m) => {
-      sums[m] = 0;
+      metricSums[m] = 0;
     });
     filteredDataMemo.forEach((row) => {
       METRICS.forEach((m) => {
         const key = METRIC_KEYS[m];
         const val = parseFloat(row[key]);
         if (!isNaN(val)) {
-          sums[m] += val;
+          metricSums[m] += val;
         }
       });
     });
     const metricAverages = {};
     METRICS.forEach((m) => {
-      metricAverages[m] = (sums[m] / filteredDataMemo.length).toFixed(2);
+      metricAverages[m] = (metricSums[m] / filteredDataMemo.length).toFixed(2);
     });
     return metricAverages;
   }, [filteredDataMemo]);
 
   const comparisonAverages = useMemo(() => {
     if (comparisonData.length === 0) return {};
-    const sums = {};
+    const metricSums = {};
     METRICS.forEach((m) => {
-      sums[m] = 0;
+      metricSums[m] = 0;
     });
     comparisonData.forEach((row) => {
       METRICS.forEach((m) => {
         const key = METRIC_KEYS[m];
         const val = parseFloat(row[key]);
         if (!isNaN(val)) {
-          sums[m] += val;
+          metricSums[m] += val;
         }
       });
     });
     const metricAverages = {};
     METRICS.forEach((m) => {
-      metricAverages[m] = (sums[m] / comparisonData.length).toFixed(2);
+      metricAverages[m] = (metricSums[m] / comparisonData.length).toFixed(2);
     });
     return metricAverages;
   }, [comparisonData]);
@@ -346,6 +382,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
   const getDifferenceColor = (metric) => {
     const diff = parseFloat(percentageDifferences[metric]);
     if (isNaN(diff)) return "gray.300";
+    // Lower is better, so positive => improvement
     if (diff > 0) {
       return "green.400";
     } else if (diff < 0) {
@@ -401,7 +438,11 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
     toast({
       title: `${mode} Comparison`,
       description: `Comparing to ${
-        mode === "Weekly" ? "Last Week" : mode === "Monthly" ? "Last Month" : "Last Year"
+        mode === "Weekly"
+          ? "Last Week"
+          : mode === "Monthly"
+          ? "Last Month"
+          : "Last Year"
       }.`,
       status: "info",
       duration: 3000,
@@ -411,8 +452,13 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
 
   // Plot data
   const plotlyData = useMemo(() => {
-    const sorted = [...filteredDataMemo].sort((a, b) => parseDate(a.date) - parseDate(b.date));
-    const shouldAggregate = selectedCategories.length > 1 || GROUP_NAMES.includes(selectedCompany);
+    const sorted = [...filteredDataMemo].sort(
+      (a, b) => parseDate(a.date) - parseDate(b.date)
+    );
+
+    const shouldAggregate =
+      selectedCategories.length > 1 || GROUP_NAMES.includes(selectedCompany);
+
     if (shouldAggregate) {
       const dataByDate = {};
       sorted.forEach((row) => {
@@ -438,6 +484,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
           return obj;
         })
         .sort((a, b) => parseDate(a.date) - parseDate(b.date));
+
       return averagedData.map((row) => {
         const obj = { date: row.date };
         METRICS.forEach((m) => {
@@ -482,9 +529,10 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
           gap={3}
           width="100%"
           align="center"
-          bg="white"
+          bg="linear-gradient(90deg, #000000, #7800ff)"
           p={3}
           borderRadius="15px"
+          borderColor="gray.300"
           mx="auto"
         >
           {/* Header Row */}
@@ -498,21 +546,21 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
           >
             {/* Company Selector */}
             <Flex alignItems="center" gap={2}>
-              <Text color="black" fontSize="md" fontWeight="semibold">
+              <Text color="white" fontSize="md" fontWeight="semibold">
                 Company:
               </Text>
               <Select
                 value={selectedCompany}
                 onChange={handleCompanyChange}
                 border="2px"
-                borderColor="#cbd5e0"
+                borderColor="#cbd5e0" // Apply the border color
                 borderRadius="8px"
                 size="sm"
-                color="black"
-                bg="white"
+                color="white"
+                bg="transparent"
                 _hover={{ borderColor: "gray.300" }}
                 _focus={{ borderColor: "gray.300", boxShadow: "none" }}
-                iconColor="black"
+                iconColor="white"
                 width="fit-content"
               >
                 {companyOptions}
@@ -524,16 +572,21 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                   <IconButton
                     aria-label="Filter Controls"
                     icon={<FaFilter />}
-                    color="black"
+                    color="white"
                     bg="transparent"
-                    _hover={{ bg: "gray.200" }}
+                    _hover={{ bg: "gray.700" }}
                     size="sm"
                   />
                 </PopoverTrigger>
-                <PopoverContent bg="white" border="none" boxShadow="lg" borderRadius="md">
-                  <PopoverArrow bg="white" />
-                  <PopoverCloseButton color="black" />
-                  <PopoverHeader color="black" fontWeight="bold">
+                <PopoverContent
+                  bg="gray.800"
+                  border="none"
+                  boxShadow="lg"
+                  borderRadius="md"
+                >
+                  <PopoverArrow bg="gray.800" />
+                  <PopoverCloseButton color="white" />
+                  <PopoverHeader color="white" fontWeight="bold">
                     Controls
                   </PopoverHeader>
                   <PopoverBody>
@@ -541,7 +594,12 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                       {/* Category */}
                       {!hide_category && (
                         <Box>
-                          <Text fontSize="sm" fontWeight="semibold" mb={1} color="black">
+                          <Text
+                            fontSize="sm"
+                            fontWeight="semibold"
+                            mb={1}
+                            color="white" // <-- changed
+                          >
                             Category:
                           </Text>
                           <CheckboxGroup
@@ -550,10 +608,20 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                             onChange={handleCategoryChange}
                           >
                             <HStack spacing={2}>
-                              <Checkbox value="note" bg="transparent" size="sm" color="black">
+                              <Checkbox
+                                value="note"
+                                bg="transparent"
+                                size="sm"
+                                color="white" // <-- changed
+                              >
                                 Nota
                               </Checkbox>
-                              <Checkbox value="video" bg="transparent" size="sm" color="black">
+                              <Checkbox
+                                value="video"
+                                bg="transparent"
+                                size="sm"
+                                color="white" // <-- changed
+                              >
                                 Video
                               </Checkbox>
                             </HStack>
@@ -563,31 +631,49 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
 
                       {/* Week */}
                       <Box>
-                        <Text fontSize="sm" fontWeight="semibold" mb={1} color="black">
+                        <Text
+                          fontSize="sm"
+                          fontWeight="semibold"
+                          mb={1}
+                          color="white" // <-- changed
+                        >
                           Week:
                         </Text>
                         <Select
                           value={selectedWeek}
                           onChange={handleWeekChange}
                           placeholder="Select Week"
-                          bg="white"
-                          color="black"
+                          bg="transparent"
+                          color="white"
                           borderRadius="md"
                           size="sm"
                           width="100%"
-                          border="1px solid rgba(0, 0, 0, 0.6)"
+                          border="1px solid rgba(255, 255, 255, 0.6)"
                           _placeholder={{ color: "gray.300" }}
-                          _focus={{ borderColor: "teal.300", boxShadow: "none" }}
+                          _focus={{
+                            borderColor: "teal.300",
+                            boxShadow: "none",
+                          }}
                           _hover={{ borderColor: "teal.200" }}
                         >
                           {availableWeeks.map((week) => (
-                            <option key={week} value={week} style={{ color: "black" }}>
+                            <option
+                              key={week}
+                              value={week}
+                              style={{ color: "black" }} // <-- changed
+                            >
                               {week}
                             </option>
                           ))}
                         </Select>
                         {selectedWeek && (
-                          <Button colorScheme="red" variant="outline" size="xs" onClick={resetWeekSelection} mt={1}>
+                          <Button
+                            colorScheme="red"
+                            variant="outline"
+                            size="xs"
+                            onClick={resetWeekSelection}
+                            mt={1}
+                          >
                             Clear
                           </Button>
                         )}
@@ -595,29 +681,42 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
 
                       {/* Comparison Mode */}
                       <Box>
-                        <Text fontSize="sm" fontWeight="semibold" mb={1} color="black">
+                        <Text
+                          fontSize="sm"
+                          fontWeight="semibold"
+                          mb={1}
+                          color="white" // <-- changed
+                        >
                           Comparison Mode:
                         </Text>
                         <HStack spacing={2}>
                           <Button
-                            color="black"
-                            colorScheme={comparisonMode === "Weekly" ? "teal" : "gray.500"}
+                            color="white" // <-- changed
+                            colorScheme={
+                              comparisonMode === "Weekly" ? "teal" : "gray.500"
+                            }
                             onClick={() => handleComparisonModeChange("Weekly")}
                             size="xs"
                           >
                             Weekly
                           </Button>
                           <Button
-                            color="black"
-                            colorScheme={comparisonMode === "Monthly" ? "teal" : "gray.600"}
-                            onClick={() => handleComparisonModeChange("Monthly")}
+                            color="white" // <-- changed
+                            colorScheme={
+                              comparisonMode === "Monthly" ? "teal" : "gray.600"
+                            }
+                            onClick={() =>
+                              handleComparisonModeChange("Monthly")
+                            }
                             size="xs"
                           >
                             Monthly
                           </Button>
                           <Button
-                            color="black"
-                            colorScheme={comparisonMode === "Yearly" ? "teal" : "gray.600"}
+                            color="white" // <-- changed
+                            colorScheme={
+                              comparisonMode === "Yearly" ? "teal" : "gray.600"
+                            }
                             onClick={() => handleComparisonModeChange("Yearly")}
                             size="xs"
                           >
@@ -630,6 +729,7 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                 </PopoverContent>
               </Popover>
             </Flex>
+          </Flex>
 
           {/* Metrics Grid */}
           <Grid
@@ -647,7 +747,10 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
             {METRICS.map((metric) => {
               const plotDataPoints = plotlyData.map((d) => d.date);
               const plotMetricValues = plotlyData.map((d) => d[metric]);
-              const xValues = plotlyData.map((d) => parseDate(d.date).getTime());
+
+              const xValues = plotlyData.map((d) =>
+                parseDate(d.date).getTime()
+              );
               const slope = calculateSlope(xValues, plotMetricValues);
               const lineColor = slope < 0 ? "green" : "red";
 
@@ -678,7 +781,10 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                     border="none"
                     borderRadius="lg"
                     transition="box-shadow 0.2s, transform 0.2s"
-                    _hover={{ boxShadow: "lg", transform: "translateY(-4px)" }}
+                    _hover={{
+                      boxShadow: "lg",
+                      transform: "translateY(-4px)",
+                    }}
                     cursor="pointer"
                     minW="140px"
                     minH="220px"
@@ -689,7 +795,11 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                   >
                     <Flex direction="column" align="center">
                       {/* Title & Expand */}
-                      <Flex width="100%" justifyContent="space-between" alignItems="center">
+                      <Flex
+                        width="100%"
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
                         <Box
                           height="40px"
                           display="flex"
@@ -698,7 +808,12 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                           textAlign="center"
                           flex="1"
                         >
-                          <Text color="white" fontSize="sm" fontWeight="bold" isTruncated>
+                          <Text
+                            color="white"
+                            fontSize="sm"
+                            fontWeight="bold"
+                            isTruncated
+                          >
                             {metric}
                           </Text>
                         </Box>
@@ -709,20 +824,37 @@ const General = ({ fetchData, groups, preSelectedWebsites = "ADN40", hide_catego
                           bg="transparent"
                           _hover={{ bg: "transparent" }}
                           size="sm"
-                          onClick={() => handleExpand(individualPlotData, metric)}
+                          onClick={() =>
+                            handleExpand(individualPlotData, metric)
+                          }
                         />
                       </Flex>
 
                       {/* Value & Comparison */}
-                      <Flex direction="column" justify="center" align="center" mt={1}>
+                      <Flex
+                        direction="column"
+                        justify="center"
+                        align="center"
+                        mt={1}
+                      >
                         <Flex alignItems="center" justifyContent="center">
-                          <Text color="white" fontSize="2xl" fontWeight="bold" textAlign="center">
-                            {formatNumber(averages[metric])} {METRIC_UNITS[metric]}
+                          <Text
+                            color="white"
+                            fontSize="2xl"
+                            fontWeight="bold"
+                            textAlign="center"
+                          >
+                            {formatNumber(averages[metric])}{" "}
+                            {METRIC_UNITS[metric]}
                           </Text>
+                          {/* Performance Circle */}
                           <Box
                             w={3}
                             h={3}
-                            bg={getPerformanceColor(metric, parseFloat(+averages[metric]))}
+                            bg={getPerformanceColor(
+                              metric,
+                              parseFloat(+averages[metric])
+                            )}
                             borderRadius="50%"
                             ml={2}
                           />
