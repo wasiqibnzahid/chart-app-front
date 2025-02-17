@@ -15,12 +15,16 @@ import { WebCheck } from "../types/index.ts";
 
 export const TestManager = () => {
   const [data, setData] = useState<WebCheck[]>([]);
-
   const [searchValue, setSearchValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [latestItem, setLatestItem] = useState<WebCheck | null>(null);
+  const [selectedJsonData, setSelectedJsonData] = useState<Record<string, any> | null>(null);
+  const [gettingJson, setGettingJson] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Your fetch logic here
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -28,31 +32,23 @@ export const TestManager = () => {
 
     fetchData();
   }, []);
-  const [isLoading, setIsLoading] = useState(false);
+
   const isButtonDisabled = useMemo(() => {
-    console.log("A");
     if (isLoading) return true;
-    console.log("B");
-    let url;
     try {
-      console.log("C");
-      url = new URL(searchValue);
-      console.log("D");
+      new URL(searchValue);
       return false;
     } catch (e) {
-      console.log("E");
       return true;
     }
   }, [searchValue, isLoading]);
+
   async function getWebsiteData() {
     setIsLoading(true);
     try {
-      const response = await axios.get<{
-        checks: WebCheck[];
-      }>(endPoints.getTestWebsite, {
+      const response = await axios.get<{ checks: WebCheck[] }>(endPoints.getTestWebsite, {
         params: { site: searchValue },
       });
-
       setData(
         response.data.checks.sort((a, b) =>
           b.created_at.localeCompare(a.created_at)
@@ -63,6 +59,7 @@ export const TestManager = () => {
     }
     setIsLoading(false);
   }
+
   async function addWebsite() {
     setIsLoading(true);
     try {
@@ -75,7 +72,6 @@ export const TestManager = () => {
     getWebsiteData();
   }
 
-  const [latestItem, setLatestItem] = useState<WebCheck | null>(null);
   function selectRow(row: WebCheck) {
     if (!gettingJson) {
       if (row.status === "done" && row.json_url) {
@@ -83,16 +79,10 @@ export const TestManager = () => {
       }
     }
   }
-  const [selectedJsonData, setSelectedJsonData] = useState<Record<
-    string,
-    any
-  > | null>(null);
-  const [gettingJson, setGettingJson] = useState(false);
+
   useEffect(() => {
-    const latestItem = data.find((item) => {
-      return item.status === "done";
-    });
-    setLatestItem(latestItem || null);
+    const latestDone = data.find((item) => item.status === "done");
+    setLatestItem(latestDone || null);
   }, [data]);
 
   useEffect(() => {
@@ -129,13 +119,10 @@ export const TestManager = () => {
   }
 
   return (
-    <div className="main">
+    // The inline style here ensures that all text and icons (like the arrow symbols) appear black.
+    <div className="main" style={{ color: "black" }}>
       <div className="search-container d-flex">
-        <div
-          style={{
-            width: "70%",
-          }}
-        >
+        <div style={{ width: "70%" }}>
           <Input
             type="search"
             className="box"
@@ -185,35 +172,33 @@ export const TestManager = () => {
       </div>
       <div className="d-flex test-container">
         <div className="d-flex top-row-dual text-white custom-row">
-          <div className="box relative box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">Performance</div>
             </div>
             {gettingJson ? (
               <div className="spinner-border"></div>
             ) : (
-              <>
-                <div className="d-flex justify-content-center align-items-center percentage">
-                  <div
-                    className={`circle mr-2 ${
-                      !latestItem?.metrics.performance_score
-                        ? ""
-                        : latestItem?.metrics.performance_score >= 0.9
-                        ? "bg-green"
-                        : latestItem?.metrics.performance_score >= 0.5
-                        ? "bg-orange"
-                        : "bg-red"
-                    }`}
-                  ></div>
-                  <AnimateNumber
-                    number={(latestItem?.metrics.performance_score ?? 0) * 100}
-                  />
-                  %
-                </div>
-              </>
+              <div className="d-flex justify-content-center align-items-center percentage">
+                <div
+                  className={`circle mr-2 ${
+                    !latestItem?.metrics.performance_score
+                      ? ""
+                      : latestItem?.metrics.performance_score >= 0.9
+                      ? "bg-green"
+                      : latestItem?.metrics.performance_score >= 0.5
+                      ? "bg-orange"
+                      : "bg-red"
+                  }`}
+                ></div>
+                <AnimateNumber
+                  number={(latestItem?.metrics.performance_score ?? 0) * 100}
+                />
+                %
+              </div>
             )}
           </div>
-          <div className="box relative box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">SEO</div>
             </div>
@@ -239,7 +224,7 @@ export const TestManager = () => {
               </div>
             )}
           </div>
-          <div className="box relative box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">Accessibility</div>
             </div>
@@ -268,7 +253,7 @@ export const TestManager = () => {
               </div>
             )}
           </div>
-          <div className="box relative box-large pt-2 px-3 ">
+          <div className="box relative box-large pt-2 px-3">
             <div className="d-flex align-items-center justify-content-between">
               <div className="title">Best Practices</div>
             </div>
@@ -280,19 +265,19 @@ export const TestManager = () => {
                   className={`circle mr-2 ${
                     !selectedJsonData?.categories?.["best-practices"].score
                       ? ""
-                      : selectedJsonData?.categories?.["best-practices"]
-                          .score >= 0.9
+                      : selectedJsonData?.categories?.["best-practices"].score >=
+                        0.9
                       ? "bg-green"
-                      : selectedJsonData?.categories?.["best-practices"]
-                          .score >= 0.5
+                      : selectedJsonData?.categories?.["best-practices"].score >=
+                        0.5
                       ? "bg-orange"
                       : "bg-red"
                   }`}
                 ></div>
                 <AnimateNumber
                   number={
-                    (selectedJsonData?.categories?.["best-practices"].score ||
-                      0) * 100
+                    (selectedJsonData?.categories?.["best-practices"].score || 0) *
+                    100
                   }
                 />
                 %
@@ -307,7 +292,6 @@ export const TestManager = () => {
               downloadJson();
             }}
           >
-            {/* chevron right */}
             <span className="text">Download JSON</span>
             <span>&rarr;</span>
           </div>
@@ -340,7 +324,7 @@ export const TestManager = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((check, index) => (
+              {data.map((check) => (
                 <tr
                   onClick={() => selectRow(check)}
                   key={check.id}
@@ -384,9 +368,9 @@ export const TestManager = () => {
                       {check.metrics?.speed_index && (
                         <div
                           className={`circle mr-2 ${
-                            check.metrics?.speed_index <= 3.4
+                            check.metrics.speed_index <= 3.4
                               ? "bg-green"
-                              : check.metrics?.speed_index <= 5.8
+                              : check.metrics.speed_index <= 5.8
                               ? "bg-orange"
                               : "bg-red"
                           }`}
@@ -400,16 +384,15 @@ export const TestManager = () => {
                       {check.metrics?.largest_contentful_paint && (
                         <div
                           className={`circle mr-2 ${
-                            check.metrics?.largest_contentful_paint <= 2.5
+                            check.metrics.largest_contentful_paint <= 2.5
                               ? "bg-green"
-                              : check.metrics?.largest_contentful_paint <= 4
+                              : check.metrics.largest_contentful_paint <= 4
                               ? "bg-orange"
                               : "bg-red"
                           }`}
                         ></div>
                       )}
-                      {check.metrics?.largest_contentful_paint?.toFixed(1) ||
-                        "-"}
+                      {check.metrics?.largest_contentful_paint?.toFixed(1) || "-"}
                     </div>
                   </td>
                   <td>
@@ -417,19 +400,17 @@ export const TestManager = () => {
                       {check.metrics?.cumulative_layout_shift && (
                         <div
                           className={`circle mr-2 ${
-                            check.metrics?.cumulative_layout_shift <= 0.1
+                            check.metrics.cumulative_layout_shift <= 0.1
                               ? "bg-green"
-                              : check.metrics?.cumulative_layout_shift <= 0.25
+                              : check.metrics.cumulative_layout_shift <= 0.25
                               ? "bg-orange"
                               : "bg-red"
                           }`}
                         ></div>
                       )}
-                      {check.metrics?.cumulative_layout_shift?.toFixed(1) ||
-                        "-"}
+                      {check.metrics?.cumulative_layout_shift?.toFixed(1) || "-"}
                     </div>
                   </td>
-                  {/* if status is done add class text-green, if failed add class text-red, otherwise text-orange */}
                   <td
                     className={
                       check.status === "done"
@@ -438,9 +419,7 @@ export const TestManager = () => {
                         ? "text-red"
                         : "text-orange"
                     }
-                    style={{
-                      textTransform: "capitalize",
-                    }}
+                    style={{ textTransform: "capitalize" }}
                   >
                     {check.status}
                   </td>
