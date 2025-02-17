@@ -69,11 +69,11 @@ const General = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const pinInputRef = useRef(null);
   const toastAuth = useToast();
-  const navigate = useRef(null); // Assuming you might need to navigate; adjust as per your routing setup
+  const navigate = useRef(null); // Adjust as per your routing setup
 
   const handlePinSubmit = (e) => {
     e.preventDefault();
-    if (pinInput.trim() === '123456') { // Replace '123456' with your desired PIN
+    if (pinInput.trim() === '123456') { // Replace with your desired PIN
       setIsAuthorized(true);
       toastAuth({
         title: "Access Granted",
@@ -109,13 +109,13 @@ const General = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [comparisonMode, setComparisonMode] = useState("percentage"); // 'percentage' or 'raw'
-  const [selectedPeriod, setSelectedPeriod] = useState(PERIODS.CURRENT_MONTH); // **Default to Current Month**
+  const [selectedPeriod, setSelectedPeriod] = useState(PERIODS.CURRENT_MONTH); // Default to Current Month
   const [averageData, setAverageData] = useState({
     totalAvg: "N/A",
     envivoAvg: "N/A",
   });
 
-  // **New State for Selected Date**
+  // New State for Selected Date
   const [selectedDate, setSelectedDate] = useState(null); // Stores the user-selected date
 
   const toast = useToast(); // For user feedback
@@ -133,6 +133,8 @@ const General = () => {
         try {
           const parsedData = results.data;
           console.log("Parsed CSV Data Sample:", parsedData.slice(0, 5));
+
+          // Process total request counts per day
           const totalRequestsMap = {};
           const envivoRequestsMap = {};
 
@@ -194,10 +196,9 @@ const General = () => {
     });
   }, []);
 
-  // **Helper Function to Filter Data Based on Selected Period or Selected Date**
+  // Helper Function to Filter Data Based on Selected Period or Selected Date
   const filterData = (period, date) => {
-    if (totalData.length === 0)
-      return { filteredTotal: [], filteredEnvivo: [] };
+    if (totalData.length === 0) return { filteredTotal: [], filteredEnvivo: [] };
 
     if (date) {
       const totalForDate = totalData.find((d) => d.date === date);
@@ -276,10 +277,7 @@ const General = () => {
     const { filteredTotal, filteredEnvivo } = filterData(selectedPeriod, selectedDate);
 
     if (filteredTotal.length === 0) {
-      setAverageData({
-        totalAvg: "N/A",
-        envivoAvg: "N/A",
-      });
+      setAverageData({ totalAvg: "N/A", envivoAvg: "N/A" });
       return;
     }
 
@@ -295,13 +293,10 @@ const General = () => {
       maximumFractionDigits: 0,
     });
 
-    setAverageData({
-      totalAvg,
-      envivoAvg,
-    });
+    setAverageData({ totalAvg, envivoAvg });
   }, [selectedPeriod, selectedDate, totalData, envivoData]);
 
-  // **Function to Find Data from 7 Days Ago**
+  // Function to Find Data from 7 Days Ago
   const findDataSevenDaysAgo = (date, dataSet) => {
     const current = new Date(date);
     current.setDate(current.getDate() - 7);
@@ -328,8 +323,7 @@ const General = () => {
   }, [totalData, currentTotalRequest, selectedDate]);
 
   const totalRequestChange = useMemo(() => {
-    if (previousTotalRequest === null || currentTotalRequest === null)
-      return "N/A";
+    if (previousTotalRequest === null || currentTotalRequest === null) return "N/A";
     const change = currentTotalRequest - previousTotalRequest;
     return change.toLocaleString(undefined, {
       minimumFractionDigits: 0,
@@ -338,8 +332,7 @@ const General = () => {
   }, [currentTotalRequest, previousTotalRequest]);
 
   const totalPercentageChange = useMemo(() => {
-    if (previousTotalRequest === null || currentTotalRequest === null)
-      return "N/A";
+    if (previousTotalRequest === null || currentTotalRequest === null) return "N/A";
     return calculatePercentageChange(currentTotalRequest, previousTotalRequest);
   }, [currentTotalRequest, previousTotalRequest]);
 
@@ -361,8 +354,7 @@ const General = () => {
   }, [envivoData, currentEnvivoRequest, selectedDate]);
 
   const envivoRequestChange = useMemo(() => {
-    if (previousEnvivoRequest === null || currentEnvivoRequest === null)
-      return "N/A";
+    if (previousEnvivoRequest === null || currentEnvivoRequest === null) return "N/A";
     const change = currentEnvivoRequest - previousEnvivoRequest;
     return change.toLocaleString(undefined, {
       minimumFractionDigits: 0,
@@ -371,8 +363,7 @@ const General = () => {
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
   const envivoPercentageChange = useMemo(() => {
-    if (previousEnvivoRequest === null || currentEnvivoRequest === null)
-      return "N/A";
+    if (previousEnvivoRequest === null || currentEnvivoRequest === null) return "N/A";
     return calculatePercentageChange(currentEnvivoRequest, previousEnvivoRequest);
   }, [currentEnvivoRequest, previousEnvivoRequest]);
 
@@ -381,21 +372,32 @@ const General = () => {
     setComparisonMode((prev) => (prev === "percentage" ? "raw" : "percentage"));
   };
 
-  // **Compute the Latest or Selected Date Label**
+  // Compute the Latest or Selected Date Label
   const latestDateLabel = useMemo(() => {
     if (selectedDate) {
       const selected = parseLocalDate(selectedDate);
-      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
       return `Viewing data for ${selected.toLocaleDateString(undefined, options)}`;
     }
+
     if (totalData.length === 0) return "No data available";
     const latestDateStr = totalData[totalData.length - 1].date;
     const latestDate = parseLocalDate(latestDateStr);
-    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
     return `Viewing data for ${latestDate.toLocaleDateString(undefined, options)}`;
   }, [selectedDate, totalData]);
 
-  // **Handle Date Selection**
+  // Handle Date Selection
   const handleDateChange = (e) => {
     const date = e.target.value;
     if (date) {
@@ -410,7 +412,7 @@ const General = () => {
     }
   };
 
-  // **Function to Reset Selected Date**
+  // Function to Reset Selected Date
   const resetSelectedDate = () => {
     setSelectedDate(null);
     toast({
@@ -422,17 +424,18 @@ const General = () => {
     });
   };
 
-  // **Helper Function for Color Coding**
+  // Helper Function for Color Coding
   const comparisonColor = (change) => {
     if (change === "N/A") return "gray.400";
     return change >= 0 ? "green.400" : "red.400";
   };
 
-  // **Handle Arrow Navigation**
+  // Handle Arrow Navigation
   const navigateDate = (direction) => {
     if (!totalData.length) return;
     const currentDate = selectedDate || totalData[totalData.length - 1].date;
     const currentIndex = totalData.findIndex((d) => d.date === currentDate);
+
     if (direction === "left" && currentIndex > 0) {
       const newDate = totalData[currentIndex - 1].date;
       setSelectedDate(newDate);
@@ -475,7 +478,9 @@ const General = () => {
         >
           <form onSubmit={handlePinSubmit}>
             <VStack spacing={4}>
-              <Text fontSize="xl">Enter PIN to Access General Page</Text>
+              <Text fontSize="xl" color="black">
+                Enter PIN to Access General Page
+              </Text>
               <Input
                 ref={pinInputRef}
                 type="password"
@@ -486,6 +491,7 @@ const General = () => {
                 textAlign="center"
                 aria-label="PIN Input"
                 required
+                color="black"
               />
               <Button type="submit" colorScheme="teal">
                 Submit
@@ -516,6 +522,7 @@ const General = () => {
             alignItems="center"
           >
             <Flex alignItems="center" gap={2}>
+              {/* Left Arrow Icon */}
               <IconButton
                 aria-label="Previous Day"
                 icon={<FaArrowLeft />}
@@ -530,9 +537,13 @@ const General = () => {
                 size="sm"
                 _hover={{ background: "transparent" }}
               />
+
+              {/* Date Label */}
               <Text fontSize="lg" fontWeight="bold" color="black">
                 {latestDateLabel}
               </Text>
+
+              {/* Right Arrow Icon */}
               <IconButton
                 aria-label="Next Day"
                 icon={<FaArrowRight />}
@@ -581,7 +592,7 @@ const General = () => {
                     }
                     min={totalData.length > 0 ? totalData[0].date : undefined}
                     value={selectedDate || ""}
-                    bg="white"
+                    bg="transparent"
                     borderColor="gray.300"
                     _hover={{ borderColor: "gray.400" }}
                     _focus={{ borderColor: "teal.500", boxShadow: "none" }}
@@ -754,17 +765,19 @@ const General = () => {
               <Text fontSize="lg" fontWeight="bold" color="black">
                 Averages for {selectedPeriod}
               </Text>
+
+              {/* Select Time Period Dropdown */}
               <Select
                 value={selectedPeriod}
                 onChange={(e) => {
                   setSelectedPeriod(e.target.value);
-                  setSelectedDate(null);
+                  setSelectedDate(null); // Reset selected date when period changes
                 }}
                 placeholder="Select"
                 size="sm"
                 width="150px"
                 aria-label="Select Time Period"
-                bgColor="white"
+                bgColor="transparent"
                 color="black"
                 borderColor="black"
                 _focus={{ boxShadow: "none", borderColor: "black" }}
