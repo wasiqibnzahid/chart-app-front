@@ -9,7 +9,7 @@ npm run dev
 
 This guide walks you through setting up two EC2 instances on AWS, both running Ubuntu. One instance hosts both frontend and backend applications, while the second instance runs the backend temporarily before shutting down.
 
-Prerequisites
+## Prerequisites
 
 AWS account with permissions to create EC2 instances
 
@@ -19,7 +19,7 @@ Installed git, tmux, nodejs, npm, python3-venv
 
 Basic knowledge of shell scripting and AWS EC2 management
 
-Instance 1: Full Stack Setup
+## Instance 1: Full Stack Setup
 
 1. Create an Ubuntu EC2 Instance
 
@@ -27,45 +27,44 @@ Ensure ports 3000 (Frontend) and 8000 (Backend) are open in security group setti
 
 2. SSH into the Instance
 
+```
 ssh -i your-key.pem ubuntu@your-instance-ip
+```
 
 3. Clone the Repositories
 
+```
 git clone <frontend-repo-link> ~/chart-app-front/
 git clone <backend-repo-link> ~/chart-backend/
+```
 
 4. Install Node.js and NPM
 
+```
 sudo apt update
 sudo apt install -y nodejs npm
+```
 
 5. Set Up Backend Environment
 
+```
 sudo apt install -y python3-venv
 cd ~/chart-backend/
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
 
-6. Configure Security Permissions for Database and S3
+6. Connect EC2 Instance to RDS Database
 
-Allow EC2 Instances to Access RDS Database
 
-In the AWS Console, navigate to RDS > Databases and select your database.
+Go to the AWS Console.
 
-Modify the security group to allow inbound traffic on the database port (default is 5432 for PostgreSQL, 3306 for MySQL).
+Navigate to RDS > Databases, select your database, and choose Connectivity & security.
 
-In EC2 > Security Groups, find the group assigned to the database and add a new inbound rule:
+Under the EC2 Connect section, choose Add EC2 instance and select the instance that should have access.
 
-Type: PostgreSQL (or the database type you are using)
-
-Protocol: TCP
-
-Port: DB_PORT
-
-Source: Select the security group of the EC2 instances
-
-Save changes and ensure the EC2 instance can access the RDS database.
+Save changes, and AWS will automatically configure security settings to allow this instance to connect to the RDS database.
 
 Grant S3 Access to the First EC2 Instance
 
@@ -77,14 +76,19 @@ Attach this role to the first EC2 instance.
 
 Verify access by running the following command on the instance:
 
+```
 aws s3 ls s3://your-bucket-name
+```
 
 7. Create Startup Script
 
+```
 vi ~/script.sh
+```
 
 Paste the following content:
 
+```
 #!/bin/bash
 
 # Change to the directory where your projects are located
@@ -94,21 +98,27 @@ tmux new-session -d -s dev-session 'npm install && npm run dev'
 
 # Create a new tmux window in the same session and run Django development server
 tmux new-session -d -s dev-session-be 'cd ~/chart-backend && source .venv/bin/activate && python manage.py runserver 0.0.0.0:8000'
+```
 
 8. Install tmux
 
+```
 sudo apt-get update
 sudo apt-get install -y tmux
+```
+
 
 9. Set Up Crontab to Run the Script at Reboot
-
+```
 crontab -e
-
+```
 Add this line:
 
+```
 @reboot ~/script.sh
+```
 
-Instance 2: Backend Only (Temporary)
+## Instance 2: Backend Only
 
 1. Create Another Ubuntu EC2 Instance
 
@@ -116,29 +126,38 @@ Choose an instance type that fits the backend processing needs.
 
 2. SSH into the Second Instance
 
+```
 ssh -i your-key.pem ubuntu@your-second-instance-ip
+```
 
 3. Clone the Backend Repository
 
+```
 git clone <backend-repo-link> ~/chart-backend/
+```
 
 4. Set Up Virtual Environment
 
+```
 cd ~/chart-backend/
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
-5. Configure Security Permissions for Database Access
+5. Connect EC2 Instance to RDS Database
 
-Repeat the steps mentioned earlier to ensure that this instance also has access to the RDS database.
+Follow the same steps outlined in Instance 1 to connect the second EC2 instance to the RDS database using AWS EC2 Connect.
 
 6. Create Startup Script
 
+```
 vi /home/ubuntu/startup_script.sh
+```
 
 Paste the following content:
 
+```
 #!/bin/bash
 
 # Navigate to the backend directory
@@ -146,14 +165,19 @@ cd /home/ubuntu/chart-backend || exit
 
 # Start a new tmux session and run the app
  tmux new-session -d -s my_session 'bash -c ". venv/bin/activate; python manage.py run_app; sudo shutdown -h"'
+```
 
 7. Set Up Crontab to Run the Script at Reboot
 
+```
 crontab -e
+```
 
 Add this line:
 
+```
 @reboot /home/ubuntu/startup_script.sh
+```
 
 8. Shut Down the Second Machine After Execution
 
@@ -163,14 +187,13 @@ The script automatically shuts down the instance after running. You can manually
 
 Retrieve the instance ID:
 
-aws ec2 describe-instances --filters "Name=tag:Name,Values=your-instance-name" --query "Reservations[*].Instances[*].InstanceId" --output text
-
 Update the Lambda function to include the instance ID for reactivation when necessary.
 
-Setting Up Environment Variables
+## Setting Up Environment Variables
 
 The backend project requires environment variables for database and storage configuration. Add these to ~/.bashrc or .env:
 
+```
 DB_USERNAME=your-db-user
 DB_PASSWORD=your-db-password
 DB_HOST=your-db-host
@@ -178,14 +201,17 @@ DB_PORT=your-db-port
 DB_NAME=your-db-name
 AWS_STORAGE_BUCKET_NAME=your-bucket-name
 AWS_REGION=your-region
+```
 
 Run:
 
+```
 source ~/.bashrc
+```
 
-Additional Notes
+## Additional Notes
 
-Monitoring and Logging
+### Monitoring and Logging
 
 Use tmux ls to check running tmux sessions.
 
@@ -193,7 +219,7 @@ Use tmux attach -t session_name to view a running session.
 
 Consider setting up AWS CloudWatch for logging application behavior.
 
-Security Considerations
+### Security Considerations
 
 Keep SSH keys secure and disable password authentication.
 
@@ -203,7 +229,7 @@ Restrict inbound traffic only to necessary ports.
 
 Ensure EC2 instances have the necessary IAM roles for database and S3 access.
 
-Conclusion
+## Conclusion
 
 After completing these steps, Instance 1 runs the full-stack application continuously, while Instance 2 runs backend processes before shutting down. The Lambda function can restart Instance 2 when necessary. By following best practices for monitoring, security, and automation, you ensure a reliable and efficient deployment setup.
 
