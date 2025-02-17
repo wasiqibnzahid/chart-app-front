@@ -207,7 +207,7 @@ const General = ({
         <option
           key={company}
           value={company}
-          style={{ color: "black" }} // <-- changed (was black before)
+          style={{ color: "black" }}
         >
           {company}
         </option>
@@ -529,7 +529,7 @@ const General = ({
           gap={3}
           width="100%"
           align="center"
-          bg="linear-gradient(90deg, #000000, #7800ff)"
+          bg="white"
           p={3}
           borderRadius="15px"
           borderColor="gray.300"
@@ -546,21 +546,21 @@ const General = ({
           >
             {/* Company Selector */}
             <Flex alignItems="center" gap={2}>
-              <Text color="white" fontSize="md" fontWeight="semibold">
+              <Text color="black" fontSize="md" fontWeight="semibold">
                 Company:
               </Text>
               <Select
                 value={selectedCompany}
                 onChange={handleCompanyChange}
                 border="2px"
-                borderColor="#cbd5e0" // Apply the border color
+                borderColor="#cbd5e0"
                 borderRadius="8px"
                 size="sm"
-                color="white"
-                bg="transparent"
+                color="black"
+                bg="white"
                 _hover={{ borderColor: "gray.300" }}
                 _focus={{ borderColor: "gray.300", boxShadow: "none" }}
-                iconColor="white"
+                iconColor="black"
                 width="fit-content"
               >
                 {companyOptions}
@@ -572,21 +572,22 @@ const General = ({
                   <IconButton
                     aria-label="Filter Controls"
                     icon={<FaFilter />}
-                    color="white"
-                    bg="transparent"
-                    _hover={{ bg: "gray.700" }}
+                    color="black"
+                    bg="white"
+                    _hover={{ bg: "gray.200" }}
                     size="sm"
                   />
                 </PopoverTrigger>
                 <PopoverContent
-                  bg="gray.800"
-                  border="none"
+                  bg="white"
+                  border="1px solid"
+                  borderColor="gray.300"
                   boxShadow="lg"
                   borderRadius="md"
                 >
-                  <PopoverArrow bg="gray.800" />
-                  <PopoverCloseButton color="white" />
-                  <PopoverHeader color="white" fontWeight="bold">
+                  <PopoverArrow bg="white" />
+                  <PopoverCloseButton color="black" />
+                  <PopoverHeader color="black" fontWeight="bold">
                     Controls
                   </PopoverHeader>
                   <PopoverBody>
@@ -598,7 +599,7 @@ const General = ({
                             fontSize="sm"
                             fontWeight="semibold"
                             mb={1}
-                            color="white" // <-- changed
+                            color="black"
                           >
                             Category:
                           </Text>
@@ -610,17 +611,17 @@ const General = ({
                             <HStack spacing={2}>
                               <Checkbox
                                 value="note"
-                                bg="transparent"
+                                bg="white"
                                 size="sm"
-                                color="white" // <-- changed
+                                color="black"
                               >
                                 Nota
                               </Checkbox>
                               <Checkbox
                                 value="video"
-                                bg="transparent"
+                                bg="white"
                                 size="sm"
-                                color="white" // <-- changed
+                                color="black"
                               >
                                 Video
                               </Checkbox>
@@ -635,7 +636,7 @@ const General = ({
                           fontSize="sm"
                           fontWeight="semibold"
                           mb={1}
-                          color="white" // <-- changed
+                          color="black"
                         >
                           Week:
                         </Text>
@@ -643,13 +644,13 @@ const General = ({
                           value={selectedWeek}
                           onChange={handleWeekChange}
                           placeholder="Select Week"
-                          bg="transparent"
-                          color="white"
+                          bg="white"
+                          color="black"
                           borderRadius="md"
                           size="sm"
                           width="100%"
-                          border="1px solid rgba(255, 255, 255, 0.6)"
-                          _placeholder={{ color: "gray.300" }}
+                          border="1px solid rgba(0, 0, 0, 0.6)"
+                          _placeholder={{ color: "gray.600" }}
                           _focus={{
                             borderColor: "teal.300",
                             boxShadow: "none",
@@ -660,7 +661,7 @@ const General = ({
                             <option
                               key={week}
                               value={week}
-                              style={{ color: "black" }} // <-- changed
+                              style={{ color: "black" }}
                             >
                               {week}
                             </option>
@@ -685,26 +686,22 @@ const General = ({
                           fontSize="sm"
                           fontWeight="semibold"
                           mb={1}
-                          color="white" // <-- changed
+                          color="black"
                         >
                           Comparison Mode:
                         </Text>
                         <HStack spacing={2}>
                           <Button
-                            color="white" // <-- changed
-                            colorScheme={
-                              comparisonMode === "Weekly" ? "teal" : "gray.500"
-                            }
+                            variant="outline"
+                            color="black"
                             onClick={() => handleComparisonModeChange("Weekly")}
                             size="xs"
                           >
                             Weekly
                           </Button>
                           <Button
-                            color="white" // <-- changed
-                            colorScheme={
-                              comparisonMode === "Monthly" ? "teal" : "gray.600"
-                            }
+                            variant="outline"
+                            color="black"
                             onClick={() =>
                               handleComparisonModeChange("Monthly")
                             }
@@ -713,10 +710,8 @@ const General = ({
                             Monthly
                           </Button>
                           <Button
-                            color="white" // <-- changed
-                            colorScheme={
-                              comparisonMode === "Yearly" ? "teal" : "gray.600"
-                            }
+                            variant="outline"
+                            color="black"
                             onClick={() => handleComparisonModeChange("Yearly")}
                             size="xs"
                           >
@@ -769,16 +764,17 @@ const General = ({
                 <Tooltip
                   key={metric}
                   label={RANGES_STRINGS[metric]}
-                  bg="gray.700"
-                  color="white"
+                  bg="white"
+                  color="black"
                   fontSize="sm"
                   placement="top"
                   hasArrow
                 >
                   <Box
-                    bg="transparent"
+                    bg="white"
                     p={3}
-                    border="none"
+                    border="1px solid"
+                    borderColor="gray.300"
                     borderRadius="lg"
                     transition="box-shadow 0.2s, transform 0.2s"
                     _hover={{
@@ -809,7 +805,7 @@ const General = ({
                           flex="1"
                         >
                           <Text
-                            color="white"
+                            color="black"
                             fontSize="sm"
                             fontWeight="bold"
                             isTruncated
@@ -820,9 +816,9 @@ const General = ({
                         <IconButton
                           aria-label="Expand Graph"
                           icon={<FaExpand />}
-                          color="white"
-                          bg="transparent"
-                          _hover={{ bg: "transparent" }}
+                          color="black"
+                          bg="white"
+                          _hover={{ bg: "gray.200" }}
                           size="sm"
                           onClick={() =>
                             handleExpand(individualPlotData, metric)
@@ -839,7 +835,7 @@ const General = ({
                       >
                         <Flex alignItems="center" justifyContent="center">
                           <Text
-                            color="white"
+                            color="black"
                             fontSize="2xl"
                             fontWeight="bold"
                             textAlign="center"
@@ -870,7 +866,7 @@ const General = ({
                               {Math.abs(percentageDifferences[metric])}%
                               {percentageDifferences[metric] > 0 ? " ↑" : " ↓"}
                             </Text>
-                            <Text color="gray.300" fontSize="sm" mt={0.5}>
+                            <Text color="black" fontSize="sm" mt={0.5}>
                               {comparisonMode === "Weekly"
                                 ? "vs Last Week"
                                 : comparisonMode === "Monthly"
@@ -890,7 +886,7 @@ const General = ({
                           autosize: true,
                           margin: { l: 40, r: 10, t: 10, b: 30 },
                           xaxis: {
-                            tickfont: { size: 10, color: "white" },
+                            tickfont: { size: 10, color: "black" },
                             type: "date",
                             showgrid: false,
                             zeroline: false,
@@ -901,7 +897,7 @@ const General = ({
                             showticklabels: true,
                           },
                           yaxis: {
-                            tickfont: { size: 10, color: "white" },
+                            tickfont: { size: 10, color: "black" },
                             showgrid: false,
                             zeroline: false,
                             showline: false,
@@ -911,8 +907,8 @@ const General = ({
                           },
                           showlegend: false,
                           hovermode: "closest",
-                          paper_bgcolor: "transparent",
-                          plot_bgcolor: "transparent",
+                          paper_bgcolor: "white",
+                          plot_bgcolor: "white",
                         }}
                         config={{
                           displayModeBar: false,
@@ -931,11 +927,11 @@ const General = ({
           {/* Expanded Modal */}
           <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
             <ModalOverlay />
-            <ModalContent bg="gray.800" color="white">
+            <ModalContent bg="white" color="black">
               <ModalHeader>
                 {modalPlotData ? modalPlotData.metric : "Expanded Graph"}
               </ModalHeader>
-              <ModalCloseButton />
+              <ModalCloseButton color="black" />
               <ModalBody>
                 {modalPlotData && (
                   <Plot
@@ -944,16 +940,16 @@ const General = ({
                       autosize: true,
                       margin: { l: 50, r: 50, t: 50, b: 50 },
                       xaxis: {
-                        tickfont: { size: 12, color: "white" },
+                        tickfont: { size: 12, color: "black" },
                         type: "date",
                         title: "Date",
-                        titlefont: { size: 14, color: "white" },
+                        titlefont: { size: 14, color: "black" },
                         tickformat: "%B %d, %Y",
                         dtick: "M1",
                         showticklabels: true,
                       },
                       yaxis: {
-                        tickfont: { size: 12, color: "white" },
+                        tickfont: { size: 12, color: "black" },
                         showgrid: true,
                         zeroline: false,
                         showline: false,
@@ -963,8 +959,8 @@ const General = ({
                       },
                       showlegend: false,
                       hovermode: "closest",
-                      paper_bgcolor: "transparent",
-                      plot_bgcolor: "transparent",
+                      paper_bgcolor: "white",
+                      plot_bgcolor: "white",
                     }}
                     config={{
                       displayModeBar: true,
