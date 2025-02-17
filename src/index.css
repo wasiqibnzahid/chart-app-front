@@ -7,7 +7,7 @@
   --main-text: #000;
   
   /* Colors for dark mode */
-  --gradient-bg: linear-gradient(90deg, #000000, #7800ff);
+  --gradient-bg: white;
   --dark-text: #fff;
   
   /* Toggle button colors */
