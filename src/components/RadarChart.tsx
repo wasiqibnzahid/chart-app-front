@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Radar } from "react-chartjs-2";
-import { Box, Text, HStack } from "@chakra-ui/react";
+import { Box, Text, HStack, Button } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -26,7 +26,7 @@ const RadarChart = ({ title, labels, dataSets }) => {
   const generalData = dataSets["General"][timeFrame];
   const videoData = dataSets["Video"][timeFrame];
   const notaData = dataSets["Nota"][timeFrame];
-  console.log("ASDSADASDASVVF", generalData)
+
   const data = {
     labels,
     datasets: [
@@ -45,7 +45,7 @@ const RadarChart = ({ title, labels, dataSets }) => {
         borderWidth: 4,
       },
       {
-        label: `General TV Azteca`,
+        label: "General TV Azteca",
         data: labels.map(() => generalData[0]),
         borderColor: "rgba(0, 255, 0, 1)",
         borderWidth: 2,
@@ -64,17 +64,14 @@ const RadarChart = ({ title, labels, dataSets }) => {
       tooltip: {
         callbacks: {
           label: (context) => {
-            const datasetLabel = context.dataset.label || '';
-            const value = context.raw; // Get the raw data value
-
-            // Format the tooltip for Video and Nota datasets
+            const datasetLabel = context.dataset.label || "";
+            const value = context.raw;
             if (datasetLabel === "Video") {
               return `${datasetLabel}: ${value}%`;
             }
             if (datasetLabel === "Nota") {
               return `${datasetLabel}: ${value}%`;
             }
-            // Format the tooltip for General TV Azteca
             return `${datasetLabel}: ${generalData[0]}%`;
           },
         },
@@ -85,13 +82,13 @@ const RadarChart = ({ title, labels, dataSets }) => {
         min: 0,
         max: 100,
         angleLines: {
-          color: "rgba(255, 255, 255, 0.8)",
+          color: "rgba(0, 0, 0, 0.8)", // Black radial lines
         },
         grid: {
-          color: "rgba(255, 255, 255, 0.8)",
+          color: "rgba(0, 0, 0, 0.8)", // Black spider web lines
         },
         pointLabels: {
-          color: "white",
+          color: "black", // Black label text
           font: {
             size: 10,
             weight: "bold",
@@ -110,48 +107,44 @@ const RadarChart = ({ title, labels, dataSets }) => {
   };
 
   const toggleTimeFrame = () => {
-    let newTimeFrom = "";
-    switch(timeFrame){
+    let newTimeFrame = "";
+    switch (timeFrame) {
       case "Week":
-        newTimeFrom = "Month"
+        newTimeFrame = "Month";
         break;
       case "Month":
-        newTimeFrom = "Year"
+        newTimeFrame = "Year";
         break;
       case "Year":
-        newTimeFrom = "AllTime"
+        newTimeFrame = "AllTime";
         break;
       case "AllTime":
-        newTimeFrom = "Week"
+        newTimeFrame = "Week";
         break;
       default:
-          newTimeFrom = "Month"
-
+        newTimeFrame = "Month";
     }
-    setTimeFrame(newTimeFrom);
+    setTimeFrame(newTimeFrame);
   };
 
   return (
-    <Box
-      mb={10}
-      borderRadius="lg"
-      position="relative"
-      height="400px"
-    >
-      <Text fontSize="lg" color="white" mb={0}>
+    <Box mb={10} borderRadius="lg" position="relative" height="400px">
+      <Text fontSize="lg" color="black" mb={0}>
         {title}
       </Text>
 
-      <HStack justify="flex-start" mb={0}>
-        <button onClick={toggleTimeFrame} style={{
-          background: "#7800ff",
-          color: "white",
-          padding: "10px 20px",
-          borderRadius: "10px",
-          marginTop: "2%",
-        }}>
+      <HStack justify="flex-start" mb={2}>
+        <Button
+          onClick={toggleTimeFrame}
+          bg="transparent"
+          color="black"
+          border="1px solid black"
+          borderRadius="10px"
+          marginTop="2%"
+          _hover={{ bg: "gray.200" }}
+        >
           {timeFrame}
-        </button>
+        </Button>
       </HStack>
 
       <Radar data={data} options={options} />
