@@ -1,3 +1,65 @@
+/* =======================================================
+   Dark/Light Mode Variables and Global Styles
+   ======================================================= */
+:root {
+  /* Colors for light mode */
+  --main-bg: white;
+  --main-text: #000;
+  
+  /* Colors for dark mode */
+  --gradient-bg: linear-gradient(90deg, #000000, #7800ff);
+  --dark-text: #fff;
+  
+  /* Toggle button colors */
+  --btn-bg-light: #ccc;
+  --btn-text-light: #000;
+  --btn-bg-dark: #444;
+  --btn-text-dark: #fff;
+}
+
+/* Default (light mode) styles */
+body {
+  overflow-x: hidden;
+  background: var(--main-bg) !important;
+  color: var(--main-text) !important;
+  font-family: Livvic, sans-serif !important;
+  width: 100%;
+  height: 100%;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* When dark mode is active, add the class "dark-mode" to <body> */
+body.dark-mode {
+  background: var(--gradient-bg) !important;
+  color: var(--dark-text) !important;
+}
+
+/* =======================================================
+   Dark/Light Mode Toggle Button (Place in your HTML)
+   ======================================================= */
+#modeToggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: var(--btn-bg-light);
+  color: var(--btn-text-light);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode #modeToggle {
+  background: var(--btn-bg-dark);
+  color: var(--btn-text-dark);
+}
+
+/* =======================================================
+   Your Existing CSS Code (Adjusted for Mode Flexibility)
+   ======================================================= */
+
 @font-face {
   font-family: "Livvic";
   src: url("Livvic-Thin.ttf") format("truetype");
@@ -117,16 +179,6 @@
   font-style: bold;
 }
 
-body {
-  overflow-x: hidden;
-  /* background: #210d41 !important; */
-  background: radial-gradient(circle at 0% 0%, #000000, #7800ff) !important;
-  color: #777 !important;
-  font-family: Livvic !important;
-  width: 100%;
-  height: 100%;
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -137,21 +189,17 @@ body {
   background: #f3f4fa !important;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-strong {
+h1, h2, h3, h4, h5, h6, strong {
   font-weight: 600 !important;
 }
 
+/* Content Area */
 .content-area {
   max-width: 1280px !important;
   margin: 0 auto !important;
 }
 
+/* Box Styles (these remain white in both modes) */
 .box {
   background: white;
   padding: 25px 20px;
@@ -170,6 +218,7 @@ strong {
   box-shadow: 0px 1px 15px 1px rgba(69, 65, 78, 0.08) !important;
 }
 
+/* Sparkboxes – using “inherit” so text will follow the current mode’s text color */
 .sparkboxes .box {
   padding-top: 10px;
   padding-bottom: 10px !important;
@@ -179,53 +228,36 @@ strong {
   border-radius: 5px !important;
 }
 
-/* Changed details text to black */
 .sparkboxes .box .details {
   position: absolute !important;
-  color: #000 !important;
+  color: inherit !important;
   transform: scale(0.7) translate(-22px, 20px) !important;
 }
 
-/* Changed strong text to black */
 .sparkboxes strong {
   position: relative !important;
   z-index: 3 !important;
   top: -8px !important;
-  color: #000 !important;
+  color: inherit !important;
 }
 
-/* Replaced gradient backgrounds with white */
-.sparkboxes .box1 {
-  background: white !important;
-}
-
-.sparkboxes .box2 {
-  background: white !important;
-}
-
-.sparkboxes .box3 {
-  background: white !important;
-}
-
+/* For sparkboxes, replace gradient backgrounds with white */
+.sparkboxes .box1,
+.sparkboxes .box2,
+.sparkboxes .box3,
 .sparkboxes .box4 {
   background: white !important;
 }
 
-/* Changed text and legend fill colors to black */
+/* Text and icon colors – using “inherit” so they change with mode */
 text,
-.apexcharts-legend-text {
-  color: #000 !important;
-  fill: #000 !important;
+.apexcharts-legend-text,
+h4, h5, li {
+  color: inherit !important;
+  fill: inherit !important;
 }
 
-/* Changed h4, h5, li text to black */
-h4,
-h5,
-li {
-  color: #000 !important;
-  fill: #000 !important;
-}
-
+/* Image and Title Section */
 .my-image {
   position: absolute;
   top: 0;
@@ -246,7 +278,7 @@ li {
   margin-right: auto;
   padding-bottom: 0;
   font-size: 35px;
-  color: #000; /* changed from white to black */
+  color: inherit;
 }
 
 .title-section-i img {
@@ -258,6 +290,7 @@ li {
   color: #ffde59;
 }
 
+/* Rows and Layout */
 .row.custom-row {
   padding: 0 5rem;
   margin-bottom: 2rem;
@@ -305,7 +338,7 @@ li {
 
 .toggles.d-flex {
   font-weight: lighter;
-  color: #000; /* changed to black */
+  color: inherit;
   font-size: 10px;
 }
 
@@ -319,6 +352,7 @@ li {
   font-size: 50px;
 }
 
+/* Status Colors */
 .text-green {
   color: #3dae63 !important;
 }
@@ -357,9 +391,7 @@ li {
   color: #6e7172 !important;
 }
 
-h5 {
-}
-
+/* Toggle Container and Slider */
 .toggle-container label {
   margin-bottom: 0 !important;
   font-size: 12px !important;
@@ -399,8 +431,7 @@ h5 {
   align-items: center;
 }
 
-/* Starter Code */
-
+/* Starter Code for App Layout */
 .app-container {
   display: flex;
 }
@@ -427,7 +458,7 @@ h5 {
 }
 
 .toggle-sidebar {
-  color: #000; /* changed from white to black */
+  color: inherit;
   background: none;
   border: none;
   cursor: pointer;
@@ -454,7 +485,7 @@ h5 {
 .title {
   font-size: 20px;
   font-weight: bold;
-  color: #e2e8f0;
+  color: inherit;
   margin: 0;
 }
 
@@ -474,7 +505,7 @@ h5 {
   padding: 12px 20px;
   margin-bottom: 8px;
   background-color: transparent;
-  color: #cbd5e0;
+  color: inherit;
   font-size: 16px;
   font-weight: 500;
   text-align: left;
@@ -517,7 +548,7 @@ h5 {
 .custom-tooltip {
   background: rgba(0, 0, 0, 0.7);
   padding: 10px;
-  color: #000; /* changed from white to black */
+  color: inherit;
   border-radius: 4px;
 }
 
@@ -546,7 +577,7 @@ h5 {
   padding: 4px;
   border-radius: 5px;
   background: white;
-  color: #000; /* changed from white to black */
+  color: inherit;
   border: 1px solid #ccc;
 }
 
@@ -561,11 +592,11 @@ h5 {
 
 .custom-select:focus,
 .custom-select:valid {
-  color: #000; /* changed from white to black */
+  color: inherit;
 }
 
 .custom-select option:disabled {
-  color: #000; /* changed from white to black */
+  color: inherit;
 }
 
 .test-container {
@@ -612,7 +643,7 @@ h5 {
   width: 100%;
   border-collapse: collapse;
   border-color: transparent !important;
-  color: #fff;
+  color: inherit;
   border: none !important;
 }
 
@@ -648,7 +679,7 @@ h5 {
   letter-spacing: 1px;
   font-size: 18px;
   font-family: Livvic;
-  color: #000; /* changed from white to black */
+  color: inherit;
 }
 
 .sidebar-test > .button .text {
@@ -683,7 +714,7 @@ h5 {
 .spinner-border {
   width: 40px;
   height: 40px;
-  border: 2px solid #000; /* changed from white to black */
+  border: 2px solid currentColor;
   border-top: 2px solid transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -703,7 +734,6 @@ h5 {
   }
 }
 
-/* Changed the .text-white class to force black text */
 .text-white {
-  color: #000 !important;
+  color: inherit !important;
 }
