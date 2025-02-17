@@ -81,6 +81,7 @@ export interface BarChartProps {
   };
   titleHeading: string;
   disableGrouping?: boolean;
+  getinsights?: any;
 }
 
 function calculatePercentageChange(num1: number, num2: number) {
