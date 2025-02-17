@@ -421,7 +421,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
       {/* Header Text */}
       <div className="justify-content-between align-items-center">
         <div>
-          <h5 style={{ color: "white" }}>{titleHeading}</h5>
+          <h5 style={{ color: "black" }}>{titleHeading}</h5>
         </div>
         <section className="VerticalBarChart__legend">
           {/* control SVG Start */}
@@ -449,13 +449,13 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                 <g id="SVGRepo_iconCarrier">
                   <path
                     d="M6 5V20"
-                    stroke="white"
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 5V20"
-                    stroke="white"
+                    stroke="black"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
