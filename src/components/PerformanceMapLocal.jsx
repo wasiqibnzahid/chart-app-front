@@ -355,7 +355,7 @@ const PerformanceMapLocal = () => {
           y0: 0,
           y1: 1,
           line: {
-            color: "black",
+            color: "turquoise",
             width: 2,
             dash: "dot",
           },
