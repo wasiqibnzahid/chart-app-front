@@ -21,6 +21,43 @@ export const TestManager = () => {
   const [selectedJsonData, setSelectedJsonData] = useState<Record<string, any> | null>(null);
   const [gettingJson, setGettingJson] = useState(false);
 
+  // Helper function for percentage (score) metrics (0 to 1)
+  const getScoreColor = (score: number) => {
+    if (score >= 0.9) return "green";
+    else if (score >= 0.5) return "orange";
+    else return "red";
+  };
+
+  // Helper function for table timing metrics
+  const getMetricColor = (metric: string, value: number) => {
+    switch (metric) {
+      case "first_contentful_paint":
+        // Lower is better
+        if (value <= 1.8) return "green";
+        else if (value <= 3.0) return "orange";
+        else return "red";
+      case "largest_contentful_paint":
+        if (value <= 2.5) return "green";
+        else if (value <= 4.0) return "orange";
+        else return "red";
+      case "speed_index":
+        if (value <= 3.4) return "green";
+        else if (value <= 5.0) return "orange";
+        else return "red";
+      case "total_blocking_time":
+        // Assuming value is in milliseconds
+        if (value <= 200) return "green";
+        else if (value <= 600) return "orange";
+        else return "red";
+      case "cumulative_layout_shift":
+        if (value <= 0.1) return "green";
+        else if (value <= 0.25) return "orange";
+        else return "red";
+      default:
+        return "black";
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -171,7 +208,7 @@ export const TestManager = () => {
         </div>
       </div>
       <div className="d-flex test-container">
-        {/* Removed any text-white classes and enforce black text */}
+        {/* Top metrics */}
         <div className="d-flex top-row-dual custom-row" style={{ color: "black" }}>
           <div className="box relative box-large pt-2 px-3">
             <div className="d-flex align-items-center justify-content-between">
@@ -183,7 +220,11 @@ export const TestManager = () => {
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
                   className="circle mr-2"
-                  style={{ backgroundColor: "black" }}
+                  style={{
+                    backgroundColor: getScoreColor(
+                      latestItem?.metrics.performance_score ?? 0
+                    ),
+                  }}
                 ></div>
                 <AnimateNumber
                   number={(latestItem?.metrics.performance_score ?? 0) * 100}
@@ -202,7 +243,11 @@ export const TestManager = () => {
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
                   className="circle mr-2"
-                  style={{ backgroundColor: "black" }}
+                  style={{
+                    backgroundColor: getScoreColor(
+                      selectedJsonData?.categories?.seo.score || 0
+                    ),
+                  }}
                 ></div>
                 <AnimateNumber
                   number={(selectedJsonData?.categories?.seo.score || 0) * 100}
@@ -221,7 +266,11 @@ export const TestManager = () => {
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
                   className="circle mr-2"
-                  style={{ backgroundColor: "black" }}
+                  style={{
+                    backgroundColor: getScoreColor(
+                      selectedJsonData?.categories?.accessibility.score || 0
+                    ),
+                  }}
                 ></div>
                 <AnimateNumber
                   number={
@@ -243,7 +292,11 @@ export const TestManager = () => {
               <div className="d-flex justify-content-center align-items-center percentage">
                 <div
                   className="circle mr-2"
-                  style={{ backgroundColor: "black" }}
+                  style={{
+                    backgroundColor: getScoreColor(
+                      selectedJsonData?.categories?.["best-practices"].score || 0
+                    ),
+                  }}
                 ></div>
                 <AnimateNumber
                   number={
@@ -307,7 +360,12 @@ export const TestManager = () => {
                       {check.metrics?.first_contentful_paint && (
                         <div
                           className="circle mr-2"
-                          style={{ backgroundColor: "black" }}
+                          style={{
+                            backgroundColor: getMetricColor(
+                              "first_contentful_paint",
+                              check.metrics.first_contentful_paint
+                            ),
+                          }}
                         ></div>
                       )}
                       {check.metrics?.first_contentful_paint?.toFixed(1) || "-"}
@@ -318,7 +376,12 @@ export const TestManager = () => {
                       {check.metrics?.total_blocking_time && (
                         <div
                           className="circle mr-2"
-                          style={{ backgroundColor: "black" }}
+                          style={{
+                            backgroundColor: getMetricColor(
+                              "total_blocking_time",
+                              check.metrics.total_blocking_time
+                            ),
+                          }}
                         ></div>
                       )}
                       {check.metrics?.total_blocking_time?.toFixed(1) || "-"}
@@ -329,7 +392,12 @@ export const TestManager = () => {
                       {check.metrics?.speed_index && (
                         <div
                           className="circle mr-2"
-                          style={{ backgroundColor: "black" }}
+                          style={{
+                            backgroundColor: getMetricColor(
+                              "speed_index",
+                              check.metrics.speed_index
+                            ),
+                          }}
                         ></div>
                       )}
                       {check.metrics?.speed_index?.toFixed(1) || "-"}
@@ -340,7 +408,12 @@ export const TestManager = () => {
                       {check.metrics?.largest_contentful_paint && (
                         <div
                           className="circle mr-2"
-                          style={{ backgroundColor: "black" }}
+                          style={{
+                            backgroundColor: getMetricColor(
+                              "largest_contentful_paint",
+                              check.metrics.largest_contentful_paint
+                            ),
+                          }}
                         ></div>
                       )}
                       {check.metrics?.largest_contentful_paint?.toFixed(1) || "-"}
@@ -351,7 +424,12 @@ export const TestManager = () => {
                       {check.metrics?.cumulative_layout_shift && (
                         <div
                           className="circle mr-2"
-                          style={{ backgroundColor: "black" }}
+                          style={{
+                            backgroundColor: getMetricColor(
+                              "cumulative_layout_shift",
+                              check.metrics.cumulative_layout_shift
+                            ),
+                          }}
                         ></div>
                       )}
                       {check.metrics?.cumulative_layout_shift?.toFixed(1) || "-"}
