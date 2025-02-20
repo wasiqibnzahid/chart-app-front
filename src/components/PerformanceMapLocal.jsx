@@ -535,7 +535,7 @@ const PerformanceMapLocal = () => {
               },
               marker: {
                 size: 6,
-                color: "black",
+                color: "turquoise",
               },
               name: "All",
               hovertemplate: `
