@@ -529,7 +529,7 @@ const PerformanceMapLocal = () => {
               type: "scatter",
               mode: "lines+markers",
               line: {
-                color: "black",
+                color: "turquoise",
                 width: 2,
                 shape: "linear",
               },
