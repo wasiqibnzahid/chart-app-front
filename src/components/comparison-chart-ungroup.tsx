@@ -538,8 +538,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 background: isNaN(item)
                   ? "transparent"
                   : item > 0
-                  ? "#3dae63"
-                  : "#dc2c3e",
+                  ? "black"
+                  : "black",
                 borderRadius: "8px",
                 padding: "0.25rem 0.25rem",
                 color: "#black",
