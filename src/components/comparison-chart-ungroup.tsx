@@ -492,8 +492,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 size="sm"
                 color="black"
                 bg="transparent"
-                _hover={{ borderColor: "gray.300" }}
-                _focus={{ borderColor: "gray.300", boxShadow: "none" }}
+                _hover={{ borderColor: "black" }}
+                _focus={{ borderColor: "black", boxShadow: "none" }}
                 iconColor="black"
                 width="fit-content"
               >
