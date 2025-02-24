@@ -620,7 +620,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                   : "#dc2c3e",
                 borderRadius: "8px",
                 padding: "0.25rem 0.25rem",
-                color: "#fff",
+                color: "black",
                 width: "50px",
               }}
               // className={`${item > 0 ? "text-green" : "text-red"}`}
@@ -703,7 +703,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
             alignItems: "center",
             justifyContent: "center",
             fontSize: "12px",
-            color: "#fff",
+            color: "black",
             gap: "0.75rem",
             marginBottom: "1rem",
             flexWrap: "wrap",
