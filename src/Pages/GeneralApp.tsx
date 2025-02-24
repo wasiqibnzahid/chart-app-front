@@ -31,7 +31,21 @@ const GeneralApp: React.FC = () => {
 
   return (
     <div className="app-container flex" style={{ color: "black" }}>
-      {/* Sidebar */}
+      {/* Fixed message at the top center, no interference (pointerEvents: "none") */}
+      <div
+        style={{
+          position: "fixed",
+          top: "10px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          color: "red",
+          zIndex: 9999,
+          pointerEvents: "none",
+        }}
+      >
+        Current week calculations are not yet available due to sitemap modifications
+      </div>
+
       <div className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <div className="logo-container">
@@ -127,7 +141,6 @@ const GeneralApp: React.FC = () => {
         </button>
       </div>
 
-      {/* Sidebar toggle */}
       <button
         className="toggle-sidebar"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -143,29 +156,11 @@ const GeneralApp: React.FC = () => {
         )}
       </button>
 
-      {/* Main content */}
-      <div className="content" style={{ position: "relative" }}>
-        {/* Fixed message at the top center */}
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: "50%",
-            transform: "translateX(-50%)",
-            color: "red",
-            zIndex: 9999,
-            padding: "0.5rem",
-          }}
-        >
-          Current week calculations are not yet available due to sitemap modifications
-        </div>
-
-        {/* Add top padding so content isn't hidden under the fixed message */}
+      <div className="content">
         <section
           className={`ContainerSetting ${
             isSidebarOpen ? "sidebar-open" : "sidebar-closed"
           }`}
-          style={{ paddingTop: "3rem" }}
         >
           {activeTab === 0 && <GeneralOverview />}
           {activeTab === 1 && <VerticalOverview />}
