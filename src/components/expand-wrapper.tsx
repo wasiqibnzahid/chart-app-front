@@ -15,10 +15,15 @@ export const ExpandWrapper: React.FC<PropsWithChildren> = ({ children }) => {
           position: "relative",
         }}
       >
-        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} closeOnOverlayClick>
-          <ModalOverlay />
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          closeOnOverlayClick
+        >
+          <ModalOverlay></ModalOverlay>
+
           <ModalContent
-            backgroundColor="black"
+            backgroundColor="transparent"
             style={{ background: "orange !important" }}
           >
             <div
@@ -28,22 +33,23 @@ export const ExpandWrapper: React.FC<PropsWithChildren> = ({ children }) => {
                 position: "fixed",
                 left: "0",
                 top: "0",
-                zIndex: "1",
+                zIndex:"1",
+                // transform: "translate(-50%,-50%)",
               }}
               className="h-screen w-screen"
             >
-              <div
-                style={{
-                  position: "absolute",
-                  right: "1.5rem",
-                  top: "23px",
-                  cursor: "pointer",
-                  zIndex: "1",
-                }}
-                onClick={() => setIsOpen(false)}
-              >
-                <img style={{ width: "20px" }} src="/Cross.svg" />
-              </div>
+            <div
+              style={{
+                position: "absolute",
+                right: "1.5rem",
+                top: "23px",
+               cursor: "pointer",
+               zIndex: "1",
+              }}
+              onClick={() => setIsOpen(false)}
+            >
+          <img style={{ width: "20px" }} src="/Cross.svg" />
+        </div>
               <div className="box" style={{ paddingBottom: "5rem" }}>
                 {children}
               </div>
@@ -60,7 +66,7 @@ export const ExpandWrapper: React.FC<PropsWithChildren> = ({ children }) => {
           }}
           onClick={() => setIsOpen(true)}
         >
-          <img style={{ width: "20px", filter: "grayscale(100%) brightness(0)" }} src="/Expand.png" />
+          <img style={{ width: "20px" }} src="/Expand.png" />
         </div>
         {children}
       </div>
