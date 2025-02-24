@@ -142,6 +142,15 @@ const GeneralApp: React.FC = () => {
       </button>
 
       <div className="content">
+        <div
+          style={{
+            color: "red",
+            textAlign: "center",
+            marginBottom: "1rem",
+          }}
+        >
+          Current week calculations are not yet available due to sitemap modifications
+        </div>
         <section
           className={`ContainerSetting ${
             isSidebarOpen ? "sidebar-open" : "sidebar-closed"
