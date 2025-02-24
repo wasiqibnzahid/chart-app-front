@@ -563,7 +563,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
                 value={selectedOption}
                 onChange={(e) => setSelectedOption(e.target.value)}
                 border="2px"
-                borderColor="#cbd5e0" // Apply the border color
+                borderColor="black" // Apply the border color
                 borderRadius="8px"
                 size="sm"
                 color="black"
@@ -666,7 +666,7 @@ const PipCombineGrouped: React.FC<BarChartProps> = ({
             <span
               key={month}
               style={{
-                color: "#cbd5e0",
+                color: "#black",
               }}
             >
               {month}
