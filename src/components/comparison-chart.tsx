@@ -426,33 +426,33 @@ const BarChart: React.FC<BarChartProps> = ({
                 <g id="SVGRepo_iconCarrier">
                   <path
                     d="M6 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke={showControls ? "black" : "black"} // Changed to black
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke={showControls ? "black" : "black"} // Changed to black
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M18 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke={showControls ? "black" : "black"} // Changed to black
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill={showControls ? "black" : "black"} // Changed to black
                   />
                   <path
                     d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill={showControls ? "black" : "black"} // Changed to black
                   />
                   <path
                     d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill={showControls ? "black" : "black"} // Changed to black
                   />
                 </g>
               </svg>
@@ -478,7 +478,7 @@ const BarChart: React.FC<BarChartProps> = ({
                 height="20"
                 viewBox="0 0 488.484 488.484"
                 xmlSpace="preserve"
-                fill={showZoomIn ? "white" : "gray"}
+                fill={showZoomIn ? "black" : "black"} // Changed to black
               >
                 <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                 <g
@@ -521,11 +521,11 @@ const BarChart: React.FC<BarChartProps> = ({
                 borderColor="#cbd5e0" // Apply the border color
                 borderRadius="8px"
                 size="sm"
-                color="white"
+                color="black" // Changed to black
                 bg="transparent"
                 _hover={{ borderColor: "gray.300" }}
                 _focus={{ borderColor: "gray.300", boxShadow: "none" }}
-                iconColor="white"
+                iconColor="black" // Changed to black
                 width="fit-content"
               >
                 {dropdownOptions.map((item) => (
@@ -692,7 +692,7 @@ const BarChart: React.FC<BarChartProps> = ({
           transition: "max-height 0.7s ease",
         }}
       >
-        <Box p={0} borderRadius="md" color="white">
+        <Box p={0} borderRadius="md" color="black"> {/* Changed to black */}
           {showControls && (
             <>
               {/* Check Box Row's */}
@@ -732,33 +732,33 @@ const BarChart: React.FC<BarChartProps> = ({
                       <g id="SVGRepo_iconCarrier">
                         <path
                           d="M6 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke={showControls ? "black" : "black"} // Changed to black
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M12 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke={showControls ? "black" : "black"} // Changed to black
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M18 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke={showControls ? "black" : "black"} // Changed to black
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill={showControls ? "black" : "black"} // Changed to black
                         />
                         <path
                           d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill={showControls ? "black" : "black"} // Changed to black
                         />
                         <path
                           d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill={showControls ? "black" : "black"} // Changed to black
                         />
                       </g>
                     </svg>
@@ -774,8 +774,8 @@ const BarChart: React.FC<BarChartProps> = ({
                       onChange={(e) => setIsChecked(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black" // Changed to black
+                      borderColor="black" // Changed to black
                       size="lg"
                     >
                       Show percentages
@@ -787,8 +787,8 @@ const BarChart: React.FC<BarChartProps> = ({
                       onChange={(e) => setShowAllData(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black" // Changed to black
+                      borderColor="black" // Changed to black
                       size="lg"
                     >
                       Show All Data
@@ -799,8 +799,8 @@ const BarChart: React.FC<BarChartProps> = ({
                       onChange={handleCheckboxChange}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black" // Changed to black
+                      borderColor="black" // Changed to black
                       size="lg"
                     >
                       Show Raw Values
@@ -811,8 +811,8 @@ const BarChart: React.FC<BarChartProps> = ({
                       onChange={(e) => setShowDateFilter(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black" // Changed to black
+                      borderColor="black" // Changed to black
                       size="lg"
                     >
                       Show Date Filter
@@ -923,7 +923,7 @@ const BarChart: React.FC<BarChartProps> = ({
                         height="20"
                         viewBox="0 0 488.484 488.484"
                         xmlSpace="preserve"
-                        fill={showZoomIn ? "white" : "gray"}
+                        fill={showZoomIn ? "black" : "black"} // Changed to black
                       >
                         <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                         <g
@@ -955,7 +955,7 @@ const BarChart: React.FC<BarChartProps> = ({
                     </button>
                   </div>
                   {/* Insights SVG End */}
-                  <Text style={{ lineHeight: "2rem" }}>
+                  <Text style={{ lineHeight: "2rem", color: "black" }}> {/* Changed to black */}
                     {insights ? insights.self : "There is no insights"} <br />
                     {insights ? insights.competition : "There is no insights"}
                   </Text>
