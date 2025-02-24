@@ -37,7 +37,6 @@ export interface AverageChartProps {
     quarterData: QuarterData[];
   };
 }
-
 const dropdownOptions = ["Video", "Note", "Both"];
 const months = [
   "Jan", // 0
@@ -58,7 +57,6 @@ const seriesColors: { [key: string]: string } = {
   Competition: "#FF5733",
   AMP: "#DAA520",
 };
-
 const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
   // States
   const [showZoomIn, setShowZoomIn] = useState(false);
@@ -74,22 +72,26 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     setData(propData);
   }, [propData]);
   useEffect(() => {
-    if (!showdateFilter) {
+    if (showdateFilter === false) {
       setData(propData);
     } else {
-      const matchedweeklyData = propData.weekly.data.map((outerData) => ({
-        ...outerData,
-        data: outerData.data.filter((innerData) =>
-          dateFilter.includes(innerData.x)
-        ),
-      }));
+      const matchedweeklyData = propData.weekly.data.map((outerData) => {
+        return {
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
+        };
+      });
 
-      const matchedchangesData = propData.weekly.changes.map((outerData) => ({
-        ...outerData,
-        data: outerData.data.filter((innerData) =>
-          dateFilter.includes(innerData.x)
-        ),
-      }));
+      const matchedchangesData = propData.weekly.changes.map((outerData) => {
+        return {
+          ...outerData,
+          data: outerData.data.filter((innerData) =>
+            dateFilter.includes(innerData.x)
+          ),
+        };
+      });
 
       setData({
         ...propData,
@@ -133,6 +135,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         data: item.data.filter((date) => {
           const f = new Date(date.x);
           const month = f.getMonth();
+
           return (
             f.getFullYear() === selectedYear &&
             month >= quarterVal[0] &&
@@ -167,12 +170,12 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
           speed: 800,
         },
         height: 328,
-        type: "area",
+        type: "area", // Area chart
         zoom: {
           enabled: true,
         },
         toolbar: {
-          show: false,
+          show: false, // We'll handle custom toolbar
         },
       },
       stroke: {
@@ -192,7 +195,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         },
       },
       grid: {
-        show: false,
+        show: false, // Disable grid lines
         padding: {
           bottom: 0,
         },
@@ -217,13 +220,13 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         position: "bottom",
         horizontalAlign: "center",
       },
-      colors: dataToUse.map((item) => seriesColors[item.name] || "#000"),
+      colors: dataToUse.map((item) => seriesColors[item.name] || "#000"), // Assign colors based on series
       fill: {
-        type: "gradient",
+        type: "gradient", // Enable gradient fill
         gradient: {
           shadeIntensity: 1,
-          opacityFrom: 0.5,
-          opacityTo: 0.1,
+          opacityFrom: 0.5, // Increased opacity for more vibrant fill
+          opacityTo: 0.1, // Increased opacity to make the area more colorful
           stops: [0, 90, 100],
         },
       },
@@ -236,28 +239,40 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
             : showPercentages
             ? -10
             : 0,
-        enabled: showVals || showPercentages,
+        enabled: showVals || showPercentages, // Enable based on state
         formatter(val, data): string {
-          const item =
-            dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
+          const item = dataToUse[data.seriesIndex].data[data.dataPointIndex]?.y;
           const prevItem =
             dataToUse[data.seriesIndex].data?.[data.dataPointIndex - 1]?.y;
           let str = "";
           if (item !== undefined && prevItem !== undefined) {
-            str += item > prevItem ? "▲ " : item < prevItem ? "▼ " : "- ";
-            let percentageDifference = +((item - prevItem) / prevItem * 100).toFixed(1);
+            if (item > prevItem) {
+              str += "▲ ";
+            } else if (item < prevItem) {
+              str += "▼ ";
+            } else {
+              str += "- ";
+            }
+            let difference = item - prevItem;
+            let percentageDifference = +((difference / prevItem) * 100).toFixed(
+              1
+            );
             str += percentageDifference;
           }
           const res = [];
-          if (showVals) res.push(val.toString());
-          if (str && showPercentages) res.unshift(`${str}%`);
-          return res.join(" ");
+          if (showVals) {
+            res.push(val.toString());
+          }
+          if (str && showPercentages) {
+            res.unshift(`${str}%`);
+          }
+          return res.join(" "); // Return as a single string
         },
         background: {
           enabled: true,
           borderColor: "transparent",
         },
-        distributed: false,
+        distributed: false, // Set to false to use series colors
         style: {
           colors: dataToUse.map((item) => seriesColors[item.name] || "#000"),
         },
@@ -269,7 +284,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         },
         y: {
           formatter: function (val) {
-            return `${val} units`;
+            return `${val} units`; // Customize this to show your units
           },
         },
       },
@@ -277,6 +292,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     [dataToUse, showPercentages, showVals]
   );
 
+  // Define 'seriesLine' separately
   const seriesLine = useMemo(() => {
     return dataToUse.map((item) => ({
       name: item.name,
@@ -284,6 +300,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         x: d.x,
         y: d.y,
       })),
+      // Color is handled via the 'colors' array in ApexOptions
     }));
   }, [dataToUse]);
 
@@ -295,12 +312,12 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
     prevReqController.current = new AbortController();
     getInsights(
       {
-        start: `${quarterVal[0] > 8 ? "" : "0"}${quarterVal[0] + 1}-${
-          selectedYear
-        }`,
-        end: `${quarterVal[1] > 8 ? "" : "0"}${quarterVal[1] + 1}-${
-          selectedYear
-        }`,
+        start: `${quarterVal[0] > 8 ? "" : "0"}${
+          quarterVal[0] + 1
+        }-${selectedYear}`,
+        end: `${quarterVal[1] > 8 ? "" : "0"}${
+          quarterVal[1] + 1
+        }-${selectedYear}`,
       },
       prevReqController.current.signal
     ).then((res) => setInsights(res));
@@ -314,6 +331,8 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
 
   const handleSelectDateChange = (e) => {
     const value = e.target.value;
+
+    // Check if the value is already in the dateFilter array
     if (!dateFilter.includes(value) && value) {
       setDateFilter([...dateFilter, value]);
       setSelectedDate(value);
@@ -325,13 +344,11 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       {/* Header Text */}
       <div className="justify-content-between align-items-center mb-4">
         <div>
-          <h5 style={{ color: "black" }}>
-            AMP vs Azteca vs Competition Overview
-          </h5>
+          <h5>AMP vs Azteca vs Competition Overview</h5>
         </div>
 
         <section className="VerticalBarChart__legend">
-          {/* Control SVG */}
+          {/* control SVG Start */}
           <div>
             <button
               onClick={() => setShowControls(!showControls)}
@@ -346,44 +363,51 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                 height="20"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                style={{ fill: "black", stroke: "black" }}
               >
-                <g>
+                <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                <g
+                  id="SVGRepo_tracerCarrier"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <g id="SVGRepo_iconCarrier">
                   <path
                     d="M6 5V20"
-                    stroke="black"
+                    stroke={showControls ? "white" : "gray"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 5V20"
-                    stroke="black"
+                    stroke={showControls ? "white" : "gray"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M18 5V20"
-                    stroke="black"
+                    stroke={showControls ? "white" : "gray"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                    fill="black"
+                    fill={showControls ? "white" : "gray"}
                   />
                   <path
                     d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                    fill="black"
+                    fill={showControls ? "white" : "gray"}
                   />
                   <path
                     d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                    fill="black"
+                    fill={showControls ? "white" : "gray"}
                   />
                 </g>
               </svg>
             </button>
           </div>
-          {/* Insights SVG */}
+          {/* Control SVG End */}
+
+          {/* Insights SVG Start */}
           <div>
             <button
               onClick={() => setShowZoomIn(!showZoomIn)}
@@ -401,24 +425,39 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                 height="20"
                 viewBox="0 0 488.484 488.484"
                 xmlSpace="preserve"
-                style={{ fill: "black" }}
+                fill={showZoomIn ? "white" : "gray"}
               >
-                <g>
-                  <path
-                    d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 c134.684,0,244.249-109.564,244.249-244.244C488.484,109.566,378.92,0.002,244.236,0.002z 
-                  M244.236,413.619c-93.4,0-169.38-75.979-169.38-169.379c0-93.396,75.979-169.375,169.38-169.375s169.391,75.979,169.391,169.375 
-                  C413.627,337.641,337.637,413.619,244.236,413.619z"
-                  />
-                  <path
-                    d="M244.236,206.816c-14.757,0-26.619,11.962-26.619,26.73v118.709c0,14.769,11.862,26.735,26.619,26.735 c14.769,0,26.62-11.967,26.62-26.735V233.546C270.855,218.778,259.005,206.816,244.236,206.816z"
-                  />
-                  <path
-                    d="M244.236,107.893c-19.949,0-36.102,16.158-36.102,36.091c0,19.934,16.152,36.092,36.102,36.092 c19.929,0,36.081-16.158,36.081-36.092C280.316,124.051,264.165,107.893,244.236,107.893z"
-                  />
+                <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                <g
+                  id="SVGRepo_tracerCarrier"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <g id="SVGRepo_iconCarrier">
+                  <g>
+                    <g>
+                      <path
+                        d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 
+              c134.684,0,244.249-109.564,244.249-244.244C488.484,109.566,378.92,0.002,244.236,0.002z M244.236,413.619 
+              c-93.4,0-169.38-75.979-169.38-169.379c0-93.396,75.979-169.375,169.38-169.375s169.391,75.979,169.391,169.375 
+              C413.627,337.641,337.637,413.619,244.236,413.619z"
+                      />
+                      <path
+                        d="M244.236,206.816c-14.757,0-26.619,11.962-26.619,26.73v118.709c0,14.769,11.862,26.735,26.619,26.735 
+              c14.769,0,26.62-11.967,26.62-26.735V233.546C270.855,218.778,259.005,206.816,244.236,206.816z"
+                      />
+                      <path
+                        d="M244.236,107.893c-19.949,0-36.102,16.158-36.102,36.091c0,19.934,16.152,36.092,36.102,36.092 
+              c19.929,0,36.081-16.158,36.081-36.092C280.316,124.051,264.165,107.893,244.236,107.893z"
+                      />
+                    </g>
+                  </g>
                 </g>
               </svg>
             </button>
           </div>
+          {/* Insights SVG End */}
+
           {/* Dropdown */}
           <div>
             <Box>
@@ -426,14 +465,14 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                 value={selectedDropdown}
                 onChange={(e) => setSelectedDropdown(e.target.value)}
                 border="2px"
-                borderColor="black"
+                borderColor="#cbd5e0" // Apply the border color
                 borderRadius="8px"
                 size="sm"
-                color="black"
+                color="white"
                 bg="transparent"
-                _hover={{ borderColor: "black" }}
-                _focus={{ borderColor: "black", boxShadow: "none" }}
-                iconColor="black"
+                _hover={{ borderColor: "gray.300" }}
+                _focus={{ borderColor: "gray.300", boxShadow: "none" }}
+                iconColor="white"
                 width="fit-content"
               >
                 {dropdownOptions.map((item) => (
@@ -445,6 +484,19 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
             </Box>
           </div>
         </section>
+        {/*         
+        <div style={{ width: "300px" }}>
+          <Select
+            value={selectedDropdown}
+            onChange={(e) => setSelectedDropdown(e.target.value)}
+          >
+            {dropdownOptions.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </Select>
+        </div> */}
       </div>
 
       {/* Chart */}
@@ -458,7 +510,9 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
       {/* Range Line */}
       <div
         className="px-4 mb-3 slider-container"
-        style={{ position: "relative" }}
+        style={{
+          position: "relative",
+        }}
       >
         <RangeSlider
           defaultValue={[0, 100]}
@@ -478,7 +532,12 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
 
         <div className="d-flex justify-content-between slider-custom-text">
           {months.map((month) => (
-            <span key={month} style={{ color: "black" }}>
+            <span
+              key={month}
+              style={{
+                color: "#cbd5e0",
+              }}
+            >
               {month}
             </span>
           ))}
@@ -503,7 +562,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
         </div>
       </div>
 
-      {/* Controls/Zoom Section */}
+      {/* Open When user click on Zoom in then show this */}
       <section
         style={{
           marginTop: "3%",
@@ -511,10 +570,10 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
           transition: "max-height 0.7s ease",
         }}
       >
-        <Box p={0} borderRadius="md" color="black">
+        <Box p={0} borderRadius="md" color="white">
           {showControls && (
             <>
-              {/* Checkbox Row */}
+              {/* Check Box Row's */}
               <section
                 style={{
                   display: "flex",
@@ -526,7 +585,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                   marginBottom: "2%",
                 }}
               >
-                {/* Control SVG */}
+                {/* control SVG Start */}
                 <div>
                   <button
                     onClick={() => setShowControls(!showControls)}
@@ -541,44 +600,49 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                       height="20"
                       viewBox="0 0 24 24"
                       xmlns="http://www.w3.org/2000/svg"
-                      style={{ fill: "black", stroke: "black" }}
                     >
-                      <g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                      <g
+                        id="SVGRepo_tracerCarrier"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <g id="SVGRepo_iconCarrier">
                         <path
                           d="M6 5V20"
-                          stroke="black"
+                          stroke={showControls ? "white" : "gray"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M12 5V20"
-                          stroke="black"
+                          stroke={showControls ? "white" : "gray"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M18 5V20"
-                          stroke="black"
+                          stroke={showControls ? "white" : "gray"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                          fill="black"
+                          fill={showControls ? "white" : "gray"}
                         />
                         <path
                           d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                          fill="black"
+                          fill={showControls ? "white" : "gray"}
                         />
                         <path
                           d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                          fill="black"
+                          fill={showControls ? "white" : "gray"}
                         />
                       </g>
                     </svg>
                   </button>
                 </div>
-                {/* End Control SVG */}
+                {/* Control SVG End */}
                 <div>
                   <Stack direction="row" spacing={5} align="center" mb={0}>
                     <Checkbox
@@ -587,32 +651,34 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                       onChange={(e) => setShowPercentages(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="black"
-                      borderColor="black"
+                      iconColor="white"
+                      borderColor="white"
                       size="lg"
                     >
                       Show percentages
                     </Checkbox>
+
                     <Checkbox
                       id="show-all-data"
                       isChecked={showAllData}
                       onChange={(e) => setShowAllData(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="black"
-                      borderColor="black"
+                      iconColor="white"
+                      borderColor="white"
                       size="lg"
                     >
                       Show All Data
                     </Checkbox>
+
                     <Checkbox
                       id="raw-value"
                       checked={showVals}
                       onChange={(e) => setShowVals(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="black"
-                      borderColor="black"
+                      iconColor="white"
+                      borderColor="white"
                       size="lg"
                     >
                       Show Raw Values
@@ -623,8 +689,8 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                       onChange={(e) => setShowDateFilter(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="black"
-                      borderColor="black"
+                      iconColor="white"
+                      borderColor="white"
                       size="lg"
                     >
                       Show Date Filter
@@ -658,7 +724,6 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                         fontSize: "14px",
                         padding: "4px",
                         borderRadius: "5px",
-                        color: "black",
                       }}
                     >
                       {propData.weekly.data?.[1].data.map((date) => (
@@ -694,7 +759,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                     alignItems: "start",
                   }}
                 >
-                  {/* Insights SVG */}
+                  {/* Insights SVG Start */}
                   <div>
                     <button
                       onClick={() => setShowZoomIn(!showZoomIn)}
@@ -713,7 +778,7 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                         height="20"
                         viewBox="0 0 488.484 488.484"
                         xmlSpace="preserve"
-                        style={{ fill: "black" }}
+                        fill={showZoomIn ? "white" : "gray"}
                       >
                         <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                         <g
@@ -744,7 +809,8 @@ const AmpAverageChart: React.FC<AverageChartProps> = ({ data: propData }) => {
                       </svg>
                     </button>
                   </div>
-                  <Text style={{ lineHeight: "2rem", color: "black" }}>
+                  {/* Insights SVG End */}
+                  <Text style={{ lineHeight: "2rem" }}>
                     {insights ? insights.self : "There is no insights"} <br />
                     {insights ? insights.competition : "There is no insights"}
                   </Text>
