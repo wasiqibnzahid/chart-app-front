@@ -825,8 +825,8 @@ const BarChart: React.FC<BarChartProps> = ({
                   <Checkbox
                     colorScheme="transparent"
                     outline="none"
-                    iconColor="white"
-                    borderColor="white"
+                    iconColor="black"
+                    borderColor="black"
                     size="lg"
                   />
                   <Select
