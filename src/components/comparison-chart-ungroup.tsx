@@ -81,9 +81,7 @@ export interface BarChartProps {
   };
   titleHeading: string;
   disableGrouping?: boolean;
-  getinsights?: any;
 }
-
 function calculatePercentageChange(num1: number, num2: number) {
   const difference = num2 - num1;
   const percentageChange = (difference / num1) * 100;
@@ -114,7 +112,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
 
   // Show and hide Menu
   const handleCheckboxChange = () => {
-    setShowRawValues(!showRawValues);
+    setShowRawValues(!showRawValues); // Toggle the state
   };
 
   useEffect(() => {
@@ -123,7 +121,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
   }, [propData]);
 
   useEffect(() => {
-    if (!showdateFilter) {
+    if (showdateFilter === false) {
       setData(propData);
     } else {
       const matchedvideosData = propData.comparison.videos.map((outerData) => {
@@ -192,6 +190,11 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
 
     let dateList = firstItem.data.map((item) => item.x);
     const dateOptions = firstItem.data.map((item) => item.x);
+    const stuff = dateList;
+    // .map((date, index) => ({
+    //   name: date,
+    //   data: items.map((item) => item.data[index].y),
+    // }));
     return {
       series: items,
       names,
@@ -206,7 +209,6 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
     removedNames,
     showAllData,
   ]);
-
   const [insightsData, setInsights] = useState<Insights>({
     notes: {
       competition: "",
@@ -227,7 +229,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       prevReqController.current.abort();
     }
     prevReqController.current = new AbortController();
-    (getinsights
+    getinsights
       ? getinsights(
           {
             start: `${quarterVal[0] > 8 ? "" : "0"}${
@@ -238,7 +240,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
             }-${selectedYear}`,
           },
           prevReqController.current.signal
-        )
+        ).then((res) => setInsights(res))
       : getLocalInsights(
           {
             start: `${quarterVal[0] > 8 ? "" : "0"}${
@@ -249,8 +251,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
             }-${selectedYear}`,
           },
           prevReqController.current.signal
-        )
-    ).then((res) => setInsights(res));
+        ).then((res) => setInsights(res));
   }, [quarterVal]);
 
   const options: ApexOptions = {
@@ -259,7 +260,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       stacked: false,
     },
     grid: {
-      show: false,
+      show: false, // Disable the grid lines
     },
     yaxis: {
       title: {
@@ -272,12 +273,13 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       },
     },
     xaxis: {
+      // categories: names,
       axisBorder: {
         show: true,
       },
       labels: {
         style: {
-          colors: ["black"],
+          colors: ["#000"],
         },
       },
     },
@@ -288,28 +290,30 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       opacity: 1,
     },
     dataLabels: {
-      enabled: showRawValues,
+      enabled: showRawValues, // Enable data labels
       style: {
         fontSize: "12px",
-        colors: ["#fff"],
+        colors: ["#fff"], // White color for visibility
       },
       formatter: function (val) {
         return val % 1 === 0 ? val.toFixed?.(0) : val.toFixed?.(2);
       },
-      offsetY: -20,
+      offsetY: -20, // Position the label above the bar
     },
     tooltip: {
       enabled: true,
       y: {
         formatter: function (val) {
-          return `${val}  units`;
+          return `${val}  units`; // Customize this to show your units
         },
       },
     },
     plotOptions: {
       bar: {
+        // horizontal: false,
+        // distributed: true,
         dataLabels: {
-          position: "top",
+          position: "top", // Show data labels on top of each bar
         },
       },
     },
@@ -347,25 +351,34 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
 
   const handleSelectDateChange = (e) => {
     const value = e.target.value;
+
+    // Check if the value is already in the dateFilter array
     if (!dateFilter.includes(value) && value) {
       setDateFilter([...dateFilter, value]);
       setSelectedDate(value);
     }
   };
-
   return (
-    <section style={{ position: "relative" }}>
+    <section
+      style={{
+        position: "relative",
+      }}
+    >
       {/* Header Text */}
       <div className="justify-content-between align-items-center">
         <div>
-          <h5 style={{ color: "black" }}>{titleHeading}</h5>
+          <h5>{titleHeading}</h5>
         </div>
         <section className="VerticalBarChart__legend">
-          {/* Control SVG */}
+          {/* control SVG Start */}
           <div>
             <button
               onClick={() => setShowControls(!showControls)}
-              style={{ outline: "none", border: "none", cursor: "pointer" }}
+              style={{
+                outline: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
             >
               <svg
                 width="20"
@@ -373,46 +386,58 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <g>
+                <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                <g
+                  id="SVGRepo_tracerCarrier"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <g id="SVGRepo_iconCarrier">
                   <path
                     d="M6 5V20"
-                    stroke="black"
+                    stroke={showControls ? "white" : "gray"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 5V20"
-                    stroke="black"
+                    stroke={showControls ? "white" : "gray"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M18 5V20"
-                    stroke="black"
+                    stroke={showControls ? "white" : "gray"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                    fill="black"
+                    fill={showControls ? "white" : "gray"}
                   />
                   <path
                     d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                    fill="black"
+                    fill={showControls ? "white" : "gray"}
                   />
                   <path
                     d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                    fill="black"
+                    fill={showControls ? "white" : "gray"}
                   />
                 </g>
               </svg>
             </button>
           </div>
-          {/* Insights SVG */}
+          {/* Control SVG End */}
+
+          {/* Insights SVG Start */}
           <div>
             <button
               onClick={() => setShowZoomIn(!showZoomIn)}
-              style={{ outline: "none", border: "none", cursor: "pointer" }}
+              style={{
+                outline: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
             >
               <svg
                 version="1.1"
@@ -422,26 +447,39 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 height="20"
                 viewBox="0 0 488.484 488.484"
                 xmlSpace="preserve"
-                fill="black"
+                fill={showZoomIn ? "white" : "gray"}
               >
-                <g>
-                  <path
-                    d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 c134.684,0,244.249-109.564,244.249-244.244C488.484,109.566,378.92,0.002,244.236,0.002z 
-                    M244.236,413.619c-93.4,0-169.38-75.979-169.38-169.379c0-93.396,75.979-169.375,169.38-169.375s169.391,75.979,169.391,169.375
-                    C413.627,337.641,337.637,413.619,244.236,413.619z"
-                  />
-                  <path
-                    d="M244.236,206.816c-14.757,0-26.619,11.962-26.619,26.73v118.709c0,14.769,11.862,26.735,26.619,26.735 
-                    c14.769,0,26.62-11.967,26.62-26.735V233.546C270.855,218.778,259.005,206.816,244.236,206.816z"
-                  />
-                  <path
-                    d="M244.236,107.893c-19.949,0-36.102,16.158-36.102,36.091c0,19.934,16.152,36.092,36.102,36.092 
-                    c19.929,0,36.081-16.158,36.081-36.092C280.316,124.051,264.165,107.893,244.236,107.893z"
-                  />
+                <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                <g
+                  id="SVGRepo_tracerCarrier"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <g id="SVGRepo_iconCarrier">
+                  <g>
+                    <g>
+                      <path
+                        d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 
+              c134.684,0,244.249-109.564,244.249-244.244C488.484,109.566,378.92,0.002,244.236,0.002z M244.236,413.619 
+              c-93.4,0-169.38-75.979-169.38-169.379c0-93.396,75.979-169.375,169.38-169.375s169.391,75.979,169.391,169.375 
+              C413.627,337.641,337.637,413.619,244.236,413.619z"
+                      />
+                      <path
+                        d="M244.236,206.816c-14.757,0-26.619,11.962-26.619,26.73v118.709c0,14.769,11.862,26.735,26.619,26.735 
+              c14.769,0,26.62-11.967,26.62-26.735V233.546C270.855,218.778,259.005,206.816,244.236,206.816z"
+                      />
+                      <path
+                        d="M244.236,107.893c-19.949,0-36.102,16.158-36.102,36.091c0,19.934,16.152,36.092,36.102,36.092 
+              c19.929,0,36.081-16.158,36.081-36.092C280.316,124.051,264.165,107.893,244.236,107.893z"
+                      />
+                    </g>
+                  </g>
                 </g>
               </svg>
             </button>
           </div>
+          {/* Insights SVG End */}
+
           {/* Dropdown */}
           <div>
             <Box>
@@ -449,14 +487,14 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 value={selectedOption}
                 onChange={(e) => setSelectedOption(e.target.value)}
                 border="2px"
-                borderColor="black"
+                borderColor="#cbd5e0" // Apply the border color
                 borderRadius="8px"
                 size="sm"
-                color="black"
+                color="white"
                 bg="transparent"
-                _hover={{ borderColor: "black" }}
-                _focus={{ borderColor: "black", boxShadow: "none" }}
-                iconColor="black"
+                _hover={{ borderColor: "gray.300" }}
+                _focus={{ borderColor: "gray.300", boxShadow: "none" }}
+                iconColor="white"
                 width="fit-content"
               >
                 {dropdownOptions.map((item) => (
@@ -471,11 +509,15 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       </div>
 
       {/* Chart */}
-      <div style={{ position: "relative" }}>
+      <div
+        style={{
+          position: "relative",
+        }}
+      >
         <Chart options={options} series={series} type="bar" height={200} />
       </div>
 
-      {/* Percentage Values above the Chart */}
+      {/* Perncentages Color Values before Chart */}
       {isChecked && (
         <div
           style={{
@@ -492,7 +534,6 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
         >
           {items.map((item) => (
             <span
-              key={item}
               style={{
                 background: isNaN(item)
                   ? "transparent"
@@ -504,22 +545,28 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 color: "#fff",
                 width: "50px",
               }}
+              // className={`${item > 0 ? "text-green" : "text-red"}`}
             >
               {!isNaN(item) ? (
                 <>
                   {item > 0 ? "▲" : "▼"}
                   {item}%
                 </>
-              ) : null}
+              ) : (
+                <></>
+              )}
             </span>
           ))}
         </div>
       )}
 
-      {/* Range Slider */}
+      {/* Range Line */}
       <div
         className="px-4 mb-3 slider-container"
-        style={{ marginTop: "3%", position: "relative" }}
+        style={{
+          marginTop: "3%",
+          position: "relative",
+        }}
       >
         <RangeSlider
           isDisabled={showAllData}
@@ -535,9 +582,15 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
           <RangeSliderThumb boxSize={3} index={0} />
           <RangeSliderThumb boxSize={3} index={1} />
         </RangeSlider>
+
         <div className="d-flex justify-content-between">
           {months.map((month) => (
-            <span key={month} style={{ color: "black" }}>
+            <span
+              key={month}
+              style={{
+                color: "#cbd5e0",
+              }}
+            >
               {month}
             </span>
           ))}
@@ -562,7 +615,44 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
         </div>
       </div>
 
-      {/* Controls and Zoom Section */}
+      {/* Open When user click on Zoom in then show this */}
+
+      {/* Companies Checkbox */}
+      {showControls && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "12px",
+            color: "#fff",
+            gap: "0.75rem",
+            marginBottom: "1rem",
+            flexWrap: "wrap",
+          }}
+        >
+          {allNames.map((name, i) => (
+            <span
+              key={name + i}
+              className="checkbox-container-sm d-flex justify-content-center align-items-center"
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              <Checkbox
+                size="sm"
+                colorScheme="purple"
+                isChecked={!removedNames.includes(name)}
+                id={`ASD-${name}`}
+                onChange={() => onClickHandler(name)}
+              />
+              <label htmlFor={`ASD-${name}`}>{name}</label>
+            </span>
+          ))}
+        </div>
+      )}
+      {/* Checkbox for row, perncetage and show all data */}
+
       <section
         style={{
           marginTop: "3%",
@@ -570,21 +660,22 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
           transition: "max-height 0.7s ease",
         }}
       >
-        <Box p={0} borderRadius="md" color="black">
+        <Box p={0} borderRadius="md" color="white">
           {showControls && (
             <>
-              {/* Control Options */}
+              {/* Check Box Row's */}
               <section
                 style={{
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "start",
-                  alignItems: "center",
+                  alignItems: "start",
+                  textAlign: "center",
                   gap: 5,
                   marginBottom: "2%",
                 }}
               >
-                {/* Control SVG */}
+                {/* control SVG Start */}
                 <div>
                   <button
                     onClick={() => setShowControls(!showControls)}
@@ -600,52 +691,72 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       viewBox="0 0 24 24"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                      <g
+                        id="SVGRepo_tracerCarrier"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <g id="SVGRepo_iconCarrier">
                         <path
                           d="M6 5V20"
-                          stroke="black"
+                          stroke={showControls ? "white" : "gray"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M12 5V20"
-                          stroke="black"
+                          stroke={showControls ? "white" : "gray"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M18 5V20"
-                          stroke="black"
+                          stroke={showControls ? "white" : "gray"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                          fill="black"
+                          fill={showControls ? "white" : "gray"}
                         />
                         <path
                           d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                          fill="black"
+                          fill={showControls ? "white" : "gray"}
                         />
                         <path
                           d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                          fill="black"
+                          fill={showControls ? "white" : "gray"}
                         />
                       </g>
                     </svg>
                   </button>
                 </div>
-                {/* Control Checkboxes */}
+                {/* Control SVG End */}
                 <div>
                   <Stack direction="row" spacing={5} align="center" mb={0}>
+                    {/* <Checkbox
+                      isDisabled={names.length < 9}
+                      id="x-scheme"
+                      isChecked={isChecked}
+                      onChange={(e) => setIsChecked(e.target.checked)}
+                      colorScheme="transparent"
+                      outline="none"
+                      iconColor="white"
+                      borderColor="white"
+                      size="lg"
+                    >
+                      Show percentages
+                    </Checkbox> */}
+
                     <Checkbox
                       id="show-all-data-2"
                       isChecked={showAllData}
                       onChange={(e) => setShowAllData(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="black"
-                      borderColor="black"
+                      iconColor="white"
+                      borderColor="white"
                       size="lg"
                     >
                       Show All Data
@@ -656,8 +767,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       onChange={handleCheckboxChange}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="black"
-                      borderColor="black"
+                      iconColor="white"
+                      borderColor="white"
                       size="lg"
                     >
                       Show Raw Values
@@ -668,8 +779,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       onChange={(e) => setShowDateFilter(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="black"
-                      borderColor="black"
+                      iconColor="white"
+                      borderColor="white"
                       size="lg"
                     >
                       Show Date Filter
@@ -677,6 +788,29 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                   </Stack>
                 </div>
               </section>
+
+              {/* <HStack spacing={4} mb={8}>
+                  <Checkbox
+                    colorScheme="transparent"
+                    outline="none"
+                    iconColor="white"
+                    borderColor="white"
+                    size="lg"
+                  />
+                  <Select
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="custom-select"
+                  >
+                    <option value="" disabled>Select Date</option>
+                    {dateOptions.map((date) => (
+                      <option key={date} value={date}>
+                        {date}
+                      </option>
+                    ))}
+                  </Select>
+
+                </HStack> */}
 
               {showdateFilter && (
                 <>
@@ -697,14 +831,13 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                   </Box>
                   <HStack mb={8} mx={5}>
                     <Select
-                      value={selectedDate ?? ""}
+                      value={selectedDate}
                       onChange={handleSelectDateChange}
                       style={{
                         height: "30px",
                         fontSize: "14px",
                         padding: "4px",
                         borderRadius: "5px",
-                        color: "black",
                       }}
                     >
                       {propData.weekly.data?.[1].data.map((date) => (
@@ -720,72 +853,84 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                   </HStack>
                 </>
               )}
+            </>
+          )}
 
-              {showZoomIn && (
-                <section
+          {showZoomIn && (
+            <section
+              style={{
+                transition: "max-height 0.7s ease",
+                maxHeight: showZoomIn ? "200px" : "0px",
+              }}
+            >
+              <Stack spacing={2} mb={0}>
+                <HStack
                   style={{
-                    transition: "max-height 0.7s ease",
-                    maxHeight: showZoomIn ? "200px" : "0px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "start",
+                    textAlign: "start",
+                    alignItems: "start",
                   }}
                 >
-                  <Stack spacing={2} mb={0}>
-                    <HStack
+                  {/* Insights SVG Start */}
+                  <div>
+                    <button
+                      onClick={() => setShowZoomIn(!showZoomIn)}
                       style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "start",
-                        textAlign: "start",
-                        alignItems: "center",
+                        outline: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        marginTop: "50%",
                       }}
                     >
-                      {/* Insights SVG */}
-                      <div>
-                        <button
-                          onClick={() => setShowZoomIn(!showZoomIn)}
-                          style={{
-                            outline: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            marginTop: "50%",
-                          }}
-                        >
-                          <svg
-                            version="1.1"
-                            id="Capa_1"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 488.484 488.484"
-                            xmlSpace="preserve"
-                            fill="black"
-                          >
+                      <svg
+                        version="1.1"
+                        id="Capa_1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 488.484 488.484"
+                        xmlSpace="preserve"
+                        fill={showZoomIn ? "white" : "gray"}
+                      >
+                        <g id="SVGRepo_bgCarrier" strokeWidth="0" />
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <g id="SVGRepo_iconCarrier">
+                          <g>
                             <g>
                               <path
-                                d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 c134.684,0,244.249-109.564,244.249-244.244C488.484,109.566,378.92,0.002,244.236,0.002z 
-                                M244.236,413.619c-93.4,0-169.38-75.979-169.38-169.379c0-93.396,75.979-169.375,169.38-169.375s169.391,75.979,169.391,169.375
-                                C413.627,337.641,337.637,413.619,244.236,413.619z"
+                                d="M244.236,0.002C109.562,0.002,0,109.565,0,244.238c0,134.679,109.563,244.244,244.236,244.244 
+              c134.684,0,244.249-109.564,244.249-244.244C488.484,109.566,378.92,0.002,244.236,0.002z M244.236,413.619 
+              c-93.4,0-169.38-75.979-169.38-169.379c0-93.396,75.979-169.375,169.38-169.375s169.391,75.979,169.391,169.375 
+              C413.627,337.641,337.637,413.619,244.236,413.619z"
                               />
                               <path
                                 d="M244.236,206.816c-14.757,0-26.619,11.962-26.619,26.73v118.709c0,14.769,11.862,26.735,26.619,26.735 
-                                c14.769,0,26.62-11.967,26.62-26.735V233.546C270.855,218.778,259.005,206.816,244.236,206.816z"
+              c14.769,0,26.62-11.967,26.62-26.735V233.546C270.855,218.778,259.005,206.816,244.236,206.816z"
                               />
                               <path
                                 d="M244.236,107.893c-19.949,0-36.102,16.158-36.102,36.091c0,19.934,16.152,36.092,36.102,36.092 
-                                c19.929,0,36.081-16.158,36.081-36.092C280.316,124.051,264.165,107.893,244.236,107.893z"
+              c19.929,0,36.081-16.158,36.081-36.092C280.316,124.051,264.165,107.893,244.236,107.893z"
                               />
                             </g>
-                          </svg>
-                        </button>
-                      </div>
-                      <Text style={{ lineHeight: "2rem", color: "black" }}>
-                        {insights ? insights.self : "There is no insights"} <br />
-                        {insights ? insights.competition : "There is no insights"}
-                      </Text>
-                    </HStack>
-                  </Stack>
-                </section>
-              )}
-            </>
+                          </g>
+                        </g>
+                      </svg>
+                    </button>
+                  </div>
+                  {/* Insights SVG End */}
+                  <Text style={{ lineHeight: "2rem" }}>
+                    {insights ? insights.self : "There is no insights"} <br />
+                    {insights ? insights.competition : "There is no insights"}
+                  </Text>
+                </HStack>
+              </Stack>
+            </section>
           )}
         </Box>
       </section>
