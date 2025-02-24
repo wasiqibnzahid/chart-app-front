@@ -121,11 +121,11 @@ const THRESHOLDS = {
 
 // Colors (originally for traces)
 const COLORS_TV_AZTECA = {
-    phone: "#0000FF",   // Blue for phone
+    phone: "#87CEFA",   // Blue for phone
     desktop: "#87CEFA", // Light blue for desktop
 };
 const COLORS_COMPETITORS = {
-    phone: "#0000FF",   // Blue for phone
+    phone: "#87CEFA",   // Blue for phone
     desktop: "#87CEFA", // Light blue for desktop
 };
 
