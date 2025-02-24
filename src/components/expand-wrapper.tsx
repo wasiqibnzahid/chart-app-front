@@ -23,7 +23,7 @@ export const ExpandWrapper: React.FC<PropsWithChildren> = ({ children }) => {
           <ModalOverlay></ModalOverlay>
 
           <ModalContent
-            backgroundColor="transparent"
+            backgroundColor="black"
             style={{ background: "orange !important" }}
           >
             <div
