@@ -293,7 +293,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
       enabled: showRawValues, // Enable data labels
       style: {
         fontSize: "12px",
-        colors: ["#fff"], // White color for visibility
+        colors: ["black"], // White color for visibility
       },
       formatter: function (val) {
         return val % 1 === 0 ? val.toFixed?.(0) : val.toFixed?.(2);
@@ -395,33 +395,33 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 <g id="SVGRepo_iconCarrier">
                   <path
                     d="M6 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke={showControls ? "black" : "black"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke={showControls ? "black" : "black"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M18 5V20"
-                    stroke={showControls ? "white" : "gray"}
+                    stroke={showControls ? "black" : "black"}
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill={showControls ? "black" : "black"}
                   />
                   <path
                     d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill={showControls ? "black" : "black"}
                   />
                   <path
                     d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                    fill={showControls ? "white" : "gray"}
+                    fill={showControls ? "black" : "black"}
                   />
                 </g>
               </svg>
@@ -447,7 +447,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 height="20"
                 viewBox="0 0 488.484 488.484"
                 xmlSpace="preserve"
-                fill={showZoomIn ? "white" : "gray"}
+                fill={showZoomIn ? "black" : "black"}
               >
                 <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                 <g
@@ -490,11 +490,11 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                 borderColor="#cbd5e0" // Apply the border color
                 borderRadius="8px"
                 size="sm"
-                color="white"
+                color="black"
                 bg="transparent"
                 _hover={{ borderColor: "gray.300" }}
                 _focus={{ borderColor: "gray.300", boxShadow: "none" }}
-                iconColor="white"
+                iconColor="black"
                 width="fit-content"
               >
                 {dropdownOptions.map((item) => (
@@ -660,7 +660,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
           transition: "max-height 0.7s ease",
         }}
       >
-        <Box p={0} borderRadius="md" color="white">
+        <Box p={0} borderRadius="md" color="black">
           {showControls && (
             <>
               {/* Check Box Row's */}
@@ -700,33 +700,33 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       <g id="SVGRepo_iconCarrier">
                         <path
                           d="M6 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke={showControls ? "black" : "black"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M12 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke={showControls ? "black" : "black"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M18 5V20"
-                          stroke={showControls ? "white" : "gray"}
+                          stroke={showControls ? "black" : "black"}
                           strokeWidth="2"
                           strokeLinecap="round"
                         />
                         <path
                           d="M8.5 16C8.5 17.3807 7.38071 18.5 6 18.5C4.61929 18.5 3.5 17.3807 3.5 16C3.5 14.6193 4.61929 13.5 6 13.5C7.38071 13.5 8.5 14.6193 8.5 16Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill={showControls ? "black" : "black"}
                         />
                         <path
                           d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill={showControls ? "black" : "black"}
                         />
                         <path
                           d="M20.5 16C20.5 17.3807 19.3807 18.5 18 18.5C16.6193 18.5 15.5 17.3807 15.5 16C15.5 14.6193 16.6193 13.5 18 13.5C19.3807 13.5 20.5 14.6193 20.5 16Z"
-                          fill={showControls ? "white" : "gray"}
+                          fill={showControls ? "black" : "black"}
                         />
                       </g>
                     </svg>
@@ -742,8 +742,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       onChange={(e) => setIsChecked(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show percentages
@@ -755,8 +755,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       onChange={(e) => setShowAllData(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show All Data
@@ -767,8 +767,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       onChange={handleCheckboxChange}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show Raw Values
@@ -779,8 +779,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                       onChange={(e) => setShowDateFilter(e.target.checked)}
                       colorScheme="transparent"
                       outline="none"
-                      iconColor="white"
-                      borderColor="white"
+                      iconColor="black"
+                      borderColor="black"
                       size="lg"
                     >
                       Show Date Filter
@@ -793,8 +793,8 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                   <Checkbox
                     colorScheme="transparent"
                     outline="none"
-                    iconColor="white"
-                    borderColor="white"
+                    iconColor="black"
+                    borderColor="black"
                     size="lg"
                   />
                   <Select
@@ -892,7 +892,7 @@ const ComparisonNoGroup: React.FC<BarChartProps> = ({
                         height="20"
                         viewBox="0 0 488.484 488.484"
                         xmlSpace="preserve"
-                        fill={showZoomIn ? "white" : "gray"}
+                        fill={showZoomIn ? "black" : "black"}
                       >
                         <g id="SVGRepo_bgCarrier" strokeWidth="0" />
                         <g
