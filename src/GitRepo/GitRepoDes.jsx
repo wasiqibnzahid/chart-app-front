@@ -980,4 +980,4 @@ const DevelopersDashboard = () => {
   );
 };
 
-export default GitRepoAdmin;
+export default DevelopersDashboard;
