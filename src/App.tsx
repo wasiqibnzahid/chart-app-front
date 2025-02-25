@@ -21,7 +21,7 @@ import LoginPage from './LoginPage';
 
 // ─── ADDED: Import GitRepo & GitRepoAdmin ─────────────────────────────────────
 import GitRepo from './GitRepo/GitRepo2';
-import GitRepoAdmin from './GitRepo/GitRepoDes';
+import GitRepoAdmin from './GitRepo/GitRepoAdmin';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
