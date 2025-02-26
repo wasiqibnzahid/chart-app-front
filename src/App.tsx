@@ -1,43 +1,54 @@
 // src/App.tsx
 import GeneralApp from "./Pages/GeneralApp";
-import React, { useState, useEffect } from 'react';
-import { ChakraProvider, Box } from '@chakra-ui/react';
+import React, { useState, useEffect } from "react";
+import { ChakraProvider, Box } from "@chakra-ui/react";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   Navigate,
-} from 'react-router-dom';
+} from "react-router-dom";
+import { FaSun, FaMoon } from "react-icons/fa";
 
-import HomeAdmin from './HomeAdmin/HomeAdmin';
-import NewPageAdmin from './NewPageAdmin/NewPageAdmin';
-import General from './General/General';
-import RequestCountGraph from './RequestCountGraph/RequestCountGraph';
-import DataTable from './DataTable/DataTable';
-import NewPage from './NewPage/NewPage';
-import LandingPage from './LandingPage/LandingPage';
-import MainLayout from './layouts/MainLayout';
-import LoginPage from './LoginPage';
+import HomeAdmin from "./HomeAdmin/HomeAdmin";
+import NewPageAdmin from "./NewPageAdmin/NewPageAdmin";
+import General from "./General/General";
+import RequestCountGraph from "./RequestCountGraph/RequestCountGraph";
+import DataTable from "./DataTable/DataTable";
+import NewPage from "./NewPage/NewPage";
+import LandingPage from "./LandingPage/LandingPage";
+import MainLayout from "./layouts/MainLayout";
+import LoginPage from "./LoginPage";
 
 // ─── ADDED: Import GitRepo & GitRepoAdmin ─────────────────────────────────────
-import GitRepo from './GitRepo/GitRepo2';
-import GitRepoAdmin from './GitRepo/GitRepoAdmin';
+import GitRepo from "./GitRepo/GitRepo2";
+import GitRepoAdmin from "./GitRepo/GitRepoAdmin";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('isAuthenticated');
-    setIsAuthenticated(authStatus === 'true');
+    const authStatus = localStorage.getItem("isAuthenticated");
+    setIsAuthenticated(authStatus === "true");
   }, []);
 
+  useEffect(() => {
+    // Toggle the dark-mode class on the body based on darkMode state
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [darkMode]);
+
   const handleLogin = () => {
-    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem("isAuthenticated", "true");
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem("isAuthenticated");
     setIsAuthenticated(false);
   };
 
@@ -46,9 +57,24 @@ const App: React.FC = () => {
       <Box
         width="100vw"
         minHeight="100vh"
-        bg="white"
-        color="black"
+        bg="var(--main-bg)"
+        color="var(--main-text)"
+        position="relative"
       >
+        {/* Dark Mode Toggle Button */}
+        <Box position="fixed" top="10px" right="10px" zIndex={10000}>
+          <Box
+            as="button"
+            onClick={() => setDarkMode(!darkMode)}
+            background="transparent"
+            border="none"
+            cursor="pointer"
+            fontSize="24px"
+            color="var(--main-text)"
+          >
+            {darkMode ? <FaSun /> : <FaMoon />}
+          </Box>
+        </Box>
         <Router>
           {isAuthenticated ? (
             <AuthenticatedRoutes handleLogout={handleLogout} />
@@ -61,7 +87,9 @@ const App: React.FC = () => {
   );
 };
 
-const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({ handleLogout }) => (
+const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({
+  handleLogout,
+}) => (
   <Routes>
     <Route path="/login" element={<Navigate to="/landing" replace />} />
     <Route path="/" element={<Navigate to="/landing" replace />} />
@@ -104,7 +132,9 @@ const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({ handleLog
   </Routes>
 );
 
-const UnauthenticatedRoutes: React.FC<{ handleLogin: () => void }> = ({ handleLogin }) => (
+const UnauthenticatedRoutes: React.FC<{ handleLogin: () => void }> = ({
+  handleLogin,
+}) => (
   <Routes>
     <Route path="*" element={<Navigate to="/login" replace />} />
     <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
