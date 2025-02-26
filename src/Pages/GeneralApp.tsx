@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { FaSun, FaMoon } from "react-icons/fa"; // React Icons for dark/light mode
+import React, { useState } from "react";
 // Components
 import GeneralOverview from "./GeneralOverview";
 import VerticalOverview from "./VerticalOverview";
@@ -23,59 +22,16 @@ import ImageData from "./ImageData";
 const GeneralApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
 
-  // Update CSS variables and add/remove the dark mode class on the body
-  useEffect(() => {
-    if (darkMode) {
-      // Dark Mode Variables
-      document.documentElement.style.setProperty(
-        "--main-bg",
-        "linear-gradient(90deg, #000000, #7800ff)"
-      );
-      document.documentElement.style.setProperty("--main-text", "white");
-      document.body.classList.add("dark-mode");
-    } else {
-      // Light Mode Variables
-      document.documentElement.style.setProperty("--main-bg", "white");
-      document.documentElement.style.setProperty("--main-text", "#000");
-      document.body.classList.remove("dark-mode");
-    }
-  }, [darkMode]);
-
-  // Common style for icons
-  // (When using filter: brightness(0) saturate(100%), the icons appear black in light mode.
-  //  If you want them white in dark mode, you can dynamically change the filter or just remove it.)
+  // Common style for icons to ensure they appear black
   const iconStyle = {
     marginRight: "10px",
-    filter: "brightness(0) saturate(100%)", 
+    filter: "brightness(0) saturate(100%)",
   };
 
   return (
-    <div
-      className="app-container flex"
-      // Text color changes based on darkMode
-      style={{ color: darkMode ? "white" : "black" }}
-    >
-      {/* Dark Mode Toggle Button (moon when dark, sun when light) */}
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        style={{
-          position: "fixed",
-          top: "10px",
-          right: "10px",
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          zIndex: 10000,
-          color: darkMode ? "white" : "black",
-          fontSize: "24px",
-        }}
-      >
-        {darkMode ? <FaMoon /> : <FaSun />}
-      </button>
-
-      {/* Fixed message at the top center */}
+    <div className="app-container flex" style={{ color: "black" }}>
+      {/* Fixed message at the top center, no interference (pointerEvents: "none") */}
       <div
         style={{
           position: "fixed",
@@ -87,10 +43,9 @@ const GeneralApp: React.FC = () => {
           pointerEvents: "none",
         }}
       >
-        Current week calculations are incomplete due to sitemap modifications
+        Current week calculations are not yet available due to sitemap modifications
       </div>
 
-      {/* Sidebar */}
       <div className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <div className="logo-container">
@@ -186,11 +141,13 @@ const GeneralApp: React.FC = () => {
         </button>
       </div>
 
-      {/* Sidebar toggle button */}
       <button
         className="toggle-sidebar"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        style={{ border: "none", outline: "none" }}
+        style={{
+          border: "none",
+          outline: "none",
+        }}
       >
         {isSidebarOpen ? (
           <FontAwesomeIcon icon={faChevronLeft} />
@@ -199,7 +156,6 @@ const GeneralApp: React.FC = () => {
         )}
       </button>
 
-      {/* Main content area */}
       <div className="content">
         <section
           className={`ContainerSetting ${
