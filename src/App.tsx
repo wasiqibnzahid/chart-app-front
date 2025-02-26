@@ -61,7 +61,7 @@ const App: React.FC = () => {
         color="var(--main-text)"
         position="relative"
       >
-        {/* Dark Mode Toggle Button using inline SVG */}
+        {/* Dark Mode Toggle Button without an icon */}
         <Box position="fixed" top="10px" right="10px" zIndex={10000}>
           <button
             onClick={() => setDarkMode(!darkMode)}
@@ -74,29 +74,7 @@ const App: React.FC = () => {
               padding: 0,
             }}
           >
-            {darkMode ? (
-              // Sun icon: When dark mode is active, show the sun icon to switch back to light mode.
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                height="24"
-                width="24"
-                viewBox="0 0 24 24"
-              >
-                <path d="M6.76 4.84l-1.8-1.79L2 7.01l1.79 1.79 2.97-2.97zM1 13h3v-2H1v2zm10-9h-2v3h2V4zm7.24 1.05l-2.97 2.97 1.79 1.79 2.97-2.97-1.79-1.79zM17 11v2h3v-2h-3zm-5 5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zM12 8a4 4 0 100 8 4 4 0 000-8z" />
-              </svg>
-            ) : (
-              // Moon icon: When dark mode is off, show the moon icon to switch to dark mode.
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                height="24"
-                width="24"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2a9.93 9.93 0 00-7.07 2.93A10 10 0 0012 22a10 10 0 008.07-15.07A9.93 9.93 0 0012 2zm0 18a8 8 0 01-6.4-12.8 8.001 8.001 0 0010.73 10.73A7.963 7.963 0 0112 20z" />
-              </svg>
-            )}
+            {/* Icon removed as requested */}
           </button>
         </Box>
 
