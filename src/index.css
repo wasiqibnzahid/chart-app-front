@@ -11,6 +11,7 @@ body.dark-mode {
   --main-text: white;
 }
 
+/* Base Body */
 body {
   overflow-x: hidden;
   background: var(--main-bg) !important;
@@ -20,6 +21,32 @@ body {
   height: 100%;
   transition: background 0.5s ease, color 0.5s ease;
 }
+
+/* ===========================
+   Dark Mode Box Overrides
+   =========================== */
+body.dark-mode .box,
+body.dark-mode .boxHeatmap,
+body.dark-mode .sparkboxes .box,
+body.dark-mode .sparkboxes .box1,
+body.dark-mode .sparkboxes .box2,
+body.dark-mode .sparkboxes .box3,
+body.dark-mode .sparkboxes .box4 {
+  background: var(--main-bg) !important; /* The gradient in dark mode */
+  border-color: #fff !important;         /* White border for clarity */
+  color: var(--main-text) !important;    /* White text in dark mode */
+}
+
+/* If you want the active tab button to also be gradient in dark mode */
+body.dark-mode .tab-button.active {
+  background: var(--main-bg) !important; /* gradient background */
+  border: 3px solid #fff !important;     /* white border */
+}
+
+/* 
+  Everything below here is your existing CSS code, unchanged 
+  (except for the added dark-mode overrides above).
+*/
 
 /* =======================================================
    Your Existing CSS Code
@@ -154,7 +181,13 @@ body {
   background: #f3f4fa !important;
 }
 
-h1, h2, h3, h4, h5, h6, strong {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong {
   font-weight: 600 !important;
 }
 
@@ -164,7 +197,7 @@ h1, h2, h3, h4, h5, h6, strong {
   margin: 0 auto !important;
 }
 
-/* Box Styles (remain white) */
+/* Box Styles (Light Mode) */
 .box {
   background: white;
   padding: 25px 20px;
@@ -207,7 +240,7 @@ h1, h2, h3, h4, h5, h6, strong {
   color: inherit !important;
 }
 
-/* For sparkboxes, replace gradient backgrounds with white */
+/* For sparkboxes, replace gradient backgrounds with white in light mode */
 .sparkboxes .box1,
 .sparkboxes .box2,
 .sparkboxes .box3,
@@ -218,7 +251,9 @@ h1, h2, h3, h4, h5, h6, strong {
 /* Text and icon colors – using “inherit” so they change with the mode */
 text,
 .apexcharts-legend-text,
-h4, h5, li {
+h4,
+h5,
+li {
   color: inherit !important;
   fill: inherit !important;
 }
