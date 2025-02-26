@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { FaSun, FaMoon } from "react-icons/fa"; // Import the icons
 // Components
 import GeneralOverview from "./GeneralOverview";
 import VerticalOverview from "./VerticalOverview";
@@ -22,15 +23,48 @@ import ImageData from "./ImageData";
 const GeneralApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
-  // Common style for icons to ensure they appear black
+  // When darkMode changes, update the CSS variables used in your styles.
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.style.setProperty(
+        "--main-bg",
+        "linear-gradient(90deg, #000000, #7800ff)"
+      );
+      document.documentElement.style.setProperty("--main-text", "white");
+    } else {
+      document.documentElement.style.setProperty("--main-bg", "white");
+      document.documentElement.style.setProperty("--main-text", "#000");
+    }
+  }, [darkMode]);
+
+  // Common style for icons to ensure they appear as intended
   const iconStyle = {
     marginRight: "10px",
     filter: "brightness(0) saturate(100%)",
   };
 
   return (
-    <div className="app-container flex" style={{ color: "black" }}>
+    <div className="app-container flex" style={{ color: darkMode ? "white" : "black" }}>
+      {/* Dark Mode Toggle Button */}
+      <button
+        onClick={() => setDarkMode(!darkMode)}
+        style={{
+          position: "fixed",
+          top: "10px",
+          right: "10px",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          zIndex: 10000,
+          color: darkMode ? "white" : "black",
+          fontSize: "24px"
+        }}
+      >
+        {darkMode ? <FaSun /> : <FaMoon />}
+      </button>
+
       {/* Fixed message at the top center, no interference (pointerEvents: "none") */}
       <div
         style={{
