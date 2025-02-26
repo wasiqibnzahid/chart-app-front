@@ -8,7 +8,9 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { FaSun, FaMoon } from "react-icons/fa";
+
+// Custom half-sun/half-moon icon
+import halfMoonSunIcon from "./assets/halfMoonSunIcon.svg";
 
 import HomeAdmin from "./HomeAdmin/HomeAdmin";
 import NewPageAdmin from "./NewPageAdmin/NewPageAdmin";
@@ -28,13 +30,14 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
+  // Check localStorage for authentication on mount
   useEffect(() => {
     const authStatus = localStorage.getItem("isAuthenticated");
     setIsAuthenticated(authStatus === "true");
   }, []);
 
+  // Toggle dark-mode class on body for the global CSS
   useEffect(() => {
-    // Toggle the dark-mode class on the body based on darkMode state
     if (darkMode) {
       document.body.classList.add("dark-mode");
     } else {
@@ -57,24 +60,39 @@ const App: React.FC = () => {
       <Box
         width="100vw"
         minHeight="100vh"
+        // Use your CSS variables so dark-mode overrides it
         bg="var(--main-bg)"
         color="var(--main-text)"
         position="relative"
       >
-        {/* Dark Mode Toggle Button */}
+        {/* Single custom icon for Dark Mode Toggle */}
         <Box position="fixed" top="10px" right="10px" zIndex={10000}>
-          <Box
-            as="button"
+          <button
             onClick={() => setDarkMode(!darkMode)}
-            background="transparent"
-            border="none"
-            cursor="pointer"
-            fontSize="24px"
-            color="var(--main-text)"
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              width: "40px",
+              height: "40px",
+              padding: 0,
+            }}
           >
-            {darkMode ? <FaSun /> : <FaMoon />}
-          </Box>
+            <img
+              src={halfMoonSunIcon}
+              alt="Toggle Dark Mode"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                // Optional rotation or styling in dark mode:
+                transform: darkMode ? "rotate(180deg)" : "rotate(0deg)",
+                transition: "transform 0.3s ease",
+              }}
+            />
+          </button>
         </Box>
+
         <Router>
           {isAuthenticated ? (
             <AuthenticatedRoutes handleLogout={handleLogout} />
@@ -95,20 +113,16 @@ const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({
     <Route path="/" element={<Navigate to="/landing" replace />} />
 
     {/* Landing Page */}
-    <Route
-      path="/landing"
-      element={<LandingPage handleLogout={handleLogout} />}
-    />
+    <Route path="/landing" element={<LandingPage handleLogout={handleLogout} />} />
 
     {/* Admin Routes */}
     <Route path="/ADMIN-PopularObjects" element={<HomeAdmin />} />
     <Route path="/ADMIN-DIGITAL-CALENDAR" element={<NewPageAdmin />} />
     <Route path="/Digital-Calendar" element={<NewPage />} />
 
-    {/* ─── ADDED: Git Repo routes ───────────────────────────────────────────── */}
+    {/* Git Repo routes */}
     <Route path="/git-repo" element={<GitRepo />} />
     <Route path="/ADMIN-GitRepo" element={<GitRepoAdmin />} />
-    {/* ──────────────────────────────────────────────────────────────────────── */}
 
     {/* Additional Authenticated Page */}
     <Route path="/general-app" element={<GeneralApp />} />
