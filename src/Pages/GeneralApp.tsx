@@ -49,7 +49,7 @@ const GeneralApp: React.FC = () => {
 
   return (
     <div className="app-container flex" style={{ color: darkMode ? "white" : "black" }}>
-      {/* Dark Mode Toggle Button */}
+      {/* Dark Mode Toggle Button (icon removed) */}
       <button
         onClick={() => setDarkMode(!darkMode)}
         style={{
@@ -64,7 +64,7 @@ const GeneralApp: React.FC = () => {
           fontSize: "24px",
         }}
       >
-        {darkMode ? <FaSun /> : <FaMoon />}
+        {/* Icon removed from here */}
       </button>
 
       {/* Fixed message at the top center */}
