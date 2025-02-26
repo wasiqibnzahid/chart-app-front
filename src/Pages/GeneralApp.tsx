@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaSun, FaMoon } from "react-icons/fa"; // Import the icons
+import { FaSun, FaMoon } from "react-icons/fa"; // React Icons for dark/light mode
 // Components
 import GeneralOverview from "./GeneralOverview";
 import VerticalOverview from "./VerticalOverview";
@@ -25,7 +25,7 @@ const GeneralApp: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
-  // When darkMode changes, update the CSS variables used in your styles.
+  // Update CSS variables and add/remove the dark mode class on the body
   useEffect(() => {
     if (darkMode) {
       document.documentElement.style.setProperty(
@@ -33,13 +33,15 @@ const GeneralApp: React.FC = () => {
         "linear-gradient(90deg, #000000, #7800ff)"
       );
       document.documentElement.style.setProperty("--main-text", "white");
+      document.body.classList.add("dark-mode");
     } else {
       document.documentElement.style.setProperty("--main-bg", "white");
       document.documentElement.style.setProperty("--main-text", "#000");
+      document.body.classList.remove("dark-mode");
     }
   }, [darkMode]);
 
-  // Common style for icons to ensure they appear as intended
+  // Common style for icons (unchanged for light mode)
   const iconStyle = {
     marginRight: "10px",
     filter: "brightness(0) saturate(100%)",
@@ -59,13 +61,13 @@ const GeneralApp: React.FC = () => {
           cursor: "pointer",
           zIndex: 10000,
           color: darkMode ? "white" : "black",
-          fontSize: "24px"
+          fontSize: "24px",
         }}
       >
         {darkMode ? <FaSun /> : <FaMoon />}
       </button>
 
-      {/* Fixed message at the top center, no interference (pointerEvents: "none") */}
+      {/* Fixed message at the top center */}
       <div
         style={{
           position: "fixed",
@@ -94,94 +96,49 @@ const GeneralApp: React.FC = () => {
           className={`tab-button ${activeTab === 0 ? "active" : ""}`}
           onClick={() => setActiveTab(0)}
         >
-          <img
-            src={General}
-            height={10}
-            width={20}
-            style={iconStyle}
-            alt="General Icon"
-          />{" "}
-          General Overview
+          <img src={General} height={10} width={20} style={iconStyle} alt="General Icon" /> General Overview
         </button>
 
         <button
           className={`tab-button ${activeTab === 1 ? "active" : ""}`}
           onClick={() => setActiveTab(1)}
         >
-          <img
-            src={Vertical}
-            height={10}
-            width={20}
-            style={iconStyle}
-            alt="Vertical Icon"
-          />{" "}
-          Vertical Overview
+          <img src={Vertical} height={10} width={20} style={iconStyle} alt="Vertical Icon" /> Vertical Overview
         </button>
 
         <button
           className={`tab-button ${activeTab === 2 ? "active" : ""}`}
           onClick={() => setActiveTab(2)}
         >
-          <img
-            src={Local}
-            height={10}
-            width={20}
-            style={iconStyle}
-            alt="Local Icon"
-          />{" "}
-          Local Overview
+          <img src={Local} height={10} width={20} style={iconStyle} alt="Local Icon" /> Local Overview
         </button>
 
         <button
           className={`tab-button ${activeTab === 3 ? "active" : ""}`}
           onClick={() => setActiveTab(3)}
         >
-          <img
-            src={ampIcon}
-            height={10}
-            width={20}
-            style={iconStyle}
-            alt="AMP Icon"
-          />{" "}
-          AMP Overview
+          <img src={ampIcon} height={10} width={20} style={iconStyle} alt="AMP Icon" /> AMP Overview
         </button>
 
         <button
           className={`tab-button ${activeTab === 4 ? "active" : ""}`}
           onClick={() => setActiveTab(4)}
         >
-          <img
-            src={testIcon}
-            height={10}
-            width={20}
-            style={iconStyle}
-            alt="Test Manager Icon"
-          />{" "}
-          Test Manager
+          <img src={testIcon} height={10} width={20} style={iconStyle} alt="Test Manager Icon" /> Test Manager
         </button>
 
         <button
           className={`tab-button ${activeTab === 5 ? "active" : ""}`}
           onClick={() => setActiveTab(5)}
         >
-          <img
-            src={ImageIcon}
-            height={10}
-            width={20}
-            style={iconStyle}
-            alt="Gallery Icon"
-          />{" "}
-          Gallery
+          <img src={ImageIcon} height={10} width={20} style={iconStyle} alt="Gallery Icon" /> Gallery
         </button>
       </div>
 
       <button
         className="toggle-sidebar"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        style={{
-          border: "none",
-          outline: "none",
-        }}
+        style={{ border: "none", outline: "none" }}
       >
         {isSidebarOpen ? (
           <FontAwesomeIcon icon={faChevronLeft} />
@@ -192,9 +149,7 @@ const GeneralApp: React.FC = () => {
 
       <div className="content">
         <section
-          className={`ContainerSetting ${
-            isSidebarOpen ? "sidebar-open" : "sidebar-closed"
-          }`}
+          className={`ContainerSetting ${isSidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
         >
           {activeTab === 0 && <GeneralOverview />}
           {activeTab === 1 && <VerticalOverview />}
