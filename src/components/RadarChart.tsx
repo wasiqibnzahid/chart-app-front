@@ -20,26 +20,13 @@ ChartJS.register(
   Legend
 );
 
-/**
- * Props:
- * - title: string
- * - labels: string[]
- * - dataSets: { [key: string]: { [timeFrame: string]: number[] } }
- * - darkMode?: boolean
- */
-const RadarChart = ({ title, labels, dataSets, darkMode = false }) => {
+const RadarChart = ({ title, labels, dataSets }) => {
   const [timeFrame, setTimeFrame] = useState("Week");
 
-  // For convenience, pick your text & line colors based on darkMode
-  const textColor = darkMode ? "white" : "black";
-  const lineColor = darkMode ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.8)";
-
-  // Extract the relevant data from dataSets
   const generalData = dataSets["General"][timeFrame];
   const videoData = dataSets["Video"][timeFrame];
   const notaData = dataSets["Nota"][timeFrame];
 
-  // Build your chart data object
   const data = {
     labels,
     datasets: [
@@ -71,7 +58,6 @@ const RadarChart = ({ title, labels, dataSets, darkMode = false }) => {
     ],
   };
 
-  // Chart options
   const options = {
     maintainAspectRatio: false,
     plugins: {
@@ -90,24 +76,19 @@ const RadarChart = ({ title, labels, dataSets, darkMode = false }) => {
           },
         },
       },
-      legend: {
-        labels: {
-          color: textColor, // Make legend text white in dark mode
-        },
-      },
     },
     scales: {
       r: {
         min: 0,
         max: 100,
         angleLines: {
-          color: lineColor, // radial lines
+          color: "rgba(0, 0, 0, 0.8)", // Black radial lines
         },
         grid: {
-          color: lineColor, // spider-web lines
+          color: "rgba(0, 0, 0, 0.8)", // Black spider web lines
         },
         pointLabels: {
-          color: textColor, // label text color
+          color: "black", // Black label text
           font: {
             size: 10,
             weight: "bold",
@@ -118,15 +99,13 @@ const RadarChart = ({ title, labels, dataSets, darkMode = false }) => {
           stepSize: 20,
           min: 0,
           max: 100,
-          backdropColor: "rgba(0, 0, 0, 0)", // transparent background behind ticks
-          color: textColor, // numeric scale color
+          backdropColor: "rgba(0, 0, 0, 0)",
         },
       },
     },
     responsive: true,
   };
 
-  // Simple toggle for timeFrame
   const toggleTimeFrame = () => {
     let newTimeFrame = "";
     switch (timeFrame) {
@@ -149,20 +128,8 @@ const RadarChart = ({ title, labels, dataSets, darkMode = false }) => {
   };
 
   return (
-    <Box
-      mb={10}
-      borderRadius="lg"
-      position="relative"
-      height="400px"
-      // Use your gradient or white background, plus text color
-      bg={darkMode ? "var(--main-bg)" : "white"}
-      color={textColor}
-      // If you want a border in dark mode:
-      border={darkMode ? "2px solid white" : "2px solid black"}
-      transition="background 0.5s ease, color 0.5s ease"
-      p={4}
-    >
-      <Text fontSize="lg" mb={0}>
+    <Box mb={10} borderRadius="lg" position="relative" height="400px">
+      <Text fontSize="lg" color="black" mb={0}>
         {title}
       </Text>
 
@@ -170,17 +137,16 @@ const RadarChart = ({ title, labels, dataSets, darkMode = false }) => {
         <Button
           onClick={toggleTimeFrame}
           bg="transparent"
-          color={textColor}
-          border={`1px solid ${textColor}`}
+          color="black"
+          border="1px solid black"
           borderRadius="10px"
           marginTop="2%"
-          _hover={{ bg: darkMode ? "rgba(255,255,255,0.1)" : "gray.200" }}
+          _hover={{ bg: "gray.200" }}
         >
           {timeFrame}
         </Button>
       </HStack>
 
-      {/* The Radar chart */}
       <Radar data={data} options={options} />
     </Box>
   );
