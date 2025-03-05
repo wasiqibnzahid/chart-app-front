@@ -567,8 +567,9 @@ const General = () => {
           width="100%"
           maxW="1200px"
           align="center"
-          bg="transparent" // Explicitly set the background to transparent
-          mx="auto" // Center this Flex container
+          // Changed the background to our gradient:
+          bg="linear-gradient(90deg, #000000, #7800ff)"
+          mx="auto"
           p={4}
         >
           {/* **Header with Latest Date Label and Navigation Icons** */}
@@ -593,7 +594,7 @@ const General = () => {
                     : totalData.length === 0
                 }
                 size="sm"
-                _hover={{ background: "transparent" }} // No hover background
+                _hover={{ background: "transparent" }}
               />
 
               {/* Date Label */}
@@ -619,7 +620,7 @@ const General = () => {
                     : totalData.length === 0
                 }
                 size="sm"
-                _hover={{ background: "transparent" }} // No hover background
+                _hover={{ background: "transparent" }}
               />
             </Flex>
 
@@ -630,8 +631,8 @@ const General = () => {
                   aria-label="Select Date"
                   icon={<FaCalendar />}
                   colorScheme="whiteAlpha"
-                  variant="ghost" // Transparent background
-                  _hover={{ background: "transparent" }} // No hover background
+                  variant="ghost"
+                  _hover={{ background: "transparent" }}
                   color="white"
                   size="sm"
                 />
@@ -868,12 +869,9 @@ const General = () => {
                 size="sm"
                 width="150px"
                 aria-label="Select Time Period"
-                /* ---------------------------- */
-                /* The important styling changes */
-                /* ---------------------------- */
-                bgColor="transparent"     // Transparent background
-                color="white"            // Make text white
-                borderColor="white"      // Border white
+                bgColor="transparent"
+                color="white"
+                borderColor="white"
                 _focus={{ boxShadow: "none", borderColor: "white" }}
                 _hover={{ borderColor: "white" }}
               >
@@ -882,8 +880,8 @@ const General = () => {
                     key={period}
                     value={period}
                     style={{
-                      backgroundColor: "#000", // Dark background for dropdown items
-                      color: "#fff",           // White text in dropdown items
+                      backgroundColor: "#000",
+                      color: "#fff",
                     }}
                   >
                     {period}
