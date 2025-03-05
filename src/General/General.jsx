@@ -160,9 +160,7 @@ const General = () => {
 
             if (!date || isNaN(requestCount)) {
               console.warn(
-                `Skipping row ${
-                  index + 2
-                } due to missing date or request count.`
+                `Skipping row ${index + 2} due to missing date or request count.`
               );
               return;
             }
@@ -173,8 +171,7 @@ const General = () => {
             }
             totalRequestsMap[date] += requestCount;
 
-            // Aggregate envivo query requests
-            // Ensure exact match with leading slash
+            // Aggregate envivo query requests (exact match with leading slash)
             if (object.toLowerCase() === "/envivo/query") {
               if (!envivoRequestsMap[date]) {
                 envivoRequestsMap[date] = 0;
@@ -329,14 +326,14 @@ const General = () => {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }
-    ); // No decimals
+    );
     const envivoAvg = (envivoSum / filteredEnvivo.length).toLocaleString(
       undefined,
       {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }
-    ); // No decimals
+    );
 
     setAverageData({
       totalAvg,
@@ -434,10 +431,7 @@ const General = () => {
         month: "long",
         day: "numeric",
       };
-      return `Viewing data for ${selected.toLocaleDateString(
-        undefined,
-        options
-      )}`;
+      return `Viewing data for ${selected.toLocaleDateString(undefined, options)}`;
     }
 
     if (totalData.length === 0) return "No data available";
@@ -533,7 +527,7 @@ const General = () => {
           alignItems="center"
           justifyContent="center"
           color="white"
-          zIndex="1000" /* Ensure the PIN form is on top */
+          zIndex="1000"
         >
           <form onSubmit={handlePinSubmit}>
             <VStack spacing={4}>
@@ -567,7 +561,6 @@ const General = () => {
           width="100%"
           maxW="1200px"
           align="center"
-          // Changed the background to our gradient:
           bg="linear-gradient(90deg, #000000, #7800ff)"
           mx="auto"
           p={4}
@@ -598,11 +591,7 @@ const General = () => {
               />
 
               {/* Date Label */}
-              <Text
-                fontSize="lg"
-                fontWeight="bold"
-                color="white"
-              >
+              <Text fontSize="lg" fontWeight="bold" color="white">
                 {latestDateLabel}
               </Text>
 
@@ -685,7 +674,6 @@ const General = () => {
           <Flex
             direction={{ base: "column", md: "row" }}
             gap={10}
-            className="text-white"
             width="100%"
             maxW="800px"
             justifyContent="center"
@@ -703,7 +691,6 @@ const General = () => {
                   fontSize="lg"
                   fontWeight="bold"
                   color="white"
-                  className="text-white"
                 >
                   Daily Request Count
                 </Text>
@@ -716,7 +703,8 @@ const General = () => {
                 </Button>
               </Flex>
               <Flex direction="column" alignItems="center">
-                <Text fontSize="4xl" fontWeight="bold" className="text-white">
+                {/* Numbers forced to white */}
+                <Text fontSize="4xl" fontWeight="bold" color="white">
                   {selectedDate
                     ? (
                         totalData.find((d) => d.date === selectedDate)
@@ -738,7 +726,7 @@ const General = () => {
                           ? "N/A"
                           : `${totalPercentageChange}%`}
                       </Text>
-                      <Text fontSize="md" className="text-white">
+                      <Text fontSize="md" color="white">
                         compared to last week
                       </Text>
                     </>
@@ -755,7 +743,7 @@ const General = () => {
                               totalRequestChange >= 0 ? "+" : ""
                             }${totalRequestChange}`}
                       </Text>
-                      <Text fontSize="md" className="text-white">
+                      <Text fontSize="md" color="white">
                         compared to last week
                       </Text>
                     </>
@@ -773,12 +761,7 @@ const General = () => {
               flex="1"
             >
               <Flex justifyContent="space-between" alignItems="center" mb={4}>
-                <Text
-                  fontSize="lg"
-                  fontWeight="bold"
-                  color="white"
-                  className="text-white"
-                >
+                <Text fontSize="lg" fontWeight="bold" color="white">
                   Daily Envivo Query Count
                 </Text>
                 <Button
@@ -790,7 +773,8 @@ const General = () => {
                 </Button>
               </Flex>
               <Flex direction="column" alignItems="center">
-                <Text fontSize="4xl" fontWeight="bold" className="text-white">
+                {/* Numbers forced to white */}
+                <Text fontSize="4xl" fontWeight="bold" color="white">
                   {selectedDate
                     ? (
                         envivoData.find((d) => d.date === selectedDate)
@@ -812,7 +796,7 @@ const General = () => {
                           ? "N/A"
                           : `${envivoPercentageChange}%`}
                       </Text>
-                      <Text fontSize="md" className="text-white">
+                      <Text fontSize="md" color="white">
                         compared to last week
                       </Text>
                     </>
@@ -829,7 +813,7 @@ const General = () => {
                               envivoRequestChange >= 0 ? "+" : ""
                             }${envivoRequestChange}`}
                       </Text>
-                      <Text fontSize="md" className="text-white">
+                      <Text fontSize="md" color="white">
                         compared to last week
                       </Text>
                     </>
@@ -850,20 +834,14 @@ const General = () => {
             mb={10}
           >
             <Flex justifyContent="space-between" alignItems="center" mb={4}>
-              <Text
-                fontSize="lg"
-                fontWeight="bold"
-                color="white"
-              >
+              <Text fontSize="lg" fontWeight="bold" color="white">
                 Averages for {selectedPeriod}
               </Text>
-
-              {/* Select Time Period Dropdown */}
               <Select
                 value={selectedPeriod}
                 onChange={(e) => {
                   setSelectedPeriod(e.target.value);
-                  setSelectedDate(null); // Reset selected date when period changes
+                  setSelectedDate(null);
                 }}
                 placeholder="Select"
                 size="sm"
@@ -889,31 +867,24 @@ const General = () => {
                 ))}
               </Select>
             </Flex>
-
             <Grid templateColumns="repeat(2, 1fr)" gap={6}>
               <Box textAlign="center">
-                <Text
-                  fontSize="md"
-                  fontWeight="bold"
-                  color="white"
-                >
+                <Text fontSize="md" fontWeight="bold" color="white">
                   Request Count
                 </Text>
-                <Text fontSize="2xl" className="text-white">
+                {/* Force the average number to white */}
+                <Text fontSize="2xl" color="white">
                   {averageData.totalAvg !== "N/A"
                     ? averageData.totalAvg.toLocaleString()
                     : "N/A"}
                 </Text>
               </Box>
               <Box textAlign="center">
-                <Text
-                  fontSize="md"
-                  fontWeight="bold"
-                  color="white"
-                >
+                <Text fontSize="md" fontWeight="bold" color="white">
                   Envivo Query Count
                 </Text>
-                <Text fontSize="2xl" className="text-white">
+                {/* Force the average number to white */}
+                <Text fontSize="2xl" color="white">
                   {averageData.envivoAvg !== "N/A"
                     ? averageData.envivoAvg.toLocaleString()
                     : "N/A"}
