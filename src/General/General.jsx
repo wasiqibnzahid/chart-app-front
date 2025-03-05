@@ -1,6 +1,6 @@
 // src/components/General/General.js
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Box,
   Text,
@@ -19,6 +19,7 @@ import {
   Input,
   IconButton,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import Papa from "papaparse";
 import { FaCalendar, FaArrowLeft, FaArrowRight } from "react-icons/fa"; // Importing Calendar and Arrow Icons
@@ -61,7 +62,60 @@ const calculatePercentageChange = (current, previous) => {
 };
 
 const General = () => {
-  // State variables
+  // =======================
+  // PIN Authentication States
+  // =======================
+  const [pinInput, setPinInput] = useState('');
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const pinInputRef = useRef(null);
+  const toastAuth = useToast();
+  const navigate = useRef(null); // Assuming you might need to navigate; adjust as per your routing setup
+
+  const handlePinSubmit = (e) => {
+    e.preventDefault();
+    if (pinInput.trim() === '123456') { // Replace '123456' with your desired PIN
+      setIsAuthorized(true);
+      // Optionally, store authorization state in localStorage for session persistence
+      // localStorage.setItem('isAuthorized', 'true');
+      toastAuth({
+        title: "Access Granted",
+        description: "You have successfully accessed the General page.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toastAuth({
+        title: "Incorrect PIN",
+        description: "The PIN you entered is incorrect. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      // Optionally, navigate to a different page on incorrect PIN
+      // navigate.current('/landing');
+    }
+  };
+
+  // Optionally, check for existing authorization state (e.g., from localStorage)
+  // useEffect(() => {
+  //   const auth = localStorage.getItem('isAuthorized');
+  //   if (auth === 'true') {
+  //     setIsAuthorized(true);
+  //   }
+  // }, []);
+
+  // Automatically focus the PIN input when the component mounts
+  useEffect(() => {
+    if (!isAuthorized && pinInputRef.current) {
+      pinInputRef.current.focus();
+    }
+  }, [isAuthorized]);
+
+  // =======================
+  // Existing General Component States and Logic
+  // =======================
+
   const [totalData, setTotalData] = useState([]);
   const [envivoData, setEnvivoData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -464,18 +518,49 @@ const General = () => {
 
   return (
     <>
-      {isLoading ? (
-        <Flex justifyContent="center" alignItems="center" height="50vh">
-          <Spinner size="xl" color="teal.500" />
-          <Text ml={4} fontSize="xl">
-            Loading data...
-          </Text>
-        </Flex>
-      ) : error ? (
-        <Text color="red.500" fontSize="xl">
-          {error}
-        </Text>
-      ) : (
+      {/* =======================
+           PIN Authentication Overlay
+         ======================= */}
+      {!isAuthorized && (
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          width="100vw"
+          height="100vh"
+          bg="linear-gradient(90deg, #000000, #7800ff)"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="white"
+          zIndex="1000" /* Ensure the PIN form is on top */
+        >
+          <form onSubmit={handlePinSubmit}>
+            <VStack spacing={4}>
+              <Text fontSize="xl">Enter PIN to Access General Page</Text>
+              <Input
+                ref={pinInputRef}
+                type="password"
+                value={pinInput}
+                onChange={(e) => setPinInput(e.target.value)}
+                placeholder="Enter PIN"
+                width="300px"
+                textAlign="center"
+                aria-label="PIN Input"
+                required
+              />
+              <Button type="submit" colorScheme="teal">
+                Submit
+              </Button>
+            </VStack>
+          </form>
+        </Box>
+      )}
+
+      {/* =======================
+           Main Component Rendering
+         ======================= */}
+      {isAuthorized && (
         <Flex
           direction="column"
           gap={10}
@@ -484,6 +569,7 @@ const General = () => {
           align="center"
           bg="transparent" // Explicitly set the background to transparent
           mx="auto" // Center this Flex container
+          p={4}
         >
           {/* **Header with Latest Date Label and Navigation Icons** */}
           <Flex
