@@ -9,7 +9,7 @@ const LoginPage = ({ onLogin }) => {
   const [error, setError] = useState('');
 
   // Store the credentials
-  const credentials = {
+const credentials = {
     'SEO': 'SEO_TEAM',
     'IQI9E44P': 'um3h3TAVyi',
     'UDKO6H4z': 'rlJMTrNp2o',
@@ -24,7 +24,16 @@ const LoginPage = ({ onLogin }) => {
     'Gudiño': '12345',
     'Aliaga': '1793',
     'Charly': '2024',
-  };
+    'mariana.rosas': 'P@ssw0rd1!',
+    'marina.guerrero': 'Guer1234!',
+    'pamela.benitez': 'Pam2025!',
+    'alain.arenas': 'Aren4$Xyz!',
+    'bryan.rosales': 'Ros@l3s99!',
+    'jaime.sandoval': 'JST_456!',
+    'diego.hernandez': 'DH_78Xyz!',
+    'melisa.velazquez': 'MelV2024!',
+    'guillermo.sanchez': 'GS@ncH3z!',
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
