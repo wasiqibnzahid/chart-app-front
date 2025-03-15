@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
 import { FaLock, FaGithub } from 'react-icons/fa';
-import { AiOutlineEye, AiOutlineCalendar } from 'react-icons/ai';
+import { AiOutlineEye, AiOutlineCalendar, AiOutlineClockCircle } from 'react-icons/ai';
 import nasaImage from '../assets/nasa-Q1p7bh3SHj8-unsplash.jpg';
 import logoImage from '../assets/Diseño sin título (1).png';
 import lighthouseIcon from '../assets/lighthouse-svgrepo-com.svg';
@@ -255,7 +255,7 @@ const LandingPage = ({ handleLogout }) => {
             align="center"
             justify="center"
             as={RouterLink}
-            to="/git-repo"  // <-- Updated this route
+            to="/git-repo"
             border="2px solid white"
             borderRadius="lg"
             p={4}
@@ -300,6 +300,60 @@ const LandingPage = ({ handleLogout }) => {
               textAlign="center"
             >
               Git Repo
+            </Text>
+          </Flex>
+
+          {/* Time-Box */}
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            as={RouterLink}
+            to="/Time-Box"
+            border="2px solid white"
+            borderRadius="lg"
+            p={4}
+            width={boxWidth}
+            height={boxHeight}
+            position="relative"
+            _hover={{ transform: 'scale(1.05)' }}
+            onMouseEnter={() => handleMouseEnter('timebox')}
+            onMouseLeave={handleMouseLeave}
+            transition="transform 0.3s ease"
+            cursor="pointer"
+            mb={{ base: 4, md: 0 }}
+          >
+            {showLock === 'timebox' && (
+              <Button
+                as={RouterLink}
+                to="/ADMIN-TimeBox"
+                leftIcon={<FaLock />}
+                aria-label="Admin - Time-Box"
+                position="absolute"
+                top="10px"
+                right="10px"
+                color="white"
+                variant="ghost"
+                _hover={{
+                  textDecoration: 'none',
+                  color: 'yellow.400',
+                  transform: 'scale(1.2)',
+                }}
+                _active={{ bg: 'transparent' }}
+                transition="color 0.3s ease, transform 0.3s ease"
+              >
+                Admin
+              </Button>
+            )}
+            <AiOutlineClockCircle size={iconSize} />
+            <Text
+              mt={6}
+              fontSize={['md', 'lg']}
+              fontWeight="bold"
+              fontFamily="Arial"
+              textAlign="center"
+            >
+              Time-Box
             </Text>
           </Flex>
         </Flex>
