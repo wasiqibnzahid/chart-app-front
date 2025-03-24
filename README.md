@@ -249,7 +249,7 @@ Esta guía lo guía a través de la configuración de dos instancias EC2 en AWS,
 6. **Conecte la Instancia EC2 a la Base de Datos RDS**  
 
    Vaya a la Consola de AWS.  
-   Navegue a RDS > Bases de datos, seleccione su base de datos y elija "Conectividad y seguridad".  
+   Navegue a RDS > Bases de datos, seleccione la base de datos (database-1 )y elija "Conectividad y seguridad".  
    En la sección EC2 Connect, elija **Agregar instancia EC2** y seleccione la instancia que debe tener acceso.  
    Guarde los cambios, y AWS configurará automáticamente los ajustes de seguridad para permitir que esta instancia se conecte a la base de datos RDS.
 
