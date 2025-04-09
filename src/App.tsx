@@ -19,9 +19,8 @@ import LandingPage from './LandingPage/LandingPage';
 import MainLayout from './layouts/MainLayout';
 import LoginPage from './LoginPage';
 
-// ─── ADDED: Import GitRepo & GitRepoAdmin ─────────────────────────────────────
+// ─── UPDATED: Import GitRepo ─────────────────────────────────────
 import GitRepo from './GitRepo/GitRepo2';
-import GitRepoAdmin from './GitRepo/GitRepoAdmin';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,12 +42,7 @@ const App: React.FC = () => {
 
   return (
     <ChakraProvider>
-      <Box
-        width="100vw"
-        minHeight="100vh"
-        bg="white"
-        color="black"
-      >
+      <Box width="100vw" minHeight="100vh" bg="white" color="black">
         <Router>
           {isAuthenticated ? (
             <AuthenticatedRoutes handleLogout={handleLogout} />
@@ -77,10 +71,8 @@ const AuthenticatedRoutes: React.FC<{ handleLogout: () => void }> = ({ handleLog
     <Route path="/ADMIN-DIGITAL-CALENDAR" element={<NewPageAdmin />} />
     <Route path="/Digital-Calendar" element={<NewPage />} />
 
-    {/* ─── ADDED: Git Repo routes ───────────────────────────────────────────── */}
+    {/* Git Repo Route */}
     <Route path="/git-repo" element={<GitRepo />} />
-    <Route path="/ADMIN-GitRepo" element={<GitRepoAdmin />} />
-    {/* ──────────────────────────────────────────────────────────────────────── */}
 
     {/* Additional Authenticated Page */}
     <Route path="/general-app" element={<GeneralApp />} />
